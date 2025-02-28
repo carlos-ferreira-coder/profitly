@@ -7,5 +7,13 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     allowedHosts: ['profitly.onrender.com'],
+    proxy: {
+      '/api': {
+        target: 'https://server-g7vl.onrender.com',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/api/, ''), // Remove /api se necessário
+      },
+    },
   },
 })
