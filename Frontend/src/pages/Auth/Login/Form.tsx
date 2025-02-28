@@ -29,13 +29,14 @@ const Form = () => {
   }, [state])
 
   // Login schema
-  const schema = z.object({
-    type: z.string(),
-    cpf: loginSchema.cpf,
-    email: loginSchema.email,
-    password: loginSchema.password,
-  })
-  /*.superRefine(({ cpf, email }, ctx) => {
+  const schema = z
+    .object({
+      type: z.string(),
+      cpf: loginSchema.cpf.optional(),
+      email: loginSchema.email.optional(),
+      password: loginSchema.password,
+    })
+    .superRefine(({ cpf, email }, ctx) => {
       if (!(cpf || email)) {
         ctx.addIssue({
           code: 'custom',
@@ -44,7 +45,6 @@ const Form = () => {
         })
       }
     })
-      */
   type SchemaProps = z.infer<typeof schema>
 
   const defaultValues = {
