@@ -3,7 +3,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { faEnvelope, faGears, faIdCard, faLock } from '@fortawesome/free-solid-svg-icons'
+import { faEnvelope, faGears, faIdCard, faLock, faUser } from '@fortawesome/free-solid-svg-icons'
 import { api as axios, handleAxiosError } from '../../../services/Axios'
 import { Input, InputPattern } from '../../../components/Form/Input'
 import Alert from '../../../components/Alert/Index'
@@ -32,16 +32,17 @@ const Form = () => {
   const schema = z
     .object({
       type: z.string(),
-      cpf: loginSchema.cpf.optional(),
-      email: loginSchema.email.optional(),
+      cpf: loginSchema.cpf,
+      email: loginSchema.email,
+      username: loginSchema.username,
       password: loginSchema.password,
     })
-    .superRefine(({ cpf, email }, ctx) => {
-      if (!(cpf || email)) {
+    .superRefine(({ cpf, email, username }, ctx) => {
+      if (!(cpf || email || username)) {
         ctx.addIssue({
           code: 'custom',
-          message: 'Informe um cpf ou email válido!',
-          path: ['cpf', 'email'],
+          message: 'Informe um cpf ou email ou nome de usuário válido!',
+          path: ['cpf', 'email', 'username'],
         })
       }
     })
@@ -68,13 +69,9 @@ const Form = () => {
   })
 
   useEffect(() => {
-    if (watch('type') === 'cpf') {
-      setValue('cpf', '')
-      setValue('email', '')
-    } else {
-      setValue('cpf', '')
-      setValue('email', '')
-    }
+    setValue('cpf', '')
+    setValue('email', '')
+    setValue('username', '')
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch('type')])
@@ -116,30 +113,14 @@ const Form = () => {
                 icon={faGears}
                 iconPosition="left"
                 options={[
-                  { value: 'email', label: 'email', disabled: false },
                   { value: 'cpf', label: 'cpf', disabled: false },
+                  { value: 'email', label: 'email', disabled: false },
+                  { value: 'username', label: 'nome de usuário', disabled: false },
                 ]}
               />
             )}
           />
         </div>
-      </div>
-
-      <div className="mb-6" style={{ display: watch().type === 'email' ? 'block' : 'none' }}>
-        <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="email">
-          Email <span className="text-danger">*</span>
-        </label>
-        <div className="relative">
-          <Input
-            id="email"
-            type="text"
-            icon={faEnvelope}
-            iconPosition="left"
-            placeholder="Digite o email"
-            {...register('email')}
-          />
-        </div>
-        {errors.email && <Alert type="danger" size="sm" data={[errors.email.message || '']} />}
       </div>
 
       <div className="mb-6" style={{ display: watch().type === 'cpf' ? 'block' : 'none' }}>
@@ -164,6 +145,42 @@ const Form = () => {
           />
         </div>
         {errors.cpf && <Alert type="danger" size="sm" data={[errors.cpf.message || '']} />}
+      </div>
+
+      <div className="mb-6" style={{ display: watch().type === 'email' ? 'block' : 'none' }}>
+        <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="email">
+          Email <span className="text-danger">*</span>
+        </label>
+        <div className="relative">
+          <Input
+            id="email"
+            type="text"
+            icon={faEnvelope}
+            iconPosition="left"
+            placeholder="Digite o email"
+            {...register('email')}
+          />
+        </div>
+        {errors.email && <Alert type="danger" size="sm" data={[errors.email.message || '']} />}
+      </div>
+
+      <div className="mb-6" style={{ display: watch().type === 'username' ? 'block' : 'none' }}>
+        <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="username">
+          Nome de usuário <span className="text-danger">*</span>
+        </label>
+        <div className="relative">
+          <Input
+            id="username"
+            type="text"
+            icon={faUser}
+            iconPosition="left"
+            placeholder="Digite o nome de usuário"
+            {...register('username')}
+          />
+        </div>
+        {errors.username && (
+          <Alert type="danger" size="sm" data={[errors.username.message || '']} />
+        )}
       </div>
 
       <div className="mb-6">
