@@ -3,7 +3,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { faEnvelope, faIdCard, faLock } from '@fortawesome/free-solid-svg-icons'
+import { faEnvelope, faGears, faIdCard, faLock } from '@fortawesome/free-solid-svg-icons'
 import { api as axios, handleAxiosError } from '../../../services/Axios'
 import { Input, InputPattern } from '../../../components/Form/Input'
 import Alert from '../../../components/Alert/Index'
@@ -92,6 +92,8 @@ const Form = () => {
             render={({ field }) => (
               <Select
                 {...field}
+                icon={faGears}
+                iconPosition="left"
                 options={[
                   { value: 'email', label: 'email', disabled: false },
                   { value: 'cpf', label: 'cpf', disabled: false },
@@ -102,7 +104,7 @@ const Form = () => {
         </div>
       </div>
 
-      <div className="mb-6" style={{ display: watch().type === 'email' ? 'block' : 'none' }}>
+      <div className="mb-6" style={{ display: watch().type === 'email' ? 'none' : 'block' }}>
         <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="email">
           Email <span className="text-danger">*</span>
         </label>
