@@ -32,9 +32,9 @@ const Form = () => {
   const schema = z
     .object({
       type: loginSchema.type,
-      cpf: loginSchema.cpf.optional(),
-      email: loginSchema.email.optional(),
-      username: loginSchema.username.optional(),
+      cpf: loginSchema.cpf.nullable(),
+      email: loginSchema.email.nullable(),
+      username: loginSchema.username.nullable(),
       password: loginSchema.password,
     })
     .superRefine(({ cpf, email, username }, ctx) => {
@@ -50,9 +50,9 @@ const Form = () => {
 
   const defaultValues = {
     type: 'email',
-    cpf: '',
-    email: '',
-    username: '',
+    cpf: null,
+    email: null,
+    username: null,
     password: '',
   }
 
@@ -70,9 +70,9 @@ const Form = () => {
   })
 
   useEffect(() => {
-    setValue('cpf', '')
-    setValue('email', '')
-    setValue('username', '')
+    setValue('cpf', null)
+    setValue('email', null)
+    setValue('username', null)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch('type')])
