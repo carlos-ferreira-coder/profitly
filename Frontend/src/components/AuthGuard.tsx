@@ -24,8 +24,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, admin, project, persona
           withCredentials: true,
         })
       } catch (error) {
-        const errorMessage = handleAxiosError(error)
-        navigate('/auth/login', { state: { warnings: errorMessage } })
+        navigate('/auth/login', { state: { warnings: handleAxiosError(error) } })
       }
     }
 
