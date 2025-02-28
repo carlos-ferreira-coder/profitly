@@ -47,5 +47,5 @@ export const loginSchema = {
   cpf: regex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/),
   email: email('usuário'),
   username: str('nome do usuário'),
-  password: regex('senha', /^(?=.*[A-Z])(?=.*[\W_]).{8,}$/),
+  password: regex('senha', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/),
 }
