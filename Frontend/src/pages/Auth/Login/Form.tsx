@@ -47,16 +47,37 @@ const Form = () => {
     })
   type SchemaProps = z.infer<typeof schema>
 
+  const defaultValues = {
+    type: 'email',
+    cpf: '',
+    email: '',
+    password: '',
+  }
+
   // Hookform
   const {
     watch,
     control,
     register,
+    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm<SchemaProps>({
     resolver: zodResolver(schema),
+    defaultValues: defaultValues,
   })
+
+  useEffect(() => {
+    if (watch('type') === 'cpf') {
+      setValue('cpf', '')
+      setValue('email', '')
+    } else {
+      setValue('cpf', '')
+      setValue('email', '')
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watch('type')])
 
   // Login on server
   const login = async (data: SchemaProps) => {
