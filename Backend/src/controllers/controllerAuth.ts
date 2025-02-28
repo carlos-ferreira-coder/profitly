@@ -3,8 +3,7 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { prisma } from '@/server'
 import z from 'zod'
-import { dataSchema, userSchema, authSchema } from '@utils/schema'
-import { authorization } from '@utils/auth'
+import { dataSchema, loginSchema } from '@utils/schema'
 
 const JWT_SECRET = process.env.JWT_SECRET || ''
 
@@ -13,9 +12,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     // check schema
     const schema = z
       .object({
-        cpf: userSchema.cpf,
-        email: userSchema.email,
-        password: userSchema.password,
+        cpf: loginSchema.cpf,
+        email: loginSchema.email,
+        password: loginSchema.password,
       })
       .superRefine(({ cpf, email }, ctx) => {
         if (!(cpf || email)) {
@@ -141,7 +140,7 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
     // Scroll through the permissions to check all
     for (const permission of permissions) {
       if (data[permission.key] === 'true' && !auth[permission.key]) {
-        res.status(403).json({ message: `Usuário sem autorização sobre ${permission.label}` })
+        res.status(401).json({ message: `Usuário sem autorização sobre ${permission.label}` })
         return
       }
     }
@@ -155,6 +154,7 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
+/*
 export const authSelect = async (req: Request, res: Response): Promise<void> => {
   try {
     const params = req.params
@@ -379,3 +379,4 @@ export const authDelete = async (req: Request, res: Response): Promise<void> => 
     return
   }
 }
+*/

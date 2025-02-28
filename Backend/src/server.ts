@@ -2,7 +2,9 @@ import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { PrismaClient } from '@prisma/client'
+import { auth } from '@middlewares/auth'
 import routerAuth from '@routers/routerAuth'
+import routerUser from '@routers/routerUser'
 
 const PORT = process.env.PORT || 3000
 const DOMAIN = process.env.RENDER_EXTERNAL_URL || 'http://localhost'
@@ -22,6 +24,7 @@ app.use(cors(corsOptions))
 app.use(cookieParser(JWT_SECRET))
 
 app.use('/auth', routerAuth)
+app.use('/user', auth, routerUser)
 
 const start = async () => {
   try {

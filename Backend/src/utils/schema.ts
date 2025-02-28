@@ -24,16 +24,31 @@ const uuid = (name: string) => {
     })
 }
 
-const email = (name: string) => {
-  return z
+const email = (name: string, nonempty: boolean = false) => {
+  const schema = z
     .string({
       message: `O email do(a) ${name} deve ser um texto`,
     })
     .email({
       message: `Informe um email de ${name} válido`,
     })
-    .nonempty({
+
+  if (nonempty) {
+    return schema.nonempty({
       message: `O email do(a) ${name} é obrigatório`,
+    })
+  }
+
+  return schema
+}
+
+const boolean = (name: string) => {
+  return z
+    .boolean({
+      message: `O(a) ${name} deve ser um boleano`,
+    })
+    .refine((b) => b !== undefined, {
+      message: `O(a) ${name} é obrigatória`,
     })
 }
 
@@ -69,27 +84,17 @@ const regex = (name: string, regex: RegExp, nonempty: boolean = false) => {
   return schema
 }
 
-const auth = (name: string) => {
-  return z
-    .boolean({
-      message: `A autorização de ${name} deve ser um boleano`,
-    })
-    .refine((b) => b !== undefined, {
-      message: `A autorização de ${name} é obrigatória`,
-    })
-}
-
-export const userSchema = {
+export const loginSchema = {
   cpf: regex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/),
   email: email('usuário'),
-  password: regex('senha', /^(?=.*[A-Z])(?=.*[\W_]).{8,}$/),
+  password: regex('senha', /^(?=.*[A-Z])(?=.*[\W_]).{8,}$/, true),
 }
 
 export const authSchema = {
   uuid: uuid('cargo/função'),
-  name: str('nome'),
-  admin: auth('administrador'),
-  project: auth('editar projetos'),
-  personal: auth('informações pessoais'),
-  financial: auth('informações financeiras'),
+  name: str('nome', true),
+  admin: boolean('autorização de administrador'),
+  project: boolean('autorização de editar projetos'),
+  personal: boolean('autorização de informações pessoais'),
+  financial: boolean('autorização de informações financeiras'),
 }
