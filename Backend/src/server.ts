@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { PrismaClient } from '@prisma/client'
+import routerAuth from '@routers/routerAuth'
 
 const PORT = process.env.PORT || 3000
 const DOMAIN = process.env.RENDER_EXTERNAL_URL || 'http://localhost'
@@ -19,6 +20,8 @@ export const prisma = new PrismaClient()
 app.use(express.json())
 app.use(cors(corsOptions))
 app.use(cookieParser(JWT_SECRET))
+
+app.use('/auth', routerAuth)
 
 const start = async () => {
   try {
