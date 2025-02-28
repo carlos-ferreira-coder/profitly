@@ -31,7 +31,7 @@ const Form = () => {
   // Login schema
   const schema = z
     .object({
-      type: z.string(),
+      type: loginSchema.type,
       cpf: loginSchema.cpf,
       email: loginSchema.email,
       username: loginSchema.username,
@@ -121,6 +121,7 @@ const Form = () => {
             )}
           />
         </div>
+        {errors.type && <Alert type="danger" size="sm" data={[errors.type.message || '']} />}
       </div>
 
       <div className="mb-6" style={{ display: watch().type === 'cpf' ? 'block' : 'none' }}>

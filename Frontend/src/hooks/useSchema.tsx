@@ -43,6 +43,7 @@ const regex = (name: string, regex: RegExp, nonempty: boolean = false) => {
 }
 
 export const loginSchema = {
+  type: regex('tipo', /^cpf$|^email$|^username$/),
   cpf: regex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/),
   email: email('usuário'),
   username: str('nome do usuário'),
