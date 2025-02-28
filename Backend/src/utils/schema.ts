@@ -11,7 +11,7 @@ export const dataSchema = <T>(dataCheck: T, schema: ZodSchema<T>) => {
   return { data: data, error: message }
 }
 
-const uuid = (name: String) => {
+const uuid = (name: string) => {
   return z
     .string({
       message: `O uuid do(a) ${name} deve ser um texto`,
@@ -24,17 +24,7 @@ const uuid = (name: String) => {
     })
 }
 
-const str = (name: String) => {
-  return z
-    .string({
-      message: `O(a) ${name} deve ser um texto`,
-    })
-    .nonempty({
-      message: `O(a) ${name} é obrigatório(a)`,
-    })
-}
-
-const email = (name: String) => {
+const email = (name: string) => {
   return z
     .string({
       message: `O email do(a) ${name} deve ser um texto`,
@@ -47,20 +37,39 @@ const email = (name: String) => {
     })
 }
 
-const regex = (name: String, regex: RegExp) => {
-  return z
+const str = (name: string, nonempty: boolean = false) => {
+  const schema = z.string({
+    message: `O(a) ${name} deve ser um texto`,
+  })
+
+  if (nonempty) {
+    return schema.nonempty({
+      message: `O(a) ${name} é obrigatório(a)`,
+    })
+  }
+
+  return schema
+}
+
+const regex = (name: string, regex: RegExp, nonempty: boolean = false) => {
+  const schema = z
     .string({
       message: `O(a) ${name} deve ser um texto`,
     })
     .regex(regex, {
       message: `Informe um(a) ${name} válido(a)}`,
     })
-    .nonempty({
+
+  if (nonempty) {
+    return schema.nonempty({
       message: `O(a) ${name} é obrigatório(a)`,
     })
+  }
+
+  return schema
 }
 
-const auth = (name: String) => {
+const auth = (name: string) => {
   return z
     .boolean({
       message: `A autorização de ${name} deve ser um boleano`,

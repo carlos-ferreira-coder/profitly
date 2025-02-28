@@ -1,6 +1,8 @@
 import { ComponentType } from 'react'
 import { IconProp } from '@fortawesome/fontawesome-svg-core'
 import { AuthProps } from './types/Database'
+import Login from './pages/Auth/Login/Index'
+import { faArrowRightToBracket } from '@fortawesome/free-solid-svg-icons'
 
 export type PageProps = {
   icon: IconProp
@@ -11,7 +13,16 @@ export type PageProps = {
   component: ComponentType
 }
 
-export const pages: PageProps[] = []
+export const pages: PageProps[] = [
+  {
+    title: 'Login',
+    route: '/',
+    protection: [],
+    useIn: ['Settings'],
+    icon: faArrowRightToBracket,
+    component: Login,
+  },
+]
 
 export const getPagesByUseIn = (useIn: string, auth: AuthProps) => {
   return pages

@@ -18,11 +18,11 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         password: userSchema.password,
       })
       .superRefine(({ cpf, email }, ctx) => {
-        if (!cpf && !email) {
+        if (!(cpf || email)) {
           ctx.addIssue({
             code: 'custom',
             message: 'Informe um cpf ou email válido!',
-            path: ['user'],
+            path: ['cpf', 'email'],
           })
         }
       })
