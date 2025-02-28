@@ -125,7 +125,7 @@ const Form = () => {
         </div>
       </div>
 
-      <div className="mb-6" style={{ display: watch().type === 'email' ? 'none' : 'block' }}>
+      <div className="mb-6" style={{ display: watch().type === 'email' ? 'block' : 'none' }}>
         <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="email">
           Email <span className="text-danger">*</span>
         </label>
