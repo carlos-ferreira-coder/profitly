@@ -122,6 +122,11 @@ const Form = () => {
           />
         </div>
         {errors.type && <Alert type="danger" size="sm" data={[errors.type.message || '']} />}
+        {errors.cpf && <Alert type="danger" size="sm" data={[errors.cpf.message || '']} />}
+        {errors.email && <Alert type="danger" size="sm" data={[errors.email.message || '']} />}
+        {errors.username && (
+          <Alert type="danger" size="sm" data={[errors.username.message || '']} />
+        )}
       </div>
 
       <div className="mb-6" style={{ display: watch().type === 'cpf' ? 'block' : 'none' }}>
