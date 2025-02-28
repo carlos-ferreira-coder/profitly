@@ -16,7 +16,7 @@ const regex = (name: string, regex: RegExp, nonempty: boolean = false) => {
       message: `O(a) ${name} deve ser um texto`,
     })
     .regex(regex, {
-      message: `Informe um(a) ${name} válido(a)}`,
+      message: `Informe um(a) ${name} válido(a)`,
     })
 
   if (nonempty) {
