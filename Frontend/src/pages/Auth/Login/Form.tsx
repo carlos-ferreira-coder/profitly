@@ -85,19 +85,21 @@ const Form = () => {
       {alertSuccesses && <Alert type="success" size="lg" data={alertSuccesses} />}
 
       <div className="mb-6">
-        <Controller
-          name="type"
-          control={control}
-          render={({ field }) => (
-            <Select
-              {...field}
-              options={[
-                { value: 'email', label: 'email', disabled: false },
-                { value: 'cpf', label: 'cpf', disabled: false },
-              ]}
-            />
-          )}
-        />
+        <div className="relative">
+          <Controller
+            name="type"
+            control={control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={[
+                  { value: 'email', label: 'email', disabled: false },
+                  { value: 'cpf', label: 'cpf', disabled: false },
+                ]}
+              />
+            )}
+          />
+        </div>
       </div>
 
       <div className="mb-6" style={{ display: watch().type === 'email' ? 'block' : 'none' }}>
