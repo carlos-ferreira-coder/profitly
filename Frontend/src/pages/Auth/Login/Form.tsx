@@ -32,9 +32,9 @@ const Form = () => {
   const schema = z
     .object({
       type: loginSchema.type,
-      cpf: loginSchema.cpf,
-      email: loginSchema.email,
-      username: loginSchema.username,
+      cpf: loginSchema.cpf.optional(),
+      email: loginSchema.email.optional(),
+      username: loginSchema.username.optional(),
       password: loginSchema.password,
     })
     .superRefine(({ cpf, email, username }, ctx) => {
@@ -52,6 +52,7 @@ const Form = () => {
     type: 'email',
     cpf: '',
     email: '',
+    username: '',
     password: '',
   }
 

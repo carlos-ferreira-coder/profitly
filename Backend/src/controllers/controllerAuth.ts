@@ -12,16 +12,18 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     // check schema
     const schema = z
       .object({
+        type: loginSchema.type,
         cpf: loginSchema.cpf,
         email: loginSchema.email,
+        username: loginSchema.username,
         password: loginSchema.password,
       })
-      .superRefine(({ cpf, email }, ctx) => {
-        if (!(cpf || email)) {
+      .superRefine(({ cpf, email, username }, ctx) => {
+        if (!(cpf || email || username)) {
           ctx.addIssue({
             code: 'custom',
             message: 'Informe um cpf ou email válido!',
-            path: ['cpf', 'email'],
+            path: ['cpf', 'email', 'username'],
           })
         }
       })
