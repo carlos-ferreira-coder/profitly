@@ -34,9 +34,16 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     // check if user is registered
-    const user = data.cpf
-      ? await prisma.user.findFirst({ where: { person: { cpf: data.cpf } } })
-      : await prisma.user.findFirst({ where: { person: { entity: { email: data.email } } } })
+    let user
+    if (data.email) {
+      user = await prisma.user.findFirst({ where: { person: { entity: { email: data.email } } } })
+    } else {
+      if (data.cpf) {
+        user = await prisma.user.findFirst({ where: { person: { cpf: data.cpf } } })
+      } else {
+        user = await prisma.user.findFirst({ where: { username: data.usename } })
+      }
+    }
 
     if (!user) {
       res.status(401).json({ message: 'Usuário não cadastrado!' })
