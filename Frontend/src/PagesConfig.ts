@@ -3,9 +3,11 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core'
 import {
   faArrowRightFromBracket,
   faArrowRightToBracket,
+  faHouse,
   faQuestion,
 } from '@fortawesome/free-solid-svg-icons'
 import { AuthProps } from './types/Database'
+import Home from './pages/Home/Index'
 import Login from './pages/Auth/Login/Index'
 import Logout from './pages/Auth/Logout/Index'
 
@@ -19,6 +21,14 @@ export type PageProps = {
 }
 
 export const pages: PageProps[] = [
+  {
+    title: 'Home',
+    route: '/home',
+    protection: ['logged'],
+    useIn: ['Navigate'],
+    icon: faHouse,
+    component: Home,
+  },
   {
     title: 'Login',
     route: '/',
