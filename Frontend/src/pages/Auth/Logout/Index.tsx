@@ -12,10 +12,10 @@ const Logout = () => {
   useEffect(() => {
     const logout = async () => {
       try {
-        const { data } = await axios.get('/auth/logout', {
+        const { data } = await axios.get('/logout', {
           withCredentials: true,
         })
-        navigate('/auth/login', { state: { logged: false, successes: [data.message] } })
+        navigate('/login', { state: { logged: false, successes: [data.message] } })
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])
       }
