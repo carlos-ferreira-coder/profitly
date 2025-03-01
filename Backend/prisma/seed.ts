@@ -145,6 +145,180 @@ const seed = async () => {
     ],
     skipDuplicates: true,
   })
+  await prisma.entity.createMany({
+    data: [
+      {
+        id: 0,
+        name: 'Administrador',
+        email: 'admin@profitly.com',
+        phone: null,
+        address: null,
+      },
+      {
+        id: 1,
+        name: 'John Doe',
+        email: 'john@example.com',
+        phone: '(99) 9 9999-9999',
+        address: '123 Elm Street, Springfield, IL, 62704, USA',
+      },
+      {
+        id: 2,
+        name: 'Alice Brown',
+        email: 'alice@example.com',
+        phone: '(00) 0 0000-0000',
+        address: '456 Oak Avenue, Toronto, ON, M4B 1B4, Canada',
+      },
+      {
+        id: 3,
+        name: 'Diana Blue',
+        email: 'diana@example.com',
+        phone: null,
+        address: null,
+      },
+      {
+        id: 4,
+        name: 'Charlie Green',
+        email: 'charlie@example.com',
+        phone: '(88) 8 8888-8888',
+        address: '789 Pine Lane, Sydney, NSW, 2000, Australia',
+      },
+      {
+        id: 5,
+        name: 'Jane Smith',
+        email: 'jane@example.com',
+        phone: null,
+        address: '303 Cedar Boulevard, Tokyo, 100-0001, Japan',
+      },
+      {
+        id: 6,
+        name: 'Alpha Inc',
+        email: 'contact@alpha.com',
+        phone: '(99) 9 9999-9999',
+        address: '456 Oak Avenue, Toronto, ON, M4B 1B4, Canada',
+      },
+      {
+        id: 7,
+        name: 'Delta Ltd',
+        email: 'contact@delta.com',
+        phone: '(00) 0 0000-0000',
+        address: '123 Elm Street, Springfield, IL, 62704, USA',
+      },
+      {
+        id: 8,
+        name: 'Epsilon LLC',
+        email: 'contact@epsilon.com',
+        phone: null,
+        address: null,
+      },
+      {
+        id: 9,
+        name: 'Gamma Co',
+        email: 'contact@gamma.com',
+        phone: '(88) 8 8888-8888',
+        address: '789 Pine Lane, Sydney, NSW, 2000, Australia',
+      },
+      {
+        id: 10,
+        name: 'Lambda SA',
+        email: 'contact@lambda.com',
+        phone: null,
+        address: '404 Walnut Way, Berlin, 10115, Germany',
+      },
+      {
+        id: 11,
+        name: 'Teta',
+        email: 'contact@teta.com',
+        phone: '(99) 9 9999-9999',
+        address: null,
+      },
+      {
+        id: 12,
+        name: 'Ômega',
+        email: 'contact@omega.com',
+        phone: '(00) 0 0000-0000',
+        address: '101 Maple Road, London, SW1A 1AA, UK',
+      },
+      {
+        id: 13,
+        name: 'Sigma',
+        email: 'contact@sigma.com',
+        phone: null,
+        address: '303 Cedar Boulevard, Tokyo, 100-0001, Japan',
+      },
+    ],
+    skipDuplicates: true,
+  })
+  await prisma.enterprise.createMany({
+    data: [
+      {
+        id: 6,
+        cnpj: '14.725.836/0001-01',
+        fantasy: 'Alpha',
+      },
+      {
+        id: 7,
+        cnpj: '78.912.345/0001-02',
+        fantasy: 'Delta',
+      },
+      {
+        id: 8,
+        cnpj: '36.985.214/0002-02',
+        fantasy: 'Epsilon',
+      },
+      {
+        id: 9,
+        cnpj: '75.315.948/0001-03',
+        fantasy: 'Gamma',
+      },
+      {
+        id: 10,
+        cnpj: '95.135.762/0002-02',
+        fantasy: 'Lambda',
+      },
+    ],
+    skipDuplicates: true,
+  })
+  await prisma.person.createMany({
+    data: [
+      {
+        id: 0,
+        cpf: '000.000.000-00',
+      },
+      {
+        id: 1,
+        cpf: '123.456.789-10',
+      },
+      {
+        id: 2,
+        cpf: '987.654.321-00',
+      },
+      {
+        id: 3,
+        cpf: '456.789.123-99',
+      },
+      {
+        id: 4,
+        cpf: '321.654.987-88',
+      },
+      {
+        id: 5,
+        cpf: '654.321.987-77',
+      },
+      {
+        id: 11,
+        cpf: '123.456.789-00',
+      },
+      {
+        id: 12,
+        cpf: '987.654.321-99',
+      },
+      {
+        id: 13,
+        cpf: '000.000.000-99',
+      },
+    ],
+    skipDuplicates: true,
+  })
   await prisma.user.createMany({
     data: [
       {
@@ -283,176 +457,17 @@ const seed = async () => {
     ],
     skipDuplicates: true,
   })
-  await prisma.enterprise.createMany({
+  await prisma.budget.createMany({
     data: [
-      {
-        id: 6,
-        cnpj: '14.725.836/0001-01',
-        fantasy: 'Alpha',
-      },
-      {
-        id: 7,
-        cnpj: '78.912.345/0001-02',
-        fantasy: 'Delta',
-      },
-      {
-        id: 8,
-        cnpj: '36.985.214/0002-02',
-        fantasy: 'Epsilon',
-      },
-      {
-        id: 9,
-        cnpj: '75.315.948/0001-03',
-        fantasy: 'Gamma',
-      },
-      {
-        id: 10,
-        cnpj: '95.135.762/0002-02',
-        fantasy: 'Lambda',
-      },
-    ],
-    skipDuplicates: true,
-  })
-  await prisma.person.createMany({
-    data: [
-      {
-        id: 0,
-        cpf: '000.000.000-00',
-      },
       {
         id: 1,
-        cpf: '123.456.789-10',
+        uuid: 'd1e2a3b4-5c6d-7e8f-9012-3456789abcde',
+        register: '2025-02-28T14:23:45Z',
       },
       {
         id: 2,
-        cpf: '987.654.321-00',
-      },
-      {
-        id: 3,
-        cpf: '456.789.123-99',
-      },
-      {
-        id: 4,
-        cpf: '321.654.987-88',
-      },
-      {
-        id: 5,
-        cpf: '654.321.987-77',
-      },
-      {
-        id: 11,
-        cpf: '123.456.789-00',
-      },
-      {
-        id: 12,
-        cpf: '987.654.321-99',
-      },
-      {
-        id: 13,
-        cpf: '000.000.000-99',
-      },
-    ],
-    skipDuplicates: true,
-  })
-  await prisma.entity.createMany({
-    data: [
-      {
-        id: 0,
-        name: 'Administrador',
-        email: 'admin@profitly.com',
-        phone: null,
-        address: null,
-      },
-      {
-        id: 1,
-        name: 'John Doe',
-        email: 'john@example.com',
-        phone: '(99) 9 9999-9999',
-        address: '123 Elm Street, Springfield, IL, 62704, USA',
-      },
-      {
-        id: 2,
-        name: 'Alice Brown',
-        email: 'alice@example.com',
-        phone: '(00) 0 0000-0000',
-        address: '456 Oak Avenue, Toronto, ON, M4B 1B4, Canada',
-      },
-      {
-        id: 3,
-        name: 'Diana Blue',
-        email: 'diana@example.com',
-        phone: null,
-        address: null,
-      },
-      {
-        id: 4,
-        name: 'Charlie Green',
-        email: 'charlie@example.com',
-        phone: '(88) 8 8888-8888',
-        address: '789 Pine Lane, Sydney, NSW, 2000, Australia',
-      },
-      {
-        id: 5,
-        name: 'Jane Smith',
-        email: 'jane@example.com',
-        phone: null,
-        address: '303 Cedar Boulevard, Tokyo, 100-0001, Japan',
-      },
-      {
-        id: 6,
-        name: 'Alpha Inc',
-        email: 'contact@alpha.com',
-        phone: '(99) 9 9999-9999',
-        address: '456 Oak Avenue, Toronto, ON, M4B 1B4, Canada',
-      },
-      {
-        id: 7,
-        name: 'Delta Ltd',
-        email: 'contact@delta.com',
-        phone: '(00) 0 0000-0000',
-        address: '123 Elm Street, Springfield, IL, 62704, USA',
-      },
-      {
-        id: 8,
-        name: 'Epsilon LLC',
-        email: 'contact@epsilon.com',
-        phone: null,
-        address: null,
-      },
-      {
-        id: 9,
-        name: 'Gamma Co',
-        email: 'contact@gamma.com',
-        phone: '(88) 8 8888-8888',
-        address: '789 Pine Lane, Sydney, NSW, 2000, Australia',
-      },
-      {
-        id: 10,
-        name: 'Lambda SA',
-        email: 'contact@lambda.com',
-        phone: null,
-        address: '404 Walnut Way, Berlin, 10115, Germany',
-      },
-      {
-        id: 11,
-        name: 'Teta',
-        email: 'contact@teta.com',
-        phone: '(99) 9 9999-9999',
-        address: null,
-      },
-      {
-        id: 12,
-        name: 'Ômega',
-        email: 'contact@omega.com',
-        phone: '(00) 0 0000-0000',
-        address: '101 Maple Road, London, SW1A 1AA, UK',
-      },
-      {
-        id: 13,
-        name: 'Sigma',
-        email: 'contact@sigma.com',
-        phone: null,
-        address: '303 Cedar Boulevard, Tokyo, 100-0001, Japan',
+        uuid: 'f9a4b7c2-6d3e-5f1a-9b08-7c2e5d4a3b6f',
+        register: '2024-11-15T08:37:12Z',
       },
     ],
     skipDuplicates: true,
@@ -470,7 +485,7 @@ const seed = async () => {
         userUuid: null,
         clientUuid: 'e2354148-83a8-440d-addb-4c4ee0caf5a2',
         statusUuid: 'e823a05a-a964-4b91-a463-1658149f2ae1',
-        budgetUuid: 'd1e2a3b4-5c6d-7e8f-9012-3456789abcdef',
+        budgetUuid: 'd1e2a3b4-5c6d-7e8f-9012-3456789abcde',
       },
       {
         id: 2,
@@ -486,20 +501,7 @@ const seed = async () => {
         budgetUuid: 'f9a4b7c2-6d3e-5f1a-9b08-7c2e5d4a3b6f',
       },
     ],
-  })
-  await prisma.budget.createMany({
-    data: [
-      {
-        id: 1,
-        uuid: 'd1e2a3b4-5c6d-7e8f-9012-3456789abcdef',
-        register: '2025-02-28T14:23:45Z',
-      },
-      {
-        id: 2,
-        uuid: 'f9a4b7c2-6d3e-5f1a-9b08-7c2e5d4a3b6f',
-        register: '2024-11-15T08:37:12Z',
-      },
-    ],
+    skipDuplicates: true,
   })
 }
 
