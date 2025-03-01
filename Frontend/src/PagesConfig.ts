@@ -1,8 +1,13 @@
 import { ComponentType } from 'react'
 import { IconProp } from '@fortawesome/fontawesome-svg-core'
+import {
+  faArrowRightFromBracket,
+  faArrowRightToBracket,
+  faQuestion,
+} from '@fortawesome/free-solid-svg-icons'
 import { AuthProps } from './types/Database'
 import Login from './pages/Auth/Login/Index'
-import { faArrowRightToBracket } from '@fortawesome/free-solid-svg-icons'
+import Logout from './pages/Auth/Logout/Index'
 
 export type PageProps = {
   icon: IconProp
@@ -18,9 +23,25 @@ export const pages: PageProps[] = [
     title: 'Login',
     route: '/',
     protection: [],
+    useIn: [],
+    icon: faQuestion,
+    component: Login,
+  },
+  {
+    title: 'Login',
+    route: '/login',
+    protection: [],
     useIn: ['Settings'],
     icon: faArrowRightToBracket,
     component: Login,
+  },
+  {
+    title: 'Deslogar',
+    route: '/logout',
+    protection: [],
+    useIn: ['Settings'],
+    icon: faArrowRightFromBracket,
+    component: Logout,
   },
 ]
 
