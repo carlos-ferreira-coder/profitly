@@ -26,6 +26,8 @@ app.use(cookieParser(JWT_SECRET))
 app.use('/auth', routerAuth)
 app.use('/user', auth, routerUser)
 
+app.use('/img/user', auth, express.static('src/images/users'))
+
 const start = async () => {
   try {
     app.listen(PORT, () => {
