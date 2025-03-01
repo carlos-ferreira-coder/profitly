@@ -3,7 +3,8 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { prisma } from '@/server'
 import z from 'zod'
-import { dataSchema, loginSchema } from '@utils/schema'
+import { dataSchema, loginSchema, authSchema } from '@utils/schema'
+import { authorization } from '@utils/auth'
 
 const JWT_SECRET = process.env.JWT_SECRET || ''
 
@@ -163,7 +164,6 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-/*
 export const authSelect = async (req: Request, res: Response): Promise<void> => {
   try {
     const params = req.params
@@ -388,4 +388,3 @@ export const authDelete = async (req: Request, res: Response): Promise<void> => 
     return
   }
 }
-*/
