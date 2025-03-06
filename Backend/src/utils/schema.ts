@@ -11,7 +11,7 @@ export const dataSchema = <T>(dataCheck: T, schema: ZodSchema<T>) => {
   return { data: data, error: message }
 }
 
-const uuid = (name: string) => {
+const zodUuid = (name: string) => {
   return z
     .string({
       message: `O uuid do(a) ${name} deve ser um texto`,
@@ -24,7 +24,7 @@ const uuid = (name: string) => {
     })
 }
 
-const email = (name: string, nonempty: boolean = false) => {
+const zodEmail = (name: string, nonempty: boolean = false) => {
   const schema = z
     .string({
       message: `O email do(a) ${name} deve ser um texto`,
@@ -42,7 +42,7 @@ const email = (name: string, nonempty: boolean = false) => {
   return schema
 }
 
-const boolean = (name: string) => {
+const zodBoolean = (name: string) => {
   return z
     .boolean({
       message: `O(a) ${name} deve ser um boleano`,
@@ -52,7 +52,7 @@ const boolean = (name: string) => {
     })
 }
 
-const str = (name: string, nonempty: boolean = false) => {
+const zodString = (name: string, nonempty: boolean = false) => {
   const schema = z.string({
     message: `O(a) ${name} deve ser um texto`,
   })
@@ -66,7 +66,7 @@ const str = (name: string, nonempty: boolean = false) => {
   return schema
 }
 
-const regex = (name: string, regex: RegExp, nonempty: boolean = false) => {
+const zodRegex = (name: string, regex: RegExp, nonempty: boolean = false) => {
   const schema = z
     .string({
       message: `O(a) ${name} deve ser um texto`,
@@ -84,19 +84,37 @@ const regex = (name: string, regex: RegExp, nonempty: boolean = false) => {
   return schema
 }
 
-export const loginSchema = {
-  type: regex('tipo', /^cpf$|^email$|^username$/),
-  cpf: regex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/).nullable(),
-  email: email('usuário').nullable(),
-  username: str('nome de usuário').nullable(),
-  password: regex('senha', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
-}
+export const loginSchema = z
+  .object({
+    type: zodRegex('tipo', /^cpf$|^email$|^username$/),
+    cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/).nullable(),
+    email: zodEmail('usuário').nullable(),
+    username: zodString('nome de usuário').nullable(),
+    password: zodRegex('senha', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
+  })
+  .superRefine(({ cpf, email, username }, ctx) => {
+    if (!(cpf || email || username)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Informe um cpf ou email válido!',
+        path: ['cpf', 'email', 'username'],
+      })
+    }
+  })
 
-export const authSchema = {
-  uuid: uuid('cargo/função'),
-  name: str('nome', true),
-  admin: boolean('autorização de administrador'),
-  project: boolean('autorização de editar projetos'),
-  personal: boolean('autorização de informações pessoais'),
-  financial: boolean('autorização de informações financeiras'),
-}
+export const authCreateSchema = z.object({
+  name: zodString('nome', true),
+  admin: zodBoolean('autorização de administrador'),
+  project: zodBoolean('autorização de editar projetos'),
+  personal: zodBoolean('autorização de informações pessoais'),
+  financial: zodBoolean('autorização de informações financeiras'),
+})
+
+export const authUpdateSchema = z.object({
+  uuid: zodUuid('cargo/função'),
+  name: zodString('nome', true),
+  admin: zodBoolean('autorização de administrador'),
+  project: zodBoolean('autorização de editar projetos'),
+  personal: zodBoolean('autorização de informações pessoais'),
+  financial: zodBoolean('autorização de informações financeiras'),
+})

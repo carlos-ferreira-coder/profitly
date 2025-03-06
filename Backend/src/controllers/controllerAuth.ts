@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { prisma } from '@/server'
 import z from 'zod'
-import { dataSchema, loginSchema, authSchema } from '@utils/schema'
+import { dataSchema, loginSchema, authCreateSchema, authUpdateSchema } from '@utils/schema'
 import { authorization } from '@utils/auth'
 
 const JWT_SECRET = process.env.JWT_SECRET || ''
@@ -11,23 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET || ''
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     // check schema
-    const schema = z
-      .object({
-        type: loginSchema.type,
-        cpf: loginSchema.cpf,
-        email: loginSchema.email,
-        username: loginSchema.username,
-        password: loginSchema.password,
-      })
-      .superRefine(({ cpf, email, username }, ctx) => {
-        if (!(cpf || email || username)) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'Informe um cpf ou email válido!',
-            path: ['cpf', 'email', 'username'],
-          })
-        }
-      })
+    const schema = loginSchema
     const { data, error } = dataSchema(req.body, schema)
     if (error) {
       res.status(401).json({ message: error })
@@ -223,13 +207,7 @@ export const authSelect = async (req: Request, res: Response): Promise<void> => 
 export const authCreate = async (req: Request, res: Response): Promise<void> => {
   try {
     // check schema
-    const schema = z.object({
-      name: authSchema.name,
-      admin: authSchema.admin,
-      project: authSchema.project,
-      personal: authSchema.personal,
-      financial: authSchema.financial,
-    })
+    const schema = authCreateSchema
     type SchemaProps = z.infer<typeof schema>
     const { data, error }: { data: SchemaProps; error: string } = dataSchema(req.body, schema)
     if (error) {
@@ -280,14 +258,7 @@ export const authCreate = async (req: Request, res: Response): Promise<void> => 
 export const authUpdate = async (req: Request, res: Response): Promise<void> => {
   try {
     // check schema
-    const schema = z.object({
-      uuid: authSchema.uuid,
-      name: authSchema.name,
-      admin: authSchema.admin,
-      project: authSchema.project,
-      personal: authSchema.personal,
-      financial: authSchema.financial,
-    })
+    const schema = authUpdateSchema
     type SchemaProps = z.infer<typeof schema>
     const { data, error }: { data: SchemaProps; error: string } = dataSchema(req.body, schema)
     if (error) {
