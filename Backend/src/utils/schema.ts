@@ -42,7 +42,7 @@ export const authCheckSchema = z.object({
 
 export const authSelectSchema = z.object({
   name: zodString('nome').optional(),
-  auth: zodRegex('cargo/função', /\b(admin|project|personal|financial)\b/g),
+  auth: zodString('cargo/função').optional(),
 })
 
 export const authCreateSchema = z.object({
