@@ -29,14 +29,14 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
     // check token
     const token = req.user
     if (!token) {
-      res.status(401).json({ message: 'Token não encontrado!' })
+      res.status(401).json({ error: 'Token não encontrado!' })
       return
     }
 
     // get auth
     let auth = await prisma.auth.findUnique({ where: { uuid: token.authUuid } })
     if (!auth) {
-      res.status(401).json({ message: 'Autorização não encontrada!' })
+      res.status(401).json({ error: 'Autorização não encontrada!' })
       return
     }
     if (params.data.key === 'this') {
@@ -115,7 +115,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
     return
   } catch (e) {
     console.log(e)
-    res.status(500).json({ message: 'Erro no servidor!' })
+    res.status(500).json({ error: 'Erro no servidor!' })
     return
   }
 }
