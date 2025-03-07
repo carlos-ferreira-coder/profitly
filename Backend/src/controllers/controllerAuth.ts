@@ -120,7 +120,7 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
     // get authorizations
     const auth = await prisma.auth.findUnique({ where: { uuid: userToken.authUuid } })
     if (!auth) {
-      res.status(401).json({ message: 'Autorização não encontrada!' })
+      res.status(402).json({ message: 'Autorização não encontrada!' })
       return
     }
 
@@ -137,7 +137,7 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
       if (permissions[key]) {
         const hasPermission = value === 'true'
         if (auth[key as 'admin' | 'project' | 'personal' | 'financial'] !== hasPermission) {
-          res.status(401).json({ message: `Usuário sem autorização sobre ${permissions[key]}` })
+          res.status(403).json({ message: `Usuário sem autorização sobre ${permissions[key]}` })
           return
         }
       }
