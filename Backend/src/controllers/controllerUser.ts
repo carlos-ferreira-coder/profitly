@@ -87,6 +87,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
           : params.data.key === 'this'
             ? token.uuid
             : params.data.key,
+      /*
       username: { contains: query.data.username },
       active: query.data.active ? query.data.active === 'true' : undefined,
       hourlyRate: {
@@ -107,6 +108,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
           address: { contains: query.data.address },
         },
       },
+      */
     }
 
     console.log(`Filter: ${JSON.stringify(filter)}`)
