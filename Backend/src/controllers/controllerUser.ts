@@ -51,72 +51,64 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
       }
     }
 
-    // server select
-    const select = {
-      uuid: true,
-      username: true,
-      active: true,
-      photo: true,
-      hourlyRate: auth.financial,
-      person: {
-        select: {
-          cpf: auth.personal,
-          entity: {
-            select: {
-              name: auth.personal,
-              email: true,
-              phone: true,
-              address: auth.personal,
+    // server request
+    const users = await prisma.user.findMany({
+      select: {
+        uuid: true,
+        username: true,
+        active: true,
+        photo: true,
+        hourlyRate: auth.financial,
+        person: {
+          select: {
+            cpf: auth.personal,
+            entity: {
+              select: {
+                name: auth.personal,
+                email: true,
+                phone: true,
+                address: auth.personal,
+              },
             },
           },
         },
-      },
-      auth: {
-        select: {
-          uuid: true,
-          name: true,
+        auth: {
+          select: {
+            uuid: true,
+            name: true,
+          },
         },
       },
-    }
-
-    // server filter
-    const filter = {
-      uuid:
-        params.data.key === 'all'
-          ? undefined
-          : params.data.key === 'this'
-            ? token.uuid
-            : params.data.key,
-      /*
-      username: { contains: query.data.username },
-      active: query.data.active ? query.data.active === 'true' : undefined,
-      hourlyRate: {
-        gte: query.data.hourlyRateMin
-          ? currencyToNumber(query.data.hourlyRateMin, 'BRL')
+      where: {
+        uuid:
+          params.data.key === 'all'
+            ? undefined
+            : params.data.key === 'this'
+              ? token.uuid
+              : params.data.key,
+        username: { contains: query.data.username },
+        active: query.data.active ? query.data.active === 'true' : undefined,
+        hourlyRate: {
+          gte: query.data.hourlyRateMin
+            ? currencyToNumber(query.data.hourlyRateMin, 'BRL')
+            : undefined,
+          lte: query.data.hourlyRateMax
+            ? currencyToNumber(query.data.hourlyRateMax, 'BRL')
+            : undefined,
+        },
+        authUuid: query.data.auth?.split(',').length
+          ? { in: query.data.auth.split(',') }
           : undefined,
-        lte: query.data.hourlyRateMax
-          ? currencyToNumber(query.data.hourlyRateMax, 'BRL')
-          : undefined,
-      },
-      authUuid: query.data.auth?.split(',').length ? { in: query.data.auth.split(',') } : undefined,
-      person: {
-        cpf: { contains: query.data.cpf },
-        entity: {
-          name: { contains: query.data.name },
-          email: { contains: query.data.email },
-          phone: { contains: query.data.phone },
-          address: { contains: query.data.address },
+        person: {
+          cpf: { contains: query.data.cpf },
+          entity: {
+            name: { contains: query.data.name },
+            email: { contains: query.data.email },
+            phone: { contains: query.data.phone },
+            address: { contains: query.data.address },
+          },
         },
       },
-      */
-    }
-
-    console.log(`Filter: ${JSON.stringify(filter)}`)
-
-    // server request
-    const users = await prisma.user.findMany({
-      select: select,
-      where: filter,
     })
 
     console.log(`users: ${JSON.stringify(formatUsers(users))}`)
