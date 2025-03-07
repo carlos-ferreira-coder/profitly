@@ -134,9 +134,11 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
 
     // Iterate over query parameters and check permissions
     for (const [key, value] of Object.entries(query.data)) {
-      if (auth[key as 'admin' | 'project' | 'personal' | 'financial'] !== (value === 'true')) {
-        res.status(401).json({ message: `Usuário sem autorização sobre ${permissions[key]}` })
-        return
+      if (value === 'true') {
+        if (!auth[key as 'admin' | 'project' | 'personal' | 'financial']) {
+          res.status(401).json({ message: `Usuário sem autorização sobre ${permissions[key]}` })
+          return
+        }
       }
     }
 
