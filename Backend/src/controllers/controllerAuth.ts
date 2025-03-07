@@ -91,6 +91,7 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
         sameSite: 'none',
         priority: 'high',
         path: '/',
+        domain: 'server-g7vl.onrender.com',
       })
     }
 
