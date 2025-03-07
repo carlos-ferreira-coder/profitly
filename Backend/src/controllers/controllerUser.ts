@@ -48,7 +48,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
     }
 
     // server request
-    const users = await prisma.user.findMany({
+    const users = await prisma.user.findMany() /*{
       select: {
         uuid: true,
         username: true,
@@ -75,7 +75,6 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
           },
         },
       },
-      /*
       where: {
         uuid:
           params.data.key === 'all'
@@ -106,8 +105,8 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
           },
         },
       },
-      */
     })
+    */
 
     console.log(`users: ${JSON.stringify(formatUsers(users))}`)
 
