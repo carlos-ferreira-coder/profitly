@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { zodBoolean, zodEmail, zodRegex, zodString, zodUuid } from '@utils/z'
+import { zodBoolean, zodEmail, zodEnum, zodRegex, zodString, zodUuid } from '@utils/z'
 
 export const keySchema = z.object({
   key: zodRegex(
@@ -34,9 +34,26 @@ export const loginSchema = z
   })
 
 export const authCheckSchema = z.object({
-  auth: zodRegex(
-    'permisão',
-    /^admin=(true|false)&project=(true|false)&personal=(true|false)&financial=(true|false)$/,
+  admin: zodEnum('admin', ['true', 'false']).refine((val) => val === 'true' || val === 'false', {
+    message: "admin must be 'true' or 'false'",
+  }),
+  project: zodEnum('project', ['true', 'false']).refine(
+    (val) => val === 'true' || val === 'false',
+    {
+      message: "project must be 'true' or 'false'",
+    },
+  ),
+  personal: zodEnum('personal', ['true', 'false']).refine(
+    (val) => val === 'true' || val === 'false',
+    {
+      message: "personal must be 'true' or 'false'",
+    },
+  ),
+  financial: zodEnum('financial', ['true', 'false']).refine(
+    (val) => val === 'true' || val === 'false',
+    {
+      message: "financial must be 'true' or 'false'",
+    },
   ),
 })
 

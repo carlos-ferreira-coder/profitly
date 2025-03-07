@@ -72,3 +72,7 @@ export const zodRegex = (name: string, regex: RegExp, nonempty: boolean = false)
 
   return schema
 }
+
+export const zodEnum = () => {
+  return z.enum()
+}

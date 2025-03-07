@@ -75,7 +75,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     res.status(201).json({ message: 'Logado com sucesso.' })
     return
   } catch (e) {
-    console.log(e)
+    console.error('Erro no servidor:', e)
     res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
@@ -97,7 +97,7 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json({ message: 'Deslogado com sucesso.' })
     return
   } catch (e) {
-    console.log(e)
+    console.error('Erro no servidor:', e)
     res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
@@ -145,7 +145,7 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json({ message: 'Usuário autorizado.' })
     return
   } catch (e) {
-    console.log(e)
+    console.error('Erro no servidor:', e)
     res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
@@ -195,7 +195,7 @@ export const authSelect = async (req: Request, res: Response): Promise<void> => 
     res.status(201).json(auth)
     return
   } catch (e) {
-    console.log(e)
+    console.error('Erro no servidor:', e)
     res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
@@ -234,7 +234,7 @@ export const authCreate = async (req: Request, res: Response): Promise<void> => 
     res.status(201).json({ message: 'O cargo/função foi cadastrado.' })
     return
   } catch (e) {
-    console.log(e)
+    console.error('Erro no servidor:', e)
     res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
@@ -283,7 +283,7 @@ export const authUpdate = async (req: Request, res: Response): Promise<void> => 
     res.status(201).json({ message: 'As informações do cargo/função foram atualizadas.' })
     return
   } catch (e) {
-    console.log(e)
+    console.error('Erro no servidor:', e)
     res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
@@ -321,7 +321,7 @@ export const authDelete = async (req: Request, res: Response): Promise<void> => 
     res.status(201).json({ message: 'O cargo/função foi deletado.' })
     return
   } catch (e) {
-    console.log(e)
+    console.error('Erro no servidor:', e)
     res.status(500).json({ message: 'Erro no servidor!' })
     return
   }

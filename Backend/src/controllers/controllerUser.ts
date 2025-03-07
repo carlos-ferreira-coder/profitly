@@ -114,7 +114,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
     res.status(200).json(formatUsers(users))
     return
   } catch (e) {
-    console.log(e)
+    console.error('Erro no servidor:', e)
     res.status(500).json({ message: 'Erro no servidor!' })
     return
   }

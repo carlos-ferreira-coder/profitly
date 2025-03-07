@@ -18,14 +18,20 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, admin, project, persona
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const query = `admin=${admin}&project=${project}&personal=${personal}&financial=${financial}`
+        const query = new URLSearchParams({
+          admin: String(admin),
+          project: String(project),
+          personal: String(personal),
+          financial: String(financial),
+        }).toString()
+
+        console.log(`/auth/check?${query}`)
 
         await axios.get(`/auth/check?${query}`, {
           withCredentials: true,
         })
       } catch (error) {
-        console.log(error)
-        //navigate('/login', { state: { warnings: handleAxiosError(error) } })
+        navigate('/login', { state: { warnings: handleAxiosError(error) } })
       }
     }
 
