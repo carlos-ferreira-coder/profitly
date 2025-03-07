@@ -34,10 +34,18 @@ export const loginSchema = z
   })
 
 export const authCheckSchema = z.object({
-  admin: zodString('admin'),
-  project: zodString('project'),
-  personal: zodString('personal'),
-  financial: zodString('financial'),
+  admin: z.enum(['true', 'false'], {
+    errorMap: () => ({ message: "admin must be 'true' or 'false'" }),
+  }),
+  project: z.enum(['true', 'false'], {
+    errorMap: () => ({ message: "project must be 'true' or 'false'" }),
+  }),
+  personal: z.enum(['true', 'false'], {
+    errorMap: () => ({ message: "personal must be 'true' or 'false'" }),
+  }),
+  financial: z.enum(['true', 'false'], {
+    errorMap: () => ({ message: "financial must be 'true' or 'false'" }),
+  }),
 })
 
 export const authSelectSchema = z.object({
