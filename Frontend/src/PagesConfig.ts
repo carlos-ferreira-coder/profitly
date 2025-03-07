@@ -5,6 +5,7 @@ import {
   faArrowRightToBracket,
   faHouse,
   faQuestion,
+  faUserGear,
   faUserPen,
   faUserTie,
   faUserXmark,
@@ -17,6 +18,10 @@ import UserSelect from './pages/User/Select/Index'
 import UserCreate from './pages/User/Create/Index'
 import UserUpdate from './pages/User/Update/Index'
 import UserDelete from './pages/User/Delete/Index'
+import AuthSelect from './pages/Auth/Select/Index'
+import AuthCreate from './pages/Auth/Create/Index'
+import AuthUpdate from './pages/Auth/Update/Index'
+import AuthDelete from './pages/Auth/Delete/Index'
 
 export type PageProps = {
   icon: IconProp
@@ -67,6 +72,38 @@ export const pages: PageProps[] = [
     useIn: [],
     icon: faUserXmark,
     component: UserDelete,
+  },
+  {
+    title: 'Cargos/Funções',
+    route: '/auth/select',
+    protection: ['logged', 'admin'],
+    useIn: ['Settings'],
+    icon: faUserGear,
+    component: AuthSelect,
+  },
+  {
+    title: 'Cadastrar Cargo/Função',
+    route: '/auth/create',
+    protection: ['logged', 'admin'],
+    useIn: [],
+    icon: faQuestion,
+    component: AuthCreate,
+  },
+  {
+    title: 'Editar Cargo/Função',
+    route: '/auth/update/:id',
+    protection: ['logged', 'admin'],
+    useIn: [],
+    icon: faQuestion,
+    component: AuthUpdate,
+  },
+  {
+    title: 'Deletar Cargo/Função',
+    route: '/auth/delete/:id',
+    protection: ['logged', 'admin'],
+    useIn: [],
+    icon: faQuestion,
+    component: AuthDelete,
   },
   {
     title: 'Login',

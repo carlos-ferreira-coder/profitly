@@ -107,3 +107,20 @@ export const userDeleteSchema = z.object({
   name: zodString('nome completo', true, false),
   email: zodEmail('email', true, false),
 })
+
+export const authSchema = z.object({
+  uuid: zodUuid('cargo/função'),
+  name: zodString('cargo/função', true, false),
+  admin: zodBoolean('autorização de administrador'),
+  project: zodBoolean('autorização de editar projetos'),
+  personal: zodBoolean('autorização de informações pessoais'),
+  financial: zodBoolean('autorização de informações financeiras'),
+})
+
+export const authCreateSchema = z.object({
+  name: zodString('cargo/função', true, false),
+  admin: zodBoolean('autorização de administrador'),
+  project: zodBoolean('autorização de editar projetos'),
+  personal: zodBoolean('autorização de informações pessoais'),
+  financial: zodBoolean('autorização de informações financeiras'),
+})
