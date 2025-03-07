@@ -23,8 +23,8 @@ const Header = () => {
 
         setUser(resUser[0])
         setAuth(resAuth[0])
-        console.log(`User: ${user}`)
-        console.log(`Auth: ${auth}`)
+        console.log(`User: ${JSON.stringify(user)}`)
+        console.log(`Auth: ${JSON.stringify(auth)}`)
       } catch (error) {
         setUser(null)
         setAuth(null)
