@@ -13,7 +13,7 @@ export const zodUuid = (name: string) => {
     })
 }
 
-export const zodEmail = (name: string, nonempty: boolean = false) => {
+export const zodEmail = (name: string, nonempty: boolean, nullable: boolean) => {
   const schema = z
     .string({
       message: `O email do(a) ${name} deve ser um texto`,
@@ -26,6 +26,10 @@ export const zodEmail = (name: string, nonempty: boolean = false) => {
     return schema.nonempty({
       message: `O email do(a) ${name} é obrigatório`,
     })
+  }
+
+  if (nullable) {
+    return schema.transform((s) => (s === '' ? null : s)).nullable()
   }
 
   return schema
@@ -41,7 +45,7 @@ export const zodBoolean = (name: string) => {
     })
 }
 
-export const zodString = (name: string, nonempty: boolean = false) => {
+export const zodString = (name: string, nonempty: boolean, nullable: boolean) => {
   const schema = z.string({
     message: `O(a) ${name} deve ser um texto`,
   })
@@ -52,10 +56,14 @@ export const zodString = (name: string, nonempty: boolean = false) => {
     })
   }
 
+  if (nullable) {
+    return schema.transform((s) => (s === '' ? null : s)).nullable()
+  }
+
   return schema
 }
 
-export const zodRegex = (name: string, regex: RegExp, nonempty: boolean = false) => {
+export const zodRegex = (name: string, regex: RegExp, nonempty: boolean, nullable: boolean) => {
   const schema = z
     .string({
       message: `O(a) ${name} deve ser um texto`,
@@ -68,6 +76,10 @@ export const zodRegex = (name: string, regex: RegExp, nonempty: boolean = false)
     return schema.nonempty({
       message: `O(a) ${name} é obrigatório(a)`,
     })
+  }
+
+  if (nullable) {
+    return schema.transform((s) => (s === '' ? null : s)).nullable()
   }
 
   return schema

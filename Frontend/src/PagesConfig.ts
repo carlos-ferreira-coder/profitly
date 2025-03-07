@@ -5,11 +5,18 @@ import {
   faArrowRightToBracket,
   faHouse,
   faQuestion,
+  faUserPen,
+  faUserTie,
+  faUserXmark,
 } from '@fortawesome/free-solid-svg-icons'
 import { AuthProps } from './types/Database'
 import Home from './pages/Home/Index'
 import Login from './pages/Auth/Login/Index'
 import Logout from './pages/Auth/Logout/Index'
+import UserSelect from './pages/User/Select/Index'
+import UserCreate from './pages/User/Create/Index'
+import UserUpdate from './pages/User/Update/Index'
+import UserDelete from './pages/User/Delete/Index'
 
 export type PageProps = {
   icon: IconProp
@@ -28,6 +35,38 @@ export const pages: PageProps[] = [
     useIn: ['Navigate'],
     icon: faHouse,
     component: Home,
+  },
+  {
+    title: 'Usuários',
+    route: '/user/select',
+    protection: ['logged'],
+    useIn: ['Navigate', 'Settings'],
+    icon: faUserTie,
+    component: UserSelect,
+  },
+  {
+    title: 'Cadastrar Usuário',
+    route: '/user/create',
+    protection: ['logged', 'personal'],
+    useIn: [],
+    icon: faQuestion,
+    component: UserCreate,
+  },
+  {
+    title: 'Editar Usuário',
+    route: '/user/update/:uuid',
+    protection: ['logged'],
+    useIn: ['Settings'],
+    icon: faUserPen,
+    component: UserUpdate,
+  },
+  {
+    title: 'Deletar Usuário',
+    route: '/user/delete/:uuid',
+    protection: ['logged', 'personal'],
+    useIn: [],
+    icon: faUserXmark,
+    component: UserDelete,
   },
   {
     title: 'Login',
