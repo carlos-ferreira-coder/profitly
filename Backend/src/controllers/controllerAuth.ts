@@ -106,6 +106,7 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
 export const authCheck = async (req: Request, res: Response): Promise<void> => {
   try {
     // check query
+    console.log(req.query)
     const { data: query, error: queryError } = validateData(req.query, authCheckSchema)
     if (!query) {
       res.status(401).json({ message: queryError })
