@@ -5,19 +5,14 @@ import { api as axios, handleAxiosError } from '../../services/Axios'
 import { useEffect, useState } from 'react'
 import { AuthProps, UserProps } from '../../types/Database'
 import NavigateHeader from './NavigateHeader'
-import { useLocation } from 'react-router-dom'
 
 const Header = () => {
-  const location = useLocation()
-  const { state } = location
-
   const [user, setUser] = useState<UserProps | null>(null)
   const [auth, setAuth] = useState<AuthProps | null>(null)
-
   const [errors, setErrors] = useState<string[] | null>(null)
 
   useEffect(() => {
-    const getUserAuth = async () => {
+    ;(async () => {
       try {
         const { data: user } = await axios.get('/user/select/this', {
           withCredentials: true,
@@ -32,10 +27,8 @@ const Header = () => {
         setAuth(null)
         setErrors([handleAxiosError(error)])
       }
-    }
-
-    getUserAuth()
-  }, [state?.logged])
+    })()
+  }, [])
 
   return (
     <header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
