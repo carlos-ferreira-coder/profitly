@@ -12,14 +12,9 @@ const Header = () => {
   const [errors, setErrors] = useState<string[] | null>(null)
   const [isLogged, setIsLogged] = useState<boolean>(sessionStorage.getItem('logged') === 'true')
 
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setIsLogged(sessionStorage.getItem('logged') === 'true')
-    }
-
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
-  }, [])
+  window.addEventListener('isLogged', () => {
+    setIsLogged(window.localStorage.getItem('isLogged') === 'true')
+  })
 
   useEffect(() => {
     ;(async () => {
@@ -32,6 +27,9 @@ const Header = () => {
 
           setUser(thisUser.data[0])
           setAuth(thisAuth.data[0])
+        } else {
+          setUser(null)
+          setAuth(null)
         }
       } catch (error) {
         setUser(null)

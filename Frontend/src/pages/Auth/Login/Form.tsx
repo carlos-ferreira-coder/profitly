@@ -31,8 +31,6 @@ const Form = () => {
         sessionStorage.removeItem(item)
       }
     })
-
-    sessionStorage.setItem('logged', 'false')
   }, [])
 
   // schema
@@ -81,7 +79,9 @@ const Form = () => {
         withCredentials: true,
       })
 
-      sessionStorage.setItem('logged', 'true')
+      window.localStorage.setItem('isLogged', 'true')
+      window.dispatchEvent(new Event('isLogged'))
+
       navigate('/home')
     } catch (error) {
       setAlertErrors([handleAxiosError(error)])
