@@ -15,7 +15,10 @@ const Logout = () => {
         const { data } = await axios.get('/auth/logout', {
           withCredentials: true,
         })
+
+        sessionStorage.clear()
         sessionStorage.setItem('successes', data.message)
+
         navigate('/login')
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])

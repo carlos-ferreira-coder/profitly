@@ -10,34 +10,36 @@ const Header = () => {
   const [user, setUser] = useState<UserProps | null>(null)
   const [auth, setAuth] = useState<AuthProps | null>(null)
   const [errors, setErrors] = useState<string[] | null>(null)
+  const [isLogged, setIsLogged] = useState<boolean>(sessionStorage.getItem('logged') === 'true')
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setIsLogged(sessionStorage.getItem('logged') === 'true')
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
 
   useEffect(() => {
     ;(async () => {
       try {
-        const {
-          data: { 0: resUser },
-        } = await axios.get('/user/select/this', {
-          withCredentials: true,
-        })
-        const {
-          data: { 0: resAuth },
-        } = await axios.get('/auth/select/this', {
-          withCredentials: true,
-        })
+        if (isLogged) {
+          const [thisUser, thisAuth] = await Promise.all([
+            axios.get('/user/select/this', { withCredentials: true }),
+            axios.get('/auth/select/this', { withCredentials: true }),
+          ])
 
-        console.log(`resUser: ${JSON.stringify(resUser)}`)
-        console.log(`resAuth: ${JSON.stringify(resAuth)}`)
-        setUser(resUser)
-        setAuth(resAuth)
-        console.log(`User: ${JSON.stringify(user)}`)
-        console.log(`Auth: ${JSON.stringify(auth)}`)
+          setUser(thisUser.data[0])
+          setAuth(thisAuth.data[0])
+        }
       } catch (error) {
         setUser(null)
         setAuth(null)
         setErrors([handleAxiosError(error)])
       }
     })()
-  }, [])
+  }, [isLogged])
 
   return (
     <header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">

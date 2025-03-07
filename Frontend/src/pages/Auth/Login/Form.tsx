@@ -31,6 +31,8 @@ const Form = () => {
         sessionStorage.removeItem(item)
       }
     })
+
+    sessionStorage.setItem('logged', 'false')
   }, [])
 
   // schema
@@ -78,6 +80,8 @@ const Form = () => {
       await axios.post('/auth/login', data, {
         withCredentials: true,
       })
+
+      sessionStorage.setItem('logged', 'true')
       navigate('/home')
     } catch (error) {
       setAlertErrors([handleAxiosError(error)])
