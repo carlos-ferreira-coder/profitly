@@ -37,29 +37,27 @@ const Update = () => {
   useEffect(() => {
     ;(async () => {
       try {
-        const {
-          data: { 0: resAuth },
-        } = await axios.get(`/auth/select/this`, {
-          withCredentials: true,
-        })
-
-        const { data: resAuths } = await axios.get('/auth/select/all', {
-          withCredentials: true,
-        })
+        const [
+          {
+            data: [resAuth],
+          },
+          { data: resAuths },
+        ] = await Promise.all([
+          axios.get('/auth/select/this', { withCredentials: true }),
+          axios.get('/auth/select/all', { withCredentials: true }),
+        ])
 
         // Configure options
-        const options: Options[] = resAuths.map((auth: AuthProps) => ({
-          value: auth.uuid,
-          label: auth.name,
-          disabled: false,
-        }))
-
-        // Options header
-        options.unshift({
-          value: '',
-          label: 'Selecione o cargo atual',
-          disabled: true,
-        })
+        const options: Options[] = [
+          { value: resAuth.uuid, label: resAuth.name, disabled: false },
+          ...resAuths
+            .filter((auth: AuthProps) => auth.uuid !== resAuth.uuid) // Remove duplicidade
+            .map((auth: AuthProps) => ({
+              value: auth.uuid,
+              label: auth.name,
+              disabled: false,
+            })),
+        ]
 
         setAuth(resAuth)
         setAuthOptions(options)

@@ -21,6 +21,7 @@ const Delete = () => {
         const { data } = await axios.get(`/auth/select/${uuid}`, {
           withCredentials: true,
         })
+
         setAuth(data[0])
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])
