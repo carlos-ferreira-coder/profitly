@@ -14,17 +14,21 @@ const Header = () => {
   useEffect(() => {
     ;(async () => {
       try {
-        const { data: resUser } = await axios.get('/user/select/this', {
+        const {
+          data: { 0: resUser },
+        } = await axios.get('/user/select/this', {
           withCredentials: true,
         })
-        const { data: resAuth } = await axios.get('/auth/select/this', {
+        const {
+          data: { 0: resAuth },
+        } = await axios.get('/auth/select/this', {
           withCredentials: true,
         })
 
         console.log(`resUser: ${JSON.stringify(resUser)}`)
         console.log(`resAuth: ${JSON.stringify(resAuth)}`)
-        setUser(resUser[0])
-        setAuth(resAuth[0])
+        setUser(resUser)
+        setAuth(resAuth)
         console.log(`User: ${JSON.stringify(user)}`)
         console.log(`Auth: ${JSON.stringify(auth)}`)
       } catch (error) {

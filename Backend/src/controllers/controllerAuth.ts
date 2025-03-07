@@ -177,7 +177,7 @@ export const authSelect = async (req: Request, res: Response): Promise<void> => 
           params.data.key === 'all'
             ? undefined
             : params.data.key === 'this'
-              ? userToken.uuid
+              ? userToken.authUuid
               : params.data.key,
         name: query.data.name?.split(',').length ? { in: query.data.name.split(',') } : undefined,
         admin: query.data.auth?.includes('admin') ? true : undefined,
