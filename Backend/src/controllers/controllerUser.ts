@@ -4,7 +4,7 @@ import { currencyToNumber, numberToCurrency } from '@/utils/currency'
 import { keySchema, userSelectSchema } from '@utils/schema'
 
 const formatUsers = (users: any[]) => {
-  users.map((user) => ({
+  return users.map((user) => ({
     ...user,
     hourlyRate: user.hourlyRate ? numberToCurrency(user.hourlyRate.toNumber(), 'BRL') : null,
   }))
@@ -48,7 +48,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
     }
 
     // server request
-    const users = await prisma.user.findMany() /*{
+    const users = await prisma.user.findMany({
       select: {
         uuid: true,
         username: true,
@@ -106,7 +106,6 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
         },
       },
     })
-    */
 
     console.log(`users: ${JSON.stringify(formatUsers(users))}`)
 
