@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import { prisma } from '@/server'
 import { currencyToNumber, numberToCurrency } from '@/utils/currency'
-import { validateData } from '@utils/z'
 import { keySchema, userSelectSchema } from '@utils/schema'
 
 const formatUsers = (users: any[]) => {
@@ -14,16 +13,16 @@ const formatUsers = (users: any[]) => {
 export const userSelect = async (req: Request, res: Response): Promise<void> => {
   try {
     // check params
-    const { data: params, error: paramsError } = validateData(req.params, keySchema)
-    if (!params) {
-      res.status(401).json({ message: paramsError })
+    const params = keySchema.safeParse(req.params)
+    if (!params.success) {
+      res.status(401).json({ error: 'Query inválida', details: params.error.format() })
       return
     }
 
     // check query
-    const { data: query, error: queryError } = validateData(req.query, userSelectSchema)
-    if (!query) {
-      res.status(401).json({ message: queryError })
+    const query = userSelectSchema.safeParse(req.query)
+    if (!query.success) {
+      res.status(401).json({ error: 'Query inválida', details: query.error.format() })
       return
     }
 
@@ -40,7 +39,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
       res.status(401).json({ message: 'Autorização não encontrada!' })
       return
     }
-    if (params.key === 'this') {
+    if (params.data.key === 'this') {
       auth = {
         ...auth,
         personal: true,
@@ -78,21 +77,30 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
 
     // server filter
     const filter = {
-      uuid: params.key === 'all' ? undefined : params.key === 'this' ? token.uuid : params.key,
-      username: { contains: query.username },
-      active: query.active ? query.active === 'true' : undefined,
+      uuid:
+        params.data.key === 'all'
+          ? undefined
+          : params.data.key === 'this'
+            ? token.uuid
+            : params.data.key,
+      username: { contains: query.data.username },
+      active: query.data.active ? query.data.active === 'true' : undefined,
       hourlyRate: {
-        gte: query.hourlyRateMin ? currencyToNumber(query.hourlyRateMin, 'BRL') : undefined,
-        lte: query.hourlyRateMax ? currencyToNumber(query.hourlyRateMax, 'BRL') : undefined,
+        gte: query.data.hourlyRateMin
+          ? currencyToNumber(query.data.hourlyRateMin, 'BRL')
+          : undefined,
+        lte: query.data.hourlyRateMax
+          ? currencyToNumber(query.data.hourlyRateMax, 'BRL')
+          : undefined,
       },
-      authUuid: query.auth?.split(',').length ? { in: query.auth.split(',') } : undefined,
+      authUuid: query.data.auth?.split(',').length ? { in: query.data.auth.split(',') } : undefined,
       person: {
-        cpf: { contains: query.cpf },
+        cpf: { contains: query.data.cpf },
         entity: {
-          name: { contains: query.name },
-          email: { contains: query.email },
-          phone: { contains: query.phone },
-          address: { contains: query.address },
+          name: { contains: query.data.name },
+          email: { contains: query.data.email },
+          phone: { contains: query.data.phone },
+          address: { contains: query.data.address },
         },
       },
     }

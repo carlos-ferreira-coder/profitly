@@ -12,26 +12,25 @@ import {
   loginSchema,
   uuidSchema,
 } from '@utils/schema'
-import { validateData } from '@utils/z'
 
 const JWT_SECRET = process.env.JWT_SECRET || ''
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     // check schema
-    const { data: form, error: errorForm } = validateData(req.body, loginSchema)
-    if (!form) {
-      res.status(401).json({ message: errorForm })
+    const form = loginSchema.safeParse(req.body)
+    if (!form.success) {
+      res.status(401).json({ error: 'Query inválida', details: form.error.format() })
       return
     }
 
     // check user
-    const where = form.email
-      ? { person: { entity: { email: form.email } } }
-      : form.cpf
-        ? { person: { cpf: form.cpf } }
-        : form.username
-          ? { username: form.username }
+    const where = form.data.email
+      ? { person: { entity: { email: form.data.email } } }
+      : form.data.cpf
+        ? { person: { cpf: form.data.cpf } }
+        : form.data.username
+          ? { username: form.data.username }
           : null
 
     const user = where ? await prisma.user.findFirst({ where: where }) : null
@@ -48,7 +47,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     // check if password is right
-    const isMatch = await bcrypt.compare(form.password, user.password)
+    const isMatch = await bcrypt.compare(form.data.password, user.password)
     if (!isMatch) {
       res.status(401).json({ message: 'Senha incorreta!' })
       return
@@ -106,15 +105,12 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
 export const authCheck = async (req: Request, res: Response): Promise<void> => {
   try {
     // check query
-    const result = authCheckSchema.safeParse(req.query)
-    if (!result.success) {
-      res.status(400).json({ error: 'Query inválida', details: result.error.format() })
+    const query = authCheckSchema.safeParse(req.query)
+    if (!query.success) {
+      res.status(401).json({ error: 'Query inválida', details: query.error.format() })
       return
     }
 
-    res.status(200).json({ message: 'Query válida!', data: result.data })
-    return
-    /*
     // get user form token
     const userToken = getUserFromToken(req, res)
     if (!userToken) return
@@ -135,7 +131,7 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Iterate over query parameters and check permissions
-    for (const [key, value] of Object.entries(query)) {
+    for (const [key, value] of Object.entries(query.data)) {
       if (permissions[key]) {
         const hasPermission = value === 'true'
         if (auth[key as 'admin' | 'project' | 'personal' | 'financial'] !== hasPermission) {
@@ -145,9 +141,8 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
       }
     }
 
-    res.status(201).json({ message: 'Usuário autorizado.' })
+    res.status(200).json({ message: 'Usuário autorizado.' })
     return
-    */
   } catch (e) {
     console.log(e)
     res.status(500).json({ message: 'Erro no servidor!' })
@@ -158,16 +153,16 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
 export const authSelect = async (req: Request, res: Response): Promise<void> => {
   try {
     // check params
-    const { data: params, error: paramsError } = validateData(req.params, keySchema)
-    if (!params) {
-      res.status(401).json({ message: paramsError })
+    const params = keySchema.safeParse(req.params)
+    if (!params.success) {
+      res.status(401).json({ error: 'Query inválida', details: params.error.format() })
       return
     }
 
     // check query
-    const { data: query, error: queryError } = validateData(req.query, authSelectSchema)
-    if (!query) {
-      res.status(401).json({ message: queryError })
+    const query = authSelectSchema.safeParse(req.query)
+    if (!query.success) {
+      res.status(401).json({ error: 'Query inválida', details: query.error.format() })
       return
     }
 
@@ -179,12 +174,16 @@ export const authSelect = async (req: Request, res: Response): Promise<void> => 
     const auth = await prisma.auth.findMany({
       where: {
         uuid:
-          params.key === 'all' ? undefined : params.key === 'this' ? userToken.uuid : params.key,
-        name: query.name?.split(',').length ? { in: query.name.split(',') } : undefined,
-        admin: query.auth?.includes('admin') ? true : undefined,
-        project: query.auth?.includes('project') ? true : undefined,
-        personal: query.auth?.includes('personal') ? true : undefined,
-        financial: query.auth?.includes('financial') ? true : undefined,
+          params.data.key === 'all'
+            ? undefined
+            : params.data.key === 'this'
+              ? userToken.uuid
+              : params.data.key,
+        name: query.data.name?.split(',').length ? { in: query.data.name.split(',') } : undefined,
+        admin: query.data.auth?.includes('admin') ? true : undefined,
+        project: query.data.auth?.includes('project') ? true : undefined,
+        personal: query.data.auth?.includes('personal') ? true : undefined,
+        financial: query.data.auth?.includes('financial') ? true : undefined,
       },
     })
     if (!auth) {
@@ -204,9 +203,9 @@ export const authSelect = async (req: Request, res: Response): Promise<void> => 
 export const authCreate = async (req: Request, res: Response): Promise<void> => {
   try {
     // check schema
-    const { data: form, error: errorForm } = validateData(req.body, authCreateSchema)
-    if (!form) {
-      res.status(401).json({ message: errorForm })
+    const form = authCreateSchema.safeParse(req.body)
+    if (!form.success) {
+      res.status(401).json({ error: 'Query inválida', details: form.error.format() })
       return
     }
 
@@ -223,11 +222,11 @@ export const authCreate = async (req: Request, res: Response): Promise<void> => 
     // create resource
     await prisma.auth.create({
       data: {
-        name: form.name,
-        admin: form.admin,
-        project: form.project,
-        personal: form.personal,
-        financial: form.financial,
+        name: form.data.name,
+        admin: form.data.admin,
+        project: form.data.project,
+        personal: form.data.personal,
+        financial: form.data.financial,
       },
     })
 
@@ -243,9 +242,9 @@ export const authCreate = async (req: Request, res: Response): Promise<void> => 
 export const authUpdate = async (req: Request, res: Response): Promise<void> => {
   try {
     // check schema
-    const { data: form, error: errorForm } = validateData(req.body, authUpdateSchema)
-    if (!form) {
-      res.status(401).json({ message: errorForm })
+    const form = authUpdateSchema.safeParse(req.body)
+    if (!form.success) {
+      res.status(401).json({ error: 'Query inválida', details: form.error.format() })
       return
     }
 
@@ -254,7 +253,7 @@ export const authUpdate = async (req: Request, res: Response): Promise<void> => 
     if (!userToken) return
 
     // check if auth exist
-    const auth = await prisma.auth.findUnique({ where: { uuid: form.uuid } })
+    const auth = await prisma.auth.findUnique({ where: { uuid: form.data.uuid } })
     if (!auth) {
       res.status(401).json({ message: 'Cargo/Função não econtrado!' })
       return
@@ -269,14 +268,14 @@ export const authUpdate = async (req: Request, res: Response): Promise<void> => 
     // create resource
     await prisma.auth.update({
       data: {
-        name: form.name,
-        admin: form.admin,
-        project: form.project,
-        personal: form.personal,
-        financial: form.financial,
+        name: form.data.name,
+        admin: form.data.admin,
+        project: form.data.project,
+        personal: form.data.personal,
+        financial: form.data.financial,
       },
       where: {
-        uuid: form.uuid,
+        uuid: form.data.uuid,
       },
     })
 
@@ -292,12 +291,9 @@ export const authUpdate = async (req: Request, res: Response): Promise<void> => 
 export const authDelete = async (req: Request, res: Response): Promise<void> => {
   try {
     // get uuid
-    const { data: params, error: paramsError } = validateData(
-      req.params,
-      uuidSchema('cargo/função'),
-    )
-    if (!params) {
-      res.status(401).json({ message: paramsError })
+    const params = uuidSchema('cargo/função').safeParse(req.params)
+    if (!params.success) {
+      res.status(401).json({ error: 'Query inválida', details: params.error.format() })
       return
     }
 
@@ -306,7 +302,7 @@ export const authDelete = async (req: Request, res: Response): Promise<void> => 
     if (!userToken) return
 
     // check auth
-    const auth = await prisma.auth.findUnique({ where: { uuid: params.uuid } })
+    const auth = await prisma.auth.findUnique({ where: { uuid: params.data.uuid } })
     if (!auth) {
       res.status(401).json({ message: 'Cargo/Função não econtrado!' })
       return
@@ -319,7 +315,7 @@ export const authDelete = async (req: Request, res: Response): Promise<void> => 
     }
 
     // create resource
-    await prisma.auth.delete({ where: { uuid: params.uuid } })
+    await prisma.auth.delete({ where: { uuid: params.data.uuid } })
 
     res.status(201).json({ message: 'O cargo/função foi deletado.' })
     return

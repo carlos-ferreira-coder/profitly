@@ -26,24 +26,26 @@ export const authorization = async (
   }
 }
 
-export const getUserToken = (req: Request, res: Response) => {
+export const getUserFromToken = (req: Request, res: Response) => {
   try {
     // check if has token authorization
     const token = req.cookies['token']
     if (!token) {
       res.status(401).json({ message: 'Necessário token de autorização!' })
-      return
+      return null
     }
 
     // get token information
     const userToken = jwt.verify(token, JWT_SECRET) as Express.Request['user']
     if (!userToken) {
       res.status(401).json({ message: 'Erro na validação do token de autorização!' })
-      return
+      return null
     }
+
+    return userToken
   } catch (e) {
     console.log(e)
     res.status(500).json({ message: 'Erro no servidor!' })
-    return
+    return null
   }
 }

@@ -1,16 +1,4 @@
-import { z, ZodSchema } from 'zod'
-
-export const validateData = <T>(data: unknown, schema: ZodSchema<T>) => {
-  const result = schema.safeParse(data)
-
-  if (result.success) return { data: result.data, error: null }
-
-  const errorMessage = result.error.issues
-    .map((issue) => issue.path.join('.') + ' - ' + issue.message)
-    .join(', ')
-
-  return { data: null, error: `Invalid parameters: ${errorMessage}` }
-}
+import { z } from 'zod'
 
 export const zodUuid = (name: string) => {
   return z
