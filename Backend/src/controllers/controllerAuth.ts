@@ -69,6 +69,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       sameSite: 'none',
       priority: 'high',
       path: '/',
+      domain: 'server-g7vl.onrender.com',
     })
 
     res.status(201).json({ message: 'Logado com sucesso.' })
