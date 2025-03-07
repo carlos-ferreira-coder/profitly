@@ -114,7 +114,7 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
 
     res.status(200).json({ message: 'Query válida!', data: result.data })
     return
-
+    /*
     // get user form token
     const userToken = getUserFromToken(req, res)
     if (!userToken) return
@@ -147,6 +147,7 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
 
     res.status(201).json({ message: 'Usuário autorizado.' })
     return
+    */
   } catch (e) {
     console.log(e)
     res.status(500).json({ message: 'Erro no servidor!' })
