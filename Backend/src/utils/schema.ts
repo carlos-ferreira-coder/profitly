@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { zodBoolean, zodEmail, zodEnum, zodRegex, zodString, zodUuid } from '@utils/z'
+import { zodBoolean, zodEmail, zodRegex, zodString, zodUuid } from '@utils/z'
 
 export const keySchema = z.object({
   key: zodRegex(
