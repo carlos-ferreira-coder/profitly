@@ -36,7 +36,7 @@ const Header = () => {
         <div className="left-0 mt-2.5 mb-2.5">{auth && <DropdownNavigate auth={auth} />}</div>
 
         <div className="hidden h-full md:flex md:items-center md:justify-between md:gap-1.5 lg:gap-3 xl:gap-5">
-          {auth ? <NavigateHeader auth={auth}></NavigateHeader> : errors}
+          {auth && user ? <NavigateHeader auth={auth}></NavigateHeader> : errors}
         </div>
 
         <div className="flex items-center gap-3 2xsm:gap-5 mt-2.5 mb-2.5">
