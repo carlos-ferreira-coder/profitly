@@ -21,6 +21,8 @@ const Header = () => {
           withCredentials: true,
         })
 
+        console.log(`resUser: ${JSON.stringify(resUser)}`)
+        console.log(`resAuth: ${JSON.stringify(resAuth)}`)
         setUser(resUser[0])
         setAuth(resAuth[0])
         console.log(`User: ${JSON.stringify(user)}`)
