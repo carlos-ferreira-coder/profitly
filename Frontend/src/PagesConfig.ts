@@ -91,7 +91,7 @@ export const pages: PageProps[] = [
   },
   {
     title: 'Editar Cargo/Função',
-    route: '/auth/update/:id',
+    route: '/auth/update/:uuid',
     protection: ['logged', 'admin'],
     useIn: [],
     icon: faQuestion,
@@ -99,7 +99,7 @@ export const pages: PageProps[] = [
   },
   {
     title: 'Deletar Cargo/Função',
-    route: '/auth/delete/:id',
+    route: '/auth/delete/:uuid',
     protection: ['logged', 'admin'],
     useIn: [],
     icon: faQuestion,
