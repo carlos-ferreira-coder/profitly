@@ -15,6 +15,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
     // check params
     const params = keySchema.safeParse(req.params)
     if (!params.success) {
+      console.log(1)
       res.status(401).json({ message: 'Query inválida', details: params.error.format() })
       return
     }
@@ -22,6 +23,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
     // check query
     const query = userSelectSchema.safeParse(req.query)
     if (!query.success) {
+      console.log(2)
       res.status(401).json({ message: 'Query inválida', details: query.error.format() })
       return
     }
@@ -29,6 +31,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
     // check token
     const token = req.user
     if (!token) {
+      console.log(3)
       res.status(401).json({ message: 'Token não encontrado!' })
       return
     }
@@ -36,6 +39,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
     // get auth
     let auth = await prisma.auth.findUnique({ where: { uuid: token.authUuid } })
     if (!auth) {
+      console.log(4)
       res.status(401).json({ message: 'Autorização não encontrada!' })
       return
     }

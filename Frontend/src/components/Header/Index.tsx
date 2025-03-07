@@ -20,8 +20,8 @@ const Header = () => {
         const { data: auth } = await axios.get('/auth/select/this', {
           withCredentials: true,
         })
-        console.log(user)
-        console.log(auth)
+        console.log(`User: ${user}`)
+        console.log(`Auth: ${auth}`)
         setUser(user[0])
         setAuth(auth[0])
       } catch (error) {
