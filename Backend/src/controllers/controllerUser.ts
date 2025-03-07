@@ -13,6 +13,7 @@ const formatUsers = (users: any[]) => {
 export const userSelect = async (req: Request, res: Response): Promise<void> => {
   try {
     // check params
+    console.log(`Params user: ${JSON.stringify(req.params)}`)
     const params = keySchema.safeParse(req.params)
     if (!params.success) {
       res.status(401).json({ message: 'Query inválida', details: params.error.format() })
@@ -20,6 +21,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
     }
 
     // check query
+    console.log(`Query user: ${JSON.stringify(req.query)}`)
     const query = userSelectSchema.safeParse(req.query)
     if (!query.success) {
       res.status(401).json({ message: 'Query inválida', details: query.error.format() })

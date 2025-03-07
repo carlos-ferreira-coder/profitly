@@ -106,7 +106,7 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
 export const authCheck = async (req: Request, res: Response): Promise<void> => {
   try {
     // check query
-    console.log(`Query: ${JSON.stringify(req.query)}`)
+    console.log(`Query check: ${JSON.stringify(req.query)}`)
     const query = authCheckSchema.safeParse(String(req.query))
     if (!query.success) {
       res.status(401).json({ message: 'Query inválida', details: query.error.format() })
@@ -120,7 +120,7 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
     // get authorizations
     const auth = await prisma.auth.findUnique({ where: { uuid: userToken.authUuid } })
     if (!auth) {
-      res.status(402).json({ message: 'Autorização não encontrada!' })
+      res.status(401).json({ message: 'Autorização não encontrada!' })
       return
     }
 
@@ -134,12 +134,9 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
 
     // Iterate over query parameters and check permissions
     for (const [key, value] of Object.entries(query.data)) {
-      if (permissions[key]) {
-        const hasPermission = value === 'true'
-        if (auth[key as 'admin' | 'project' | 'personal' | 'financial'] !== hasPermission) {
-          res.status(403).json({ message: `Usuário sem autorização sobre ${permissions[key]}` })
-          return
-        }
+      if (auth[key as 'admin' | 'project' | 'personal' | 'financial'] !== (value === 'true')) {
+        res.status(401).json({ message: `Usuário sem autorização sobre ${permissions[key]}` })
+        return
       }
     }
 
