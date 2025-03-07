@@ -25,7 +25,7 @@ const DropdownUser = ({ user, auth }: { user: UserProps; auth: AuthProps }) => {
           <span className="block text-sm font-medium text-black dark:text-white">
             {user?.username}
           </span>
-          <span className="block text-xs">{user?.type}</span>
+          <span className="block text-xs">{user?.auth.name}</span>
         </span>
 
         <span className="h-12 w-12 rounded-full">
