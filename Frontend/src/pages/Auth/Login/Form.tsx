@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { faEnvelope, faGears, faIdCard, faLock, faUser } from '@fortawesome/free-solid-svg-icons'
@@ -12,21 +12,26 @@ import { loginSchema } from '../../../hooks/useSchema'
 import { Select } from '../../../components/Form/Select'
 
 const Form = () => {
-  const location = useLocation()
   const navigate = useNavigate()
-  const { state } = location
 
   const [request, setRequest] = useState<'idle' | 'request'>('idle')
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
   const [alertWarnings, setAlertWarnings] = useState<(string | JSX.Element)[] | null>(null)
   const [alertSuccesses, setAlertSuccesses] = useState<(string | JSX.Element)[] | null>(null)
 
-  // Set state alerts
+  // Set alerts
   useEffect(() => {
-    if (state?.errors) setAlertErrors(state?.errors)
-    if (state?.warnings) setAlertWarnings(state?.warnings)
-    if (state?.successes) setAlertSuccesses(state?.successes)
-  }, [state])
+    ;['error', 'warning', 'success'].forEach((item) => {
+      const message = sessionStorage.getItem(item)
+      if (message) {
+        if (item === 'errors') setAlertErrors([message])
+        if (item === 'warnings') setAlertWarnings([message])
+        if (item === 'successes') setAlertSuccesses([message])
+
+        sessionStorage.removeItem(item)
+      }
+    })
+  }, [])
 
   // Login schema
   const schema = z
@@ -89,7 +94,7 @@ const Form = () => {
       await axios.post('/auth/login', data, {
         withCredentials: true,
       })
-      navigate('/home', { state: { logged: true } })
+      navigate('/home')
     } catch (error) {
       setAlertErrors([handleAxiosError(error)])
     }

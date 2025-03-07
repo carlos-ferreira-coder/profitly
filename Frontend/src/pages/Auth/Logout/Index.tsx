@@ -10,18 +10,17 @@ const Logout = () => {
 
   // logout on backend
   useEffect(() => {
-    const logout = async () => {
+    ;(async () => {
       try {
         const { data } = await axios.get('/auth/logout', {
           withCredentials: true,
         })
-        navigate('/login', { state: { logged: false, successes: [data.message] } })
+        sessionStorage.setItem('successes', data.message)
+        navigate('/login')
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])
       }
-    }
-
-    logout()
+    })()
   }, [navigate])
 
   return (

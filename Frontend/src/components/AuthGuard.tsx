@@ -10,31 +10,25 @@ type AuthGuardProps = {
   financial: boolean
 }
 
-const AuthGuard: React.FC<AuthGuardProps> = ({ children, admin, project, personal, financial }) => {
+const AuthGuard: React.FC<AuthGuardProps> = ({ children, ...permissions }) => {
   const navigate = useNavigate()
 
-  // TODO retificar acesso inrestrito
-
   useEffect(() => {
-    const checkAuth = async () => {
+    ;(async () => {
       try {
-        const query = new URLSearchParams({
-          admin: String(admin),
-          project: String(project),
-          personal: String(personal),
-          financial: String(financial),
-        }).toString()
+        const query = new URLSearchParams(
+          Object.entries(permissions).map(([key, value]) => [key, String(value)])
+        ).toString()
 
         await axios.get(`/auth/check?${query}`, {
           withCredentials: true,
         })
       } catch (error) {
-        navigate('/login', { state: { warnings: handleAxiosError(error) } })
+        sessionStorage.setItem('errors', handleAxiosError(error))
+        navigate('/login')
       }
-    }
-
-    checkAuth()
-  }, [navigate, admin, project, personal, financial])
+    })()
+  }, [navigate, permissions])
 
   return <>{children}</>
 }
