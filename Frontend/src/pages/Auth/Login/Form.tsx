@@ -21,7 +21,7 @@ const Form = () => {
 
   // Set alerts
   useEffect(() => {
-    ;['error', 'warning', 'success'].forEach((item) => {
+    ;['errors', 'warnings', 'successes'].forEach((item) => {
       const message = sessionStorage.getItem(item)
       if (message) {
         if (item === 'errors') setAlertErrors([message])
