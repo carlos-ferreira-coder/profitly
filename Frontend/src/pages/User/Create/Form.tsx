@@ -163,7 +163,7 @@ const Form = ({ authOptions }: { authOptions: Options[] }) => {
 
       <div className="mb-6">
         <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="name">
-          Nome Completo <span className="text-danger">*</span>
+          Nome completo <span className="text-danger">*</span>
         </label>
         <div className="relative">
           <Input
@@ -209,7 +209,7 @@ const Form = ({ authOptions }: { authOptions: Options[] }) => {
             className="mb-2.5 block font-medium text-black dark:text-white"
             htmlFor="hourlyRate"
           >
-            Valor da Hora <span className="text-slate-400">?</span>
+            Valor da hora <span className="text-slate-400">?</span>
           </label>
           <div className="relative">
             <Controller

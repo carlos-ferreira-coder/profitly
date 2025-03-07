@@ -89,11 +89,8 @@ export const zodPassword = (name: string) => {
   return z
     .string()
     .min(8, `O(a) ${name} deve ter pelo menos 8 caracteres.`)
-    .refine((s) => /[a-z]/.test(s), {
-      message: `O(a) ${name} deve conter pelo menos uma letra minúscula.`,
-    })
-    .refine((s) => /[A-Z]/.test(s), {
-      message: `O(a) ${name} deve conter pelo menos uma letra maiúscula.`,
+    .refine((s) => /[a-zA-Z]/.test(s), {
+      message: `O(a) ${name} deve conter pelo menos uma letra.`,
     })
     .refine((s) => /\d/.test(s), {
       message: `O(a) ${name} deve conter pelo menos um número.`,

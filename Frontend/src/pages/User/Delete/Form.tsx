@@ -154,7 +154,7 @@ const Form = ({ user }: { user: UserProps }) => {
 
       <div className="mb-6">
         <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="name">
-          Nome Completo
+          Nome completo
         </label>
         <div className="relative">
           <Input

@@ -230,7 +230,7 @@ const FormUser = ({ user, authOptions }: { user: UserProps; authOptions: Options
         <div className="w-full sm:w-1/2">
           <label
             className="mb-3 block text-sm font-medium text-black dark:text-white"
-            htmlFor="authId"
+            htmlFor="authUuid"
           >
             Cargo atual <span className="text-danger">*</span>
           </label>
@@ -241,7 +241,7 @@ const FormUser = ({ user, authOptions }: { user: UserProps; authOptions: Options
               render={({ field }) => (
                 <Select
                   {...field}
-                  id="authId"
+                  id="authUuid"
                   icon={faBriefcase}
                   iconPosition="left"
                   isSelected={true}
@@ -260,7 +260,7 @@ const FormUser = ({ user, authOptions }: { user: UserProps; authOptions: Options
             className="mb-3 block text-sm font-medium text-black dark:text-white"
             htmlFor="hourlyRate"
           >
-            Valor da Hora <span className="text-slate-400">?</span>
+            Valor da hora <span className="text-slate-400">?</span>
           </label>
           <div className="relative">
             <Controller

@@ -110,7 +110,7 @@ const FormPassword = ({ user, auth }: { user: UserProps; auth: boolean }) => {
           className="mb-3 block text-sm font-medium text-black dark:text-white"
           htmlFor="password"
         >
-          Senha Nova <span className="text-danger">*</span>
+          Senha nova <span className="text-danger">*</span>
         </label>
         <div className="relative">
           <Input
@@ -132,7 +132,7 @@ const FormPassword = ({ user, auth }: { user: UserProps; auth: boolean }) => {
           className="mb-3 block text-sm font-medium text-black dark:text-white"
           htmlFor="passwordCheck"
         >
-          Confirmar Senha <span className="text-danger">*</span>
+          Confirmar senha <span className="text-danger">*</span>
         </label>
         <div className="relative">
           <Input
