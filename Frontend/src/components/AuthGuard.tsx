@@ -25,8 +25,6 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, admin, project, persona
           financial: String(financial),
         }).toString()
 
-        console.log(`/auth/check?${query}`)
-
         await axios.get(`/auth/check?${query}`, {
           withCredentials: true,
         })

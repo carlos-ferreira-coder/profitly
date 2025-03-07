@@ -34,27 +34,10 @@ export const loginSchema = z
   })
 
 export const authCheckSchema = z.object({
-  admin: zodEnum('admin', ['true', 'false']).refine((val) => val === 'true' || val === 'false', {
-    message: "admin must be 'true' or 'false'",
-  }),
-  project: zodEnum('project', ['true', 'false']).refine(
-    (val) => val === 'true' || val === 'false',
-    {
-      message: "project must be 'true' or 'false'",
-    },
-  ),
-  personal: zodEnum('personal', ['true', 'false']).refine(
-    (val) => val === 'true' || val === 'false',
-    {
-      message: "personal must be 'true' or 'false'",
-    },
-  ),
-  financial: zodEnum('financial', ['true', 'false']).refine(
-    (val) => val === 'true' || val === 'false',
-    {
-      message: "financial must be 'true' or 'false'",
-    },
-  ),
+  admin: zodRegex('admin', /\b(true|false)\b/),
+  project: zodRegex('project', /\b(true|false)\b/),
+  personal: zodRegex('personal', /\b(true|false)\b/),
+  financial: zodRegex('financial', /\b(true|false)\b/),
 })
 
 export const authSelectSchema = z.object({
@@ -81,7 +64,7 @@ export const authUpdateSchema = z.object({
 
 export const userSelectSchema = z.object({
   username: zodString('nome de usuário').optional(),
-  active: zodRegex('ativo', /\b(true|false)\b/g).optional(),
+  active: zodRegex('ativo', /\b(true|false)\b/).optional(),
   hourlyRateMin: zodString('valor da hora').optional(),
   hourlyRateMax: zodString('valor da hora').optional(),
   auth: zodString('cargo/função').optional(),
