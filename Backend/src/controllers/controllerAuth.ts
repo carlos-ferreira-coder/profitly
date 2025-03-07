@@ -20,7 +20,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     // check schema
     const form = loginSchema.safeParse(req.body)
     if (!form.success) {
-      res.status(401).json({ error: 'Query inválida', details: form.error.format() })
+      res.status(401).json({ message: 'Query inválida', details: form.error.format() })
       return
     }
 
@@ -36,20 +36,20 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const user = where ? await prisma.user.findFirst({ where: where }) : null
 
     if (!user) {
-      res.status(401).json({ error: 'Usuário não cadastrado!' })
+      res.status(401).json({ message: 'Usuário não cadastrado!' })
       return
     }
 
     // check if user is active
     if (!user.active) {
-      res.status(401).json({ error: 'Usuário inativo!' })
+      res.status(401).json({ message: 'Usuário inativo!' })
       return
     }
 
     // check if password is right
     const isMatch = await bcrypt.compare(form.data.password, user.password)
     if (!isMatch) {
-      res.status(401).json({ error: 'Senha incorreta!' })
+      res.status(401).json({ message: 'Senha incorreta!' })
       return
     }
 
@@ -75,7 +75,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     return
   } catch (e) {
     console.log(e)
-    res.status(500).json({ error: 'Erro no servidor!' })
+    res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
 }
@@ -97,7 +97,7 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     return
   } catch (e) {
     console.log(e)
-    res.status(500).json({ error: 'Erro no servidor!' })
+    res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
 }
@@ -110,7 +110,7 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
     // check query
     const query = authCheckSchema.safeParse(String(req.query))
     if (!query.success) {
-      res.status(401).json({ error: 'Query inválida', details: query.error.format() })
+      res.status(401).json({ message: 'Query inválida', details: query.error.format() })
       return
     }
 
@@ -121,7 +121,7 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
     // get authorizations
     const auth = await prisma.auth.findUnique({ where: { uuid: userToken.authUuid } })
     if (!auth) {
-      res.status(401).json({ error: 'Autorização não encontrada!' })
+      res.status(401).json({ message: 'Autorização não encontrada!' })
       return
     }
 
@@ -148,7 +148,7 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
     return
   } catch (e) {
     console.log(e)
-    res.status(500).json({ error: 'Erro no servidor!' })
+    res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
 }
@@ -158,14 +158,14 @@ export const authSelect = async (req: Request, res: Response): Promise<void> => 
     // check params
     const params = keySchema.safeParse(req.params)
     if (!params.success) {
-      res.status(401).json({ error: 'Query inválida', details: params.error.format() })
+      res.status(401).json({ message: 'Query inválida', details: params.error.format() })
       return
     }
 
     // check query
     const query = authSelectSchema.safeParse(req.query)
     if (!query.success) {
-      res.status(401).json({ error: 'Query inválida', details: query.error.format() })
+      res.status(401).json({ message: 'Query inválida', details: query.error.format() })
       return
     }
 
@@ -190,7 +190,7 @@ export const authSelect = async (req: Request, res: Response): Promise<void> => 
       },
     })
     if (!auth) {
-      res.status(401).json({ error: 'Autorização não encontrada!' })
+      res.status(401).json({ message: 'Autorização não encontrada!' })
       return
     }
 
@@ -198,7 +198,7 @@ export const authSelect = async (req: Request, res: Response): Promise<void> => 
     return
   } catch (e) {
     console.log(e)
-    res.status(500).json({ error: 'Erro no servidor!' })
+    res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
 }
@@ -208,7 +208,7 @@ export const authCreate = async (req: Request, res: Response): Promise<void> => 
     // check schema
     const form = authCreateSchema.safeParse(req.body)
     if (!form.success) {
-      res.status(401).json({ error: 'Query inválida', details: form.error.format() })
+      res.status(401).json({ message: 'Query inválida', details: form.error.format() })
       return
     }
 
@@ -218,7 +218,7 @@ export const authCreate = async (req: Request, res: Response): Promise<void> => 
 
     // check if user has authorization
     if (!(await authorization('admin', userToken.authUuid))) {
-      res.status(401).json({ error: 'Usuário sem autorização para criar esses dados!' })
+      res.status(401).json({ message: 'Usuário sem autorização para criar esses dados!' })
       return
     }
 
@@ -237,7 +237,7 @@ export const authCreate = async (req: Request, res: Response): Promise<void> => 
     return
   } catch (e) {
     console.log(e)
-    res.status(500).json({ error: 'Erro no servidor!' })
+    res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
 }
@@ -247,7 +247,7 @@ export const authUpdate = async (req: Request, res: Response): Promise<void> => 
     // check schema
     const form = authUpdateSchema.safeParse(req.body)
     if (!form.success) {
-      res.status(401).json({ error: 'Query inválida', details: form.error.format() })
+      res.status(401).json({ message: 'Query inválida', details: form.error.format() })
       return
     }
 
@@ -258,13 +258,13 @@ export const authUpdate = async (req: Request, res: Response): Promise<void> => 
     // check if auth exist
     const auth = await prisma.auth.findUnique({ where: { uuid: form.data.uuid } })
     if (!auth) {
-      res.status(401).json({ error: 'Cargo/Função não econtrado!' })
+      res.status(401).json({ message: 'Cargo/Função não econtrado!' })
       return
     }
 
     // check if user has authorization
     if (!(await authorization('admin', userToken.authUuid)) || auth.id === 0) {
-      res.status(401).json({ error: 'Usuário sem autorização para editar esses dados!' })
+      res.status(401).json({ message: 'Usuário sem autorização para editar esses dados!' })
       return
     }
 
@@ -286,7 +286,7 @@ export const authUpdate = async (req: Request, res: Response): Promise<void> => 
     return
   } catch (e) {
     console.log(e)
-    res.status(500).json({ error: 'Erro no servidor!' })
+    res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
 }
@@ -296,7 +296,7 @@ export const authDelete = async (req: Request, res: Response): Promise<void> => 
     // get uuid
     const params = uuidSchema('cargo/função').safeParse(req.params)
     if (!params.success) {
-      res.status(401).json({ error: 'Query inválida', details: params.error.format() })
+      res.status(401).json({ message: 'Query inválida', details: params.error.format() })
       return
     }
 
@@ -307,13 +307,13 @@ export const authDelete = async (req: Request, res: Response): Promise<void> => 
     // check auth
     const auth = await prisma.auth.findUnique({ where: { uuid: params.data.uuid } })
     if (!auth) {
-      res.status(401).json({ error: 'Cargo/Função não econtrado!' })
+      res.status(401).json({ message: 'Cargo/Função não econtrado!' })
       return
     }
 
     // check if user has authorization
     if (!(await authorization('admin', userToken.authUuid)) || auth.id === 0) {
-      res.status(401).json({ error: 'Usuário sem autorização para excluir os dados!' })
+      res.status(401).json({ message: 'Usuário sem autorização para excluir os dados!' })
       return
     }
 
@@ -324,7 +324,7 @@ export const authDelete = async (req: Request, res: Response): Promise<void> => 
     return
   } catch (e) {
     console.log(e)
-    res.status(500).json({ error: 'Erro no servidor!' })
+    res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
 }
