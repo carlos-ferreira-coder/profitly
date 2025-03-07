@@ -84,7 +84,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 export const logout = async (req: Request, res: Response): Promise<void> => {
   try {
     // clear cookies
-    if (req.cookies['token']) {
+    if (req.cookies?.token) {
       res.clearCookie('token', {
         httpOnly: true,
         secure: true,
@@ -94,7 +94,7 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
       })
     }
 
-    res.status(201).json({ message: 'Deslogado com sucesso.' })
+    res.status(200).json({ message: 'Deslogado com sucesso.' })
     return
   } catch (e) {
     console.log(e)
@@ -106,12 +106,14 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
 export const authCheck = async (req: Request, res: Response): Promise<void> => {
   try {
     // check query
-    console.log(req.query)
-    const { data: query, error: queryError } = validateData(req.query, authCheckSchema)
-    if (!query) {
-      res.status(401).json({ message: queryError })
+    const result = authCheckSchema.safeParse(req.query)
+    if (!result.success) {
+      res.status(400).json({ error: 'Query inválida', details: result.error.format() })
       return
     }
+
+    res.status(200).json({ message: 'Query válida!', data: result.data })
+    return
 
     // get user form token
     const userToken = getUserFromToken(req, res)
