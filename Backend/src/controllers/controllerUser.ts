@@ -19,8 +19,6 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
       return
     }
 
-    console.log('Received query:', req.query)
-    console.log('Received query auth:', req.query.auth)
     // check query
     const query = userSelectSchema.safeParse(req.query)
     if (!query.success) {

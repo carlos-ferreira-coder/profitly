@@ -36,7 +36,7 @@ export const loginSchema = z
 export const authCheckSchema = z.object({
   auth: zodRegex(
     'permisão',
-    /^(?=.*\b(admin=true|admin=false)\b)(?=.*\b(project=true|project=false)\b)(?=.*\b(personal=true|personal=false)\b)(?=.*\b(financial=true|financial=false)\b).*$/,
+    /^admin=(true|false)&project=(true|false)&personal=(true|false)&financial=(true|false)$/,
   ),
 })
 

@@ -105,9 +105,6 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
 
 export const authCheck = async (req: Request, res: Response): Promise<void> => {
   try {
-    console.log('Received query:', req.query)
-    console.log('Received query auth:', req.query.auth)
-
     // check query
     const query = authCheckSchema.safeParse(String(req.query))
     if (!query.success) {
