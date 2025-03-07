@@ -2,47 +2,53 @@ import { Request, Response } from 'express'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { prisma } from '@/server'
-import z from 'zod'
-import { dataSchema, loginSchema, authCreateSchema, authUpdateSchema } from '@utils/schema'
-import { authorization } from '@utils/auth'
+import { authorization, getUserFromToken } from '@utils/auth'
+import {
+  authCheckSchema,
+  authCreateSchema,
+  authSelectSchema,
+  authUpdateSchema,
+  keySchema,
+  loginSchema,
+  uuidSchema,
+} from '@utils/schema'
+import { validateData } from '@utils/z'
 
 const JWT_SECRET = process.env.JWT_SECRET || ''
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     // check schema
-    const schema = loginSchema
-    const { data, error } = dataSchema(req.body, schema)
-    if (error) {
-      res.status(401).json({ message: error })
+    const { data: form, error: errorForm } = validateData(req.body, loginSchema)
+    if (!form) {
+      res.status(401).json({ message: errorForm })
       return
     }
 
-    // check if user is registered
-    let user
-    if (data.email) {
-      user = await prisma.user.findFirst({ where: { person: { entity: { email: data.email } } } })
-    } else {
-      if (data.cpf) {
-        user = await prisma.user.findFirst({ where: { person: { cpf: data.cpf } } })
-      } else {
-        user = await prisma.user.findFirst({ where: { username: data.usename } })
-      }
-    }
+    // check user
+    const where = form.email
+      ? { person: { entity: { email: form.email } } }
+      : form.cpf
+        ? { person: { cpf: form.cpf } }
+        : form.username
+          ? { username: form.username }
+          : null
+
+    const user = where ? await prisma.user.findFirst({ where: where }) : null
 
     if (!user) {
       res.status(401).json({ message: 'Usuário não cadastrado!' })
       return
     }
 
-    // check if the user is active
+    // check if user is active
     if (!user.active) {
       res.status(401).json({ message: 'Usuário inativo!' })
       return
     }
 
     // check if password is right
-    const isMatch = await bcrypt.compare(data.password, user.password)
+    const isMatch = await bcrypt.compare(form.password, user.password)
     if (!isMatch) {
       res.status(401).json({ message: 'Senha incorreta!' })
       return
@@ -70,7 +76,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     return
   } catch (e) {
     console.log(e)
-    res.status(500).json({ message: `Erro no servidor! ${e}` })
+    res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
 }
@@ -92,28 +98,23 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     return
   } catch (e) {
     console.log(e)
-    res.status(500).json({ message: `Erro no servidor! ${e}` })
+    res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
 }
 
 export const authCheck = async (req: Request, res: Response): Promise<void> => {
   try {
-    const data = req.query
-    const token = req.cookies['token']
-
-    // check if has token authorization
-    if (!token) {
-      res.status(401).json({ message: 'Necessário token de autorização!' })
+    // check query
+    const { data: query, error: queryError } = validateData(req.query, authCheckSchema)
+    if (!query) {
+      res.status(401).json({ message: queryError })
       return
     }
 
-    // get token information
-    const userToken = jwt.verify(token, JWT_SECRET) as Express.Request['user']
-    if (!userToken) {
-      res.status(403).json({ message: 'Erro na validação do token de autorização!' })
-      return
-    }
+    // get user form token
+    const userToken = getUserFromToken(req, res)
+    if (!userToken) return
 
     // get authorizations
     const auth = await prisma.auth.findUnique({ where: { uuid: userToken.authUuid } })
@@ -122,20 +123,22 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
       return
     }
 
-    // typing permissons
-    type permissionKey = 'admin' | 'project' | 'personal' | 'financial'
-    const permissions: { key: permissionKey; label: string }[] = [
-      { key: 'admin', label: 'configurações do sistema' },
-      { key: 'project', label: 'dados dos projetos' },
-      { key: 'personal', label: 'dados pessoais' },
-      { key: 'financial', label: 'dados financeiros' },
-    ]
+    // Permissions keys and labels
+    const permissions: { [key: string]: string } = {
+      admin: 'configurações do sistema',
+      project: 'dados dos projetos',
+      personal: 'dados pessoais',
+      financial: 'dados financeiros',
+    }
 
-    // Scroll through the permissions to check all
-    for (const permission of permissions) {
-      if (data[permission.key] === 'true' && !auth[permission.key]) {
-        res.status(401).json({ message: `Usuário sem autorização sobre ${permission.label}` })
-        return
+    // Iterate over query parameters and check permissions
+    for (const [key, value] of Object.entries(query)) {
+      if (permissions[key]) {
+        const hasPermission = value === 'true'
+        if (auth[key as 'admin' | 'project' | 'personal' | 'financial'] !== hasPermission) {
+          res.status(401).json({ message: `Usuário sem autorização sobre ${permissions[key]}` })
+          return
+        }
       }
     }
 
@@ -143,51 +146,41 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
     return
   } catch (e) {
     console.log(e)
-    res.status(500).json({ message: `Erro no servidor! ${e}` })
+    res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
 }
 
 export const authSelect = async (req: Request, res: Response): Promise<void> => {
   try {
-    const params = req.params
-    const query = req.query
-
-    const nameValues = query.type?.toString().split(',')
-    const authValues = query.auth?.toString().split(',')
-
-    // check if has token authorization
-    const token = req.cookies['token']
-    if (!token) {
-      res.status(401).json({ message: 'Necessário token de autorização!' })
+    // check params
+    const { data: params, error: paramsError } = validateData(req.params, keySchema)
+    if (!params) {
+      res.status(401).json({ message: paramsError })
       return
     }
 
-    // get token information
-    const userToken = jwt.verify(token, JWT_SECRET) as Express.Request['user']
-    if (!userToken) {
-      res.status(401).json({ message: 'Erro na validação do token de autorização!' })
+    // check query
+    const { data: query, error: queryError } = validateData(req.query, authSelectSchema)
+    if (!query) {
+      res.status(401).json({ message: queryError })
       return
     }
 
-    // get authorizations
-    let key: string | undefined
-    if (params.key === 'all') {
-      key = undefined
-    } else if (params.key === 'this') {
-      key = userToken.authUuid
-    } else {
-      key = params.key
-    }
+    // get user form token
+    const userToken = getUserFromToken(req, res)
+    if (!userToken) return
 
+    // server request
     const auth = await prisma.auth.findMany({
       where: {
-        uuid: key,
-        name: nameValues?.length ? { in: nameValues } : undefined,
-        admin: authValues?.includes('admin') ? true : undefined,
-        project: authValues?.includes('project') ? true : undefined,
-        personal: authValues?.includes('personal') ? true : undefined,
-        financial: authValues?.includes('financial') ? true : undefined,
+        uuid:
+          params.key === 'all' ? undefined : params.key === 'this' ? userToken.uuid : params.key,
+        name: query.name?.split(',').length ? { in: query.name.split(',') } : undefined,
+        admin: query.auth?.includes('admin') ? true : undefined,
+        project: query.auth?.includes('project') ? true : undefined,
+        personal: query.auth?.includes('personal') ? true : undefined,
+        financial: query.auth?.includes('financial') ? true : undefined,
       },
     })
     if (!auth) {
@@ -199,7 +192,7 @@ export const authSelect = async (req: Request, res: Response): Promise<void> => 
     return
   } catch (e) {
     console.log(e)
-    res.status(500).json({ message: `Erro no servidor! ${e}` })
+    res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
 }
@@ -207,27 +200,15 @@ export const authSelect = async (req: Request, res: Response): Promise<void> => 
 export const authCreate = async (req: Request, res: Response): Promise<void> => {
   try {
     // check schema
-    const schema = authCreateSchema
-    type SchemaProps = z.infer<typeof schema>
-    const { data, error }: { data: SchemaProps; error: string } = dataSchema(req.body, schema)
-    if (error) {
-      res.status(401).json({ message: error })
+    const { data: form, error: errorForm } = validateData(req.body, authCreateSchema)
+    if (!form) {
+      res.status(401).json({ message: errorForm })
       return
     }
 
-    // check if has token authorization
-    const token = req.cookies['token']
-    if (!token) {
-      res.status(401).json({ message: 'Necessário token de autorização!' })
-      return
-    }
-
-    // get token information
-    const userToken = jwt.verify(token, JWT_SECRET) as Express.Request['user']
-    if (!userToken) {
-      res.status(401).json({ message: 'Erro na validação do token de autorização!' })
-      return
-    }
+    // get user form token
+    const userToken = getUserFromToken(req, res)
+    if (!userToken) return
 
     // check if user has authorization
     if (!(await authorization('admin', userToken.authUuid))) {
@@ -238,11 +219,11 @@ export const authCreate = async (req: Request, res: Response): Promise<void> => 
     // create resource
     await prisma.auth.create({
       data: {
-        name: data.name,
-        admin: data.admin,
-        project: data.project,
-        personal: data.personal,
-        financial: data.financial,
+        name: form.name,
+        admin: form.admin,
+        project: form.project,
+        personal: form.personal,
+        financial: form.financial,
       },
     })
 
@@ -250,7 +231,7 @@ export const authCreate = async (req: Request, res: Response): Promise<void> => 
     return
   } catch (e) {
     console.log(e)
-    res.status(500).json({ message: `Erro no servidor! ${e}` })
+    res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
 }
@@ -258,30 +239,18 @@ export const authCreate = async (req: Request, res: Response): Promise<void> => 
 export const authUpdate = async (req: Request, res: Response): Promise<void> => {
   try {
     // check schema
-    const schema = authUpdateSchema
-    type SchemaProps = z.infer<typeof schema>
-    const { data, error }: { data: SchemaProps; error: string } = dataSchema(req.body, schema)
-    if (error) {
-      res.status(400).json({ message: error })
+    const { data: form, error: errorForm } = validateData(req.body, authUpdateSchema)
+    if (!form) {
+      res.status(401).json({ message: errorForm })
       return
     }
 
-    // check if has token authorization
-    const token = req.cookies['token']
-    if (!token) {
-      res.status(401).json({ message: 'Necessário token de autorização!' })
-      return
-    }
-
-    // get token information
-    const userToken = jwt.verify(token, JWT_SECRET) as Express.Request['user']
-    if (!userToken) {
-      res.status(401).json({ message: 'Erro na validação do token de autorização!' })
-      return
-    }
+    // get user form token
+    const userToken = getUserFromToken(req, res)
+    if (!userToken) return
 
     // check if auth exist
-    const auth = await prisma.auth.findUnique({ where: { uuid: data.uuid } })
+    const auth = await prisma.auth.findUnique({ where: { uuid: form.uuid } })
     if (!auth) {
       res.status(401).json({ message: 'Cargo/Função não econtrado!' })
       return
@@ -296,14 +265,14 @@ export const authUpdate = async (req: Request, res: Response): Promise<void> => 
     // create resource
     await prisma.auth.update({
       data: {
-        name: data.name,
-        admin: data.admin,
-        project: data.project,
-        personal: data.personal,
-        financial: data.financial,
+        name: form.name,
+        admin: form.admin,
+        project: form.project,
+        personal: form.personal,
+        financial: form.financial,
       },
       where: {
-        uuid: data.uuid,
+        uuid: form.uuid,
       },
     })
 
@@ -311,32 +280,29 @@ export const authUpdate = async (req: Request, res: Response): Promise<void> => 
     return
   } catch (e) {
     console.log(e)
-    res.status(500).json({ message: `Erro no servidor! ${e}` })
+    res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
 }
 
 export const authDelete = async (req: Request, res: Response): Promise<void> => {
   try {
-    // get id
-    const { uuid } = req.params
-
-    // check if has token authorization
-    const token = req.cookies['token']
-    if (!token) {
-      res.status(401).json({ message: 'Necessário token de autorização!' })
+    // get uuid
+    const { data: params, error: paramsError } = validateData(
+      req.params,
+      uuidSchema('cargo/função'),
+    )
+    if (!params) {
+      res.status(401).json({ message: paramsError })
       return
     }
 
-    // get token information
-    const userToken = jwt.verify(token, JWT_SECRET) as Express.Request['user']
-    if (!userToken) {
-      res.status(401).json({ message: 'Erro na validação do token de autorização!' })
-      return
-    }
+    // get user form token
+    const userToken = getUserFromToken(req, res)
+    if (!userToken) return
 
-    // check if auth exist
-    const auth = await prisma.auth.findUnique({ where: { uuid: uuid } })
+    // check auth
+    const auth = await prisma.auth.findUnique({ where: { uuid: params.uuid } })
     if (!auth) {
       res.status(401).json({ message: 'Cargo/Função não econtrado!' })
       return
@@ -349,13 +315,13 @@ export const authDelete = async (req: Request, res: Response): Promise<void> => 
     }
 
     // create resource
-    await prisma.auth.delete({ where: { uuid: uuid } })
+    await prisma.auth.delete({ where: { uuid: params.uuid } })
 
     res.status(201).json({ message: 'O cargo/função foi deletado.' })
     return
   } catch (e) {
     console.log(e)
-    res.status(500).json({ message: `Erro no servidor! ${e}` })
+    res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
 }

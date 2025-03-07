@@ -1,87 +1,18 @@
-import { z, ZodSchema } from 'zod'
+import { z } from 'zod'
+import { zodBoolean, zodEmail, zodRegex, zodString, zodUuid } from '@utils/z'
 
-export const dataSchema = <T>(dataCheck: T, schema: ZodSchema<T>) => {
-  let message: string = ''
+export const keySchema = z.object({
+  key: zodRegex(
+    'key',
+    /^all$|^this$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+    true,
+  ),
+})
 
-  const { success, data, error } = schema.safeParse(dataCheck)
-  if (!success) {
-    message = `Parameters passed in the schema are invalid: ${error?.issues.map((issue) => issue.path.join('.') + ' - ' + issue.message).join(', ')}`
-  }
-
-  return { data: data, error: message }
-}
-
-const zodUuid = (name: string) => {
-  return z
-    .string({
-      message: `O uuid do(a) ${name} deve ser um texto`,
-    })
-    .uuid({
-      message: `Informe um uuid de ${name} válido`,
-    })
-    .nonempty({
-      message: `O uuid do(a) ${name} é obrigatório(a)`,
-    })
-}
-
-const zodEmail = (name: string, nonempty: boolean = false) => {
-  const schema = z
-    .string({
-      message: `O email do(a) ${name} deve ser um texto`,
-    })
-    .email({
-      message: `Informe um email de ${name} válido`,
-    })
-
-  if (nonempty) {
-    return schema.nonempty({
-      message: `O email do(a) ${name} é obrigatório`,
-    })
-  }
-
-  return schema
-}
-
-const zodBoolean = (name: string) => {
-  return z
-    .boolean({
-      message: `O(a) ${name} deve ser um boleano`,
-    })
-    .refine((b) => b !== undefined, {
-      message: `O(a) ${name} é obrigatória`,
-    })
-}
-
-const zodString = (name: string, nonempty: boolean = false) => {
-  const schema = z.string({
-    message: `O(a) ${name} deve ser um texto`,
+export const uuidSchema = (name: string) => {
+  return z.object({
+    uuid: zodUuid(name),
   })
-
-  if (nonempty) {
-    return schema.nonempty({
-      message: `O(a) ${name} é obrigatório(a)`,
-    })
-  }
-
-  return schema
-}
-
-const zodRegex = (name: string, regex: RegExp, nonempty: boolean = false) => {
-  const schema = z
-    .string({
-      message: `O(a) ${name} deve ser um texto`,
-    })
-    .regex(regex, {
-      message: `Informe um(a) ${name} válido(a)}`,
-    })
-
-  if (nonempty) {
-    return schema.nonempty({
-      message: `O(a) ${name} é obrigatório(a)`,
-    })
-  }
-
-  return schema
 }
 
 export const loginSchema = z
@@ -102,6 +33,18 @@ export const loginSchema = z
     }
   })
 
+export const authCheckSchema = z.object({
+  auth: zodRegex(
+    'permisão',
+    /^(?=.*\b(admin=true|admin=false)\b)(?=.*\b(project=true|project=false)\b)(?=.*\b(personal=true|personal=false)\b)(?=.*\b(financial=true|financial=false)\b).*$/,
+  ),
+})
+
+export const authSelectSchema = z.object({
+  name: zodString('nome').optional(),
+  auth: zodRegex('cargo/função', /\b(admin|project|personal|financial)\b/g),
+})
+
 export const authCreateSchema = z.object({
   name: zodString('nome', true),
   admin: zodBoolean('autorização de administrador'),
@@ -117,4 +60,17 @@ export const authUpdateSchema = z.object({
   project: zodBoolean('autorização de editar projetos'),
   personal: zodBoolean('autorização de informações pessoais'),
   financial: zodBoolean('autorização de informações financeiras'),
+})
+
+export const userSelectSchema = z.object({
+  username: zodString('nome de usuário').optional(),
+  active: zodRegex('ativo', /\b(true|false)\b/g).optional(),
+  hourlyRateMin: zodString('valor da hora').optional(),
+  hourlyRateMax: zodString('valor da hora').optional(),
+  auth: zodString('cargo/função').optional(),
+  cpf: zodString('cpf').optional(),
+  name: zodString('nome').optional(),
+  email: zodString('email').optional(),
+  phone: zodString('telefone').optional(),
+  address: zodString('endereço').optional(),
 })
