@@ -27,7 +27,7 @@ export const loginSchema = z
     if (!(cpf || email || username)) {
       ctx.addIssue({
         code: 'custom',
-        message: 'Informe um cpf ou email válido!',
+        message: 'Informe um cpf ou email ou nome de usuário válido!',
         path: ['cpf', 'email', 'username'],
       })
     }
@@ -64,7 +64,7 @@ export const authUpdateSchema = z.object({
 
 export const userSelectSchema = z.object({
   username: zodString('nome de usuário').optional(),
-  active: zodRegex('ativo', /\b(true|false)\b/).optional(),
+  active: zodRegex('ativo', /^true$|^false$/).optional(),
   hourlyRateMin: zodString('valor da hora').optional(),
   hourlyRateMax: zodString('valor da hora').optional(),
   auth: zodString('cargo/função').optional(),

@@ -8,8 +8,8 @@ import { api as axios, handleAxiosError } from '../../../services/Axios'
 import { Input, InputPattern } from '../../../components/Form/Input'
 import Alert from '../../../components/Alert/Index'
 import Button from '../../../components/Form/Button'
-import { loginSchema } from '../../../hooks/useSchema'
 import { Select } from '../../../components/Form/Select'
+import { loginSchema } from '../../../hooks/useSchema'
 
 const Form = () => {
   const navigate = useNavigate()
@@ -33,24 +33,8 @@ const Form = () => {
     })
   }, [])
 
-  // Login schema
-  const schema = z
-    .object({
-      type: loginSchema.type,
-      cpf: loginSchema.cpf,
-      email: loginSchema.email,
-      username: loginSchema.username,
-      password: loginSchema.password,
-    })
-    .superRefine(({ cpf, email, username }, ctx) => {
-      if (!(cpf || email || username)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: 'Informe um cpf ou email ou nome de usuário válido!',
-          path: ['cpf', 'email', 'username'],
-        })
-      }
-    })
+  // schema
+  const schema = loginSchema
   type SchemaProps = z.infer<typeof schema>
 
   const defaultValues = {
