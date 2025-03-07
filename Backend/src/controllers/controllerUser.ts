@@ -107,8 +107,6 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
       },
     })
 
-    console.log(`users: ${JSON.stringify(formatUsers(users))}`)
-
     res.status(200).json(formatUsers(users))
     return
   } catch (e) {

@@ -14,16 +14,17 @@ const Header = () => {
   useEffect(() => {
     ;(async () => {
       try {
-        const { data: user } = await axios.get('/user/select/this', {
+        const { data: resUser } = await axios.get('/user/select/this', {
           withCredentials: true,
         })
-        const { data: auth } = await axios.get('/auth/select/this', {
+        const { data: resAuth } = await axios.get('/auth/select/this', {
           withCredentials: true,
         })
+
+        setUser(resUser[0])
+        setAuth(resAuth[0])
         console.log(`User: ${user}`)
         console.log(`Auth: ${auth}`)
-        setUser(user[0])
-        setAuth(auth[0])
       } catch (error) {
         setUser(null)
         setAuth(null)
