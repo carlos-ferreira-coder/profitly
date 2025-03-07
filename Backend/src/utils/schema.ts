@@ -34,10 +34,10 @@ export const loginSchema = z
   })
 
 export const authCheckSchema = z.object({
-  admin: zodRegex('admin', /\b(true|false)\b/),
-  project: zodRegex('project', /\b(true|false)\b/),
-  personal: zodRegex('personal', /\b(true|false)\b/),
-  financial: zodRegex('financial', /\b(true|false)\b/),
+  admin: zodString('admin'),
+  project: zodString('project'),
+  personal: zodString('personal'),
+  financial: zodString('financial'),
 })
 
 export const authSelectSchema = z.object({
