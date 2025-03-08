@@ -39,9 +39,9 @@ const Form = () => {
 
   const defaultValues = {
     type: 'email',
-    cpf: null,
-    email: null,
-    username: null,
+    cpf: undefined,
+    email: undefined,
+    username: undefined,
     password: '',
   }
 
@@ -59,9 +59,9 @@ const Form = () => {
   })
 
   useEffect(() => {
-    setValue('cpf', null)
-    setValue('email', null)
-    setValue('username', null)
+    setValue('cpf', undefined)
+    setValue('email', undefined)
+    setValue('username', undefined)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch('type')])
