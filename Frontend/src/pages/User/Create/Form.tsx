@@ -38,13 +38,13 @@ const Form = ({ authOptions }: { authOptions: Options[] }) => {
     password: '',
     passwordCheck: '',
     active: true,
-    hourlyRate: null,
+    hourlyRate: undefined,
     authUuid: '',
     cpf: '',
     name: '',
     email: '',
-    phone: null,
-    address: null,
+    phone: undefined,
+    address: undefined,
   }
 
   // Hookform

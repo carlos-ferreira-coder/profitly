@@ -81,13 +81,13 @@ export const userCreateSchema = z
     password: zodRegex('senha', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
     passwordCheck: zodRegex('senha de confirmação', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
     active: zodBoolean('ativo'),
-    hourlyRate: zodRegex('valor da hora', /^$/, false),
+    hourlyRate: zodRegex('valor da hora', /^$/, false).optional(),
     authUuid: zodUuid('cargo/função'),
     cpf: zodString('cpf', true),
     name: zodString('nome', true),
     email: zodEmail('email', true),
-    phone: zodRegex('contato', /^$/, false),
-    address: zodString('endereço', false),
+    phone: zodRegex('contato', /^$/, false).optional(),
+    address: zodString('endereço', false).optional(),
   })
   .superRefine(({ password, passwordCheck }, ctx) => {
     if (password !== passwordCheck) {
@@ -103,18 +103,22 @@ export const userUpdateSchema = z.object({
   uuid: zodUuid('usuário'),
   username: zodString('nome de usuário', true),
   active: zodBoolean('ativo'),
-  hourlyRate: zodRegex('valor da hora', /^$/, false),
+  hourlyRate: zodRegex('valor da hora', /^$/, false).optional(),
   authUuid: zodUuid('cargo/função'),
   name: zodString('nome', true),
   email: zodEmail('email', true),
-  phone: zodRegex('contato', /^$/, false),
-  address: zodString('endereço', false),
+  phone: zodRegex('contato', /^$/, false).optional(),
+  address: zodString('endereço', false).optional(),
 })
 
 export const userUpdatePasswordSchema = z
   .object({
     uuid: zodUuid('usuário'),
-    passwordCurrent: zodRegex('senha antiga', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
+    passwordCurrent: zodRegex(
+      'senha antiga',
+      /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/,
+      true,
+    ).optional(),
     password: zodRegex('senha nova', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
     passwordCheck: zodRegex('senha de confirmação', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
   })

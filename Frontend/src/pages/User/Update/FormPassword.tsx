@@ -23,7 +23,7 @@ const FormPassword = ({ user, auth }: { user: UserProps; auth: boolean }) => {
 
   const defaultValues = {
     uuid: user.uuid,
-    passwordCurrent: null,
+    passwordCurrent: undefined,
     password: '',
     passwordCheck: '',
   }

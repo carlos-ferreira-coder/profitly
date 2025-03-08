@@ -8,7 +8,7 @@ import Button from '../../../components/Form/Button'
 import { userPhotoURL } from '../../../services/Axios'
 import { UserProps } from '../../../types/Database'
 import { useNavigate } from 'react-router-dom'
-import { userFilePhotoSchema, userUuidSchema } from '../../../hooks/useSchema'
+import { userFilePhotoSchema, uuidSchema } from '../../../hooks/useSchema'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '../../../components/Form/Input'
@@ -49,7 +49,7 @@ const FormPhoto = ({ user }: { user: UserProps }) => {
   }, [file])
 
   // Photo schema
-  const schema = userUuidSchema
+  const schema = uuidSchema('usuário')
   type SchemaProps = z.infer<typeof schema>
 
   const defaultValues = {

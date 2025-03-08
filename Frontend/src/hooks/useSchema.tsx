@@ -1,6 +1,12 @@
 import { z } from 'zod'
 import { zodBoolean, zodEmail, zodPassword, zodRegex, zodString, zodUuid } from './useZod'
 
+export const uuidSchema = (name: string) => {
+  return z.object({
+    uuid: zodUuid(name),
+  })
+}
+
 export const loginSchema = z
   .object({
     type: zodRegex('tipo', /^cpf$|^email$|^username$/, true),
@@ -19,25 +25,42 @@ export const loginSchema = z
     }
   })
 
+export const authSchema = z.object({
+  uuid: zodUuid('cargo/função'),
+  name: zodString('cargo/função', true),
+  admin: zodBoolean('autorização de administrador'),
+  project: zodBoolean('autorização de editar projetos'),
+  personal: zodBoolean('autorização de informações pessoais'),
+  financial: zodBoolean('autorização de informações financeiras'),
+})
+
+export const authCreateSchema = z.object({
+  name: zodString('cargo/função', true),
+  admin: zodBoolean('autorização de administrador'),
+  project: zodBoolean('autorização de editar projetos'),
+  personal: zodBoolean('autorização de informações pessoais'),
+  financial: zodBoolean('autorização de informações financeiras'),
+})
+
 export const userCreateSchema = z
   .object({
     username: zodString('nome de usuário', true),
     password: zodPassword('senha'),
     passwordCheck: zodRegex('senha', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
     active: zodBoolean('ativo'),
-    hourlyRate: zodRegex('valor da hora', /^$|R?\$?\s?\d{1,3}(\.\d{3})*(,\d{1,2})?$/, false)
-      .transform((s) => (s === '' ? null : s))
-      .nullable(),
+    hourlyRate: zodRegex(
+      'valor da hora',
+      /^$|R?\$?\s?\d{1,3}(\.\d{3})*(,\d{1,2})?$/,
+      false
+    ).transform((s) => (s === '' ? undefined : s)),
     authUuid: zodUuid('cargo/função'),
     cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true),
     name: zodString('nome completo', true),
     email: zodEmail('email', true),
-    phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false)
-      .transform((s) => (s === '' ? null : s))
-      .nullable(),
-    address: zodString('endereço', false)
-      .transform((s) => (s === '' ? null : s))
-      .nullable(),
+    phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).transform((s) =>
+      s === '' ? undefined : s
+    ),
+    address: zodString('endereço', false).transform((s) => (s === '' ? undefined : s)),
   })
   .superRefine(({ password, passwordCheck }, ctx) => {
     if (password !== passwordCheck) {
@@ -53,28 +76,28 @@ export const userUpdateSchema = z.object({
   uuid: zodUuid('usuário'),
   username: zodString('nome de usuário', true),
   active: zodBoolean('ativo'),
-  hourlyRate: zodRegex('valor da hora', /^$|R?\$?\s?\d{1,3}(\.\d{3})*(,\d{1,2})?$/, false)
-    .transform((s) => (s === '' ? null : s))
-    .nullable(),
+  hourlyRate: zodRegex(
+    'valor da hora',
+    /^$|R?\$?\s?\d{1,3}(\.\d{3})*(,\d{1,2})?$/,
+    false
+  ).transform((s) => (s === '' ? undefined : s)),
   authUuid: zodUuid('cargo/função'),
   cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true),
   name: zodString('nome completo', true),
   email: zodEmail('email', true),
-  phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false)
-    .transform((s) => (s === '' ? null : s))
-    .nullable(),
-  address: zodString('endereço', false)
-    .transform((s) => (s === '' ? null : s))
-    .nullable(),
+  phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).transform((s) =>
+    s === '' ? undefined : s
+  ),
+  address: zodString('endereço', false).transform((s) => (s === '' ? undefined : s)),
 })
 
 export const userUpdatePasswordSchema = (auth: boolean) => {
   return z
     .object({
       uuid: zodUuid('usuário'),
-      passwordCurrent: zodRegex('senha', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, !auth)
-        .transform((s) => (s === '' ? null : s))
-        .nullable(),
+      passwordCurrent: zodRegex('senha', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, !auth).transform(
+        (s) => (s === '' ? undefined : s)
+      ),
       password: zodPassword('senha'),
       passwordCheck: zodRegex('senha', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
     })
@@ -88,10 +111,6 @@ export const userUpdatePasswordSchema = (auth: boolean) => {
       }
     })
 }
-
-export const userUuidSchema = z.object({
-  uuid: zodUuid('usuário'),
-})
 
 export const userFilePhotoSchema = z
   .instanceof(FileList, {
@@ -120,21 +139,4 @@ export const userDeleteSchema = z.object({
   cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true),
   name: zodString('nome completo', true),
   email: zodEmail('email', true),
-})
-
-export const authSchema = z.object({
-  uuid: zodUuid('cargo/função'),
-  name: zodString('cargo/função', true),
-  admin: zodBoolean('autorização de administrador'),
-  project: zodBoolean('autorização de editar projetos'),
-  personal: zodBoolean('autorização de informações pessoais'),
-  financial: zodBoolean('autorização de informações financeiras'),
-})
-
-export const authCreateSchema = z.object({
-  name: zodString('cargo/função', true),
-  admin: zodBoolean('autorização de administrador'),
-  project: zodBoolean('autorização de editar projetos'),
-  personal: zodBoolean('autorização de informações pessoais'),
-  financial: zodBoolean('autorização de informações financeiras'),
 })
