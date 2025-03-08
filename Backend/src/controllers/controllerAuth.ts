@@ -21,7 +21,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     // check schema
     const body = loginSchema.safeParse(req.body)
     if (!body.success) {
-      res.status(401).json({ message: 'Body inválido', details: body.error.format() })
+      res.status(401).json({ message: `Body inválido: ${JSON.stringify(body.error.format())}` })
       return
     }
 
@@ -110,7 +110,7 @@ export const authCheck = async (req: Request, res: Response): Promise<void> => {
     // check query
     const query = authCheckSchema.safeParse(req.query)
     if (!query.success) {
-      res.status(401).json({ message: 'Query inválida', details: query.error.format() })
+      res.status(401).json({ message: `Query inválido: ${JSON.stringify(query.error.format())}` })
       return
     }
 
@@ -157,14 +157,14 @@ export const authSelect = async (req: Request, res: Response): Promise<void> => 
     // check params
     const params = keySchema.safeParse(req.params)
     if (!params.success) {
-      res.status(401).json({ message: 'Params inválido', details: params.error.format() })
+      res.status(401).json({ message: `Params inválido: ${JSON.stringify(params.error.format())}` })
       return
     }
 
     // check query
     const query = authSelectSchema.safeParse(req.query)
     if (!query.success) {
-      res.status(401).json({ message: 'Query inválida', details: query.error.format() })
+      res.status(401).json({ message: `Query inválido: ${JSON.stringify(query.error.format())}` })
       return
     }
 
@@ -207,7 +207,7 @@ export const authCreate = async (req: Request, res: Response): Promise<void> => 
     // check schema
     const body = authCreateSchema.safeParse(req.body)
     if (!body.success) {
-      res.status(401).json({ message: 'Body inválido', details: body.error.format() })
+      res.status(401).json({ message: `Body inválido: ${JSON.stringify(body.error.format())}` })
       return
     }
 
@@ -246,7 +246,7 @@ export const authUpdate = async (req: Request, res: Response): Promise<void> => 
     // check schema
     const body = authUpdateSchema.safeParse(req.body)
     if (!body.success) {
-      res.status(401).json({ message: 'Body inválido', details: body.error.format() })
+      res.status(401).json({ message: `Body inválido: ${JSON.stringify(body.error.format())}` })
       return
     }
 
@@ -295,7 +295,7 @@ export const authDelete = async (req: Request, res: Response): Promise<void> => 
     // get uuid
     const params = uuidSchema('cargo/função').safeParse(req.params)
     if (!params.success) {
-      res.status(401).json({ message: 'Params inválido', details: params.error.format() })
+      res.status(401).json({ message: `Params inválido: ${JSON.stringify(params.error.format())}` })
       return
     }
 

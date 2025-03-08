@@ -16,7 +16,7 @@ export const handleAxiosError = (error: unknown): string => {
     if (error.response) {
       const data = error.response.data as { message?: string; details?: string }
       if (data.message) {
-        return `${data.message}${data.details ? `: ${JSON.stringify(data.details)}` : ''}`
+        return data.message
       }
       return `Erro do servidor (${error.response.status}): ${JSON.stringify(data)}`
     }
