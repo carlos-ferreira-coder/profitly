@@ -4,15 +4,9 @@ import { zodBoolean, zodEmail, zodPassword, zodRegex, zodString, zodUuid } from 
 export const loginSchema = z
   .object({
     type: zodRegex('tipo', /^cpf$|^email$|^username$/, true),
-    cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, false)
-      .transform((s) => (s === '' ? null : s))
-      .nullable(),
-    email: zodEmail('usuário', false)
-      .transform((s) => (s === '' ? null : s))
-      .nullable(),
-    username: zodString('nome de usuário', false)
-      .transform((s) => (s === '' ? null : s))
-      .nullable(),
+    cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, false).optional(),
+    email: zodEmail('usuário', false).optional(),
+    username: zodString('nome de usuário', false).optional(),
     password: zodRegex('senha', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
   })
   .superRefine(({ cpf, email, username }, ctx) => {
