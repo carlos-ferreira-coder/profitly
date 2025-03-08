@@ -16,7 +16,7 @@ import bcrypt from 'bcrypt'
 import fs from 'fs'
 import path from 'path'
 
-const SERVER = process.env.SERVER || 'http://localhost'
+const DOMAIN = process.env.DOMAIN || ''
 
 const formatUsers = (users: any[]) => {
   return users.map((user) => ({
@@ -391,7 +391,7 @@ export const userUpdate = async (req: Request, res: Response): Promise<void> => 
             sameSite: 'none',
             priority: 'high',
             path: '/',
-            domain: SERVER,
+            domain: DOMAIN,
           })
         }
         res.status(418).json({ message: 'Eitah me inativei kkkkkkkk!' })
@@ -666,7 +666,7 @@ export const userDelete = async (req: Request, res: Response): Promise<void> => 
             sameSite: 'none',
             priority: 'high',
             path: '/',
-            domain: SERVER,
+            domain: DOMAIN,
           })
         }
         res.status(418).json({ message: 'Eitah me deletei kkkkkkkk!' })

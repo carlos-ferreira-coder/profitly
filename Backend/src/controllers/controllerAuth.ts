@@ -13,7 +13,7 @@ import {
   uuidSchema,
 } from '@utils/schema'
 
-const SERVER = process.env.SERVER || 'http://localhost'
+const DOMAIN = process.env.DOMAIN || ''
 const JWT_SECRET = process.env.JWT_SECRET || ''
 
 export const login = async (req: Request, res: Response): Promise<void> => {
@@ -70,7 +70,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       sameSite: 'none',
       priority: 'high',
       path: '/',
-      domain: SERVER,
+      domain: DOMAIN,
     })
 
     res.status(201).json({ message: 'Logado com sucesso.' })
