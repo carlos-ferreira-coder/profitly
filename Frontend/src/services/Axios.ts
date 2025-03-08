@@ -14,9 +14,9 @@ export const userPhotoURL = (photo: string | null | undefined): string => {
 export const handleAxiosError = (error: unknown): string => {
   if (error instanceof AxiosError) {
     if (error.response) {
-      const data = error.response.data as { message?: string }
+      const data = error.response.data as { message?: string; details?: string }
       if (data.message) {
-        return data.message
+        return `${data.message}${data.details ? `: ${data.details}` : ''}`
       }
       return `Erro do servidor (${error.response.status}): ${JSON.stringify(data)}`
     }
