@@ -49,14 +49,11 @@ const Update = () => {
 
         // Configure options
         const options: Options[] = [
-          { value: resAuth.uuid, label: resAuth.name, disabled: false },
-          ...resAuths
-            .filter((auth: AuthProps) => auth.uuid !== resAuth.uuid) // Remove duplicidade
-            .map((auth: AuthProps) => ({
-              value: auth.uuid,
-              label: auth.name,
-              disabled: false,
-            })),
+          ...resAuths.map((auth: AuthProps) => ({
+            value: auth.uuid,
+            label: auth.name,
+            disabled: false,
+          })),
         ]
 
         setAuth(resAuth)

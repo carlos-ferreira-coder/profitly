@@ -33,7 +33,7 @@ const FormUser = ({ user, authOptions }: { user: UserProps; authOptions: Options
   const schema = userUpdateSchema
   type SchemaProps = z.infer<typeof schema>
 
-  // TODO verificar se o authUuid esta default correto
+  // TODO authUuid não esta resetando
   const defaultValues = {
     uuid: user.uuid,
     username: user.username,
