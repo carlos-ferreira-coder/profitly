@@ -6,7 +6,6 @@ export const keySchema = z.object({
     'key',
     /^all$|^this$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
     true,
-    false,
   ),
 })
 
@@ -18,11 +17,11 @@ export const uuidSchema = (name: string) => {
 
 export const loginSchema = z
   .object({
-    type: zodRegex('tipo', /^cpf$|^email$|^username$/, true, false),
-    cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, false, true),
-    email: zodEmail('usuário', false, true),
-    username: zodString('nome de usuário', false, true),
-    password: zodRegex('senha', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true, false),
+    type: zodRegex('tipo', /^cpf$|^email$|^username$/, true),
+    cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, false).optional(),
+    email: zodEmail('usuário', false).optional(),
+    username: zodString('nome de usuário', false).optional(),
+    password: zodRegex('senha', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
   })
   .superRefine(({ cpf, email, username }, ctx) => {
     if (!(cpf || email || username)) {
@@ -35,19 +34,19 @@ export const loginSchema = z
   })
 
 export const authCheckSchema = z.object({
-  admin: zodRegex('admin', /^true$|^false$/, true, false),
-  project: zodRegex('project', /^true$|^false$/, true, false),
-  personal: zodRegex('personal', /^true$|^false$/, true, false),
-  financial: zodRegex('financial', /^true$|^false$/, true, false),
+  admin: zodRegex('admin', /^true$|^false$/, true),
+  project: zodRegex('project', /^true$|^false$/, true),
+  personal: zodRegex('personal', /^true$|^false$/, true),
+  financial: zodRegex('financial', /^true$|^false$/, true),
 })
 
 export const authSelectSchema = z.object({
-  name: zodString('nome', false, false).optional(),
-  auth: zodString('cargo/função', false, false).optional(),
+  name: zodString('nome', false).optional(),
+  auth: zodString('cargo/função', false).optional(),
 })
 
 export const authCreateSchema = z.object({
-  name: zodString('nome', true, false),
+  name: zodString('nome', true),
   admin: zodBoolean('autorização de administrador'),
   project: zodBoolean('autorização de editar projetos'),
   personal: zodBoolean('autorização de informações pessoais'),
@@ -56,7 +55,7 @@ export const authCreateSchema = z.object({
 
 export const authUpdateSchema = z.object({
   uuid: zodUuid('cargo/função'),
-  name: zodString('nome', true, false),
+  name: zodString('nome', true),
   admin: zodBoolean('autorização de administrador'),
   project: zodBoolean('autorização de editar projetos'),
   personal: zodBoolean('autorização de informações pessoais'),
@@ -64,14 +63,81 @@ export const authUpdateSchema = z.object({
 })
 
 export const userSelectSchema = z.object({
-  username: zodString('nome de usuário', false, false).optional(),
-  active: zodRegex('ativo', /^true$|^false$/, false, false).optional(),
-  hourlyRateMin: zodString('valor da hora', false, true).optional(),
-  hourlyRateMax: zodString('valor da hora', false, true).optional(),
-  auth: zodString('cargo/função', false, false).optional(),
-  cpf: zodString('cpf', false, false).optional(),
-  name: zodString('nome', false, false).optional(),
-  email: zodString('email', false, false).optional(),
-  phone: zodString('telefone', false, true).optional(),
-  address: zodString('endereço', false, true).optional(),
+  username: zodString('nome de usuário', false).optional(),
+  active: zodRegex('ativo', /^true$|^false$/, false).optional(),
+  hourlyRateMin: zodString('valor da hora', false).optional(),
+  hourlyRateMax: zodString('valor da hora', false).optional(),
+  auth: zodString('cargo/função', false).optional(),
+  cpf: zodString('cpf', false).optional(),
+  name: zodString('nome', false).optional(),
+  email: zodString('email', false).optional(),
+  phone: zodString('telefone', false).optional(),
+  address: zodString('endereço', false).optional(),
+})
+
+export const userCreateSchema = z
+  .object({
+    username: zodString('nome de usuário', true),
+    password: zodRegex('senha', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
+    passwordCheck: zodRegex('senha de confirmação', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
+    active: zodBoolean('ativo'),
+    hourlyRate: zodRegex('valor da hora', /^$/, false),
+    authUuid: zodUuid('cargo/função'),
+    cpf: zodString('cpf', true),
+    name: zodString('nome', true),
+    email: zodEmail('email', true),
+    phone: zodRegex('contato', /^$/, false),
+    address: zodString('endereço', false),
+  })
+  .superRefine(({ password, passwordCheck }, ctx) => {
+    if (password !== passwordCheck) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'As senhas não correspondem!',
+        path: ['passwordCheck'],
+      })
+    }
+  })
+
+export const userUpdateSchema = z.object({
+  uuid: zodUuid('usuário'),
+  username: zodString('nome de usuário', true),
+  active: zodBoolean('ativo'),
+  hourlyRate: zodRegex('valor da hora', /^$/, false),
+  authUuid: zodUuid('cargo/função'),
+  name: zodString('nome', true),
+  email: zodEmail('email', true),
+  phone: zodRegex('contato', /^$/, false),
+  address: zodString('endereço', false),
+})
+
+export const userUpdatePasswordSchema = z
+  .object({
+    uuid: zodUuid('usuário'),
+    passwordCurrent: zodRegex('senha antiga', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
+    password: zodRegex('senha nova', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
+    passwordCheck: zodRegex('senha de confirmação', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
+  })
+  .superRefine(({ password, passwordCheck }, ctx) => {
+    if (password !== passwordCheck) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'As senhas não correspondem!',
+        path: ['passwordCheck'],
+      })
+    }
+  })
+
+export const userUpdatePhotoSchema = z.object({
+  uuid: zodUuid('usuário'),
+  photo: z
+    .instanceof(File, {
+      message: 'Selecione um arquivo de imagem.',
+    })
+    .refine((f) => f.size <= 5 * 1024 * 1024, {
+      message: 'O arquivo deve ser menor que 5MB.',
+    })
+    .refine((f) => ['image/svg+xml', 'image/png', 'image/jpg', 'image/jpeg'].includes(f.type), {
+      message: 'O arquivo deve ser uma imagem (SVG, JPG ou PNG).',
+    }),
 })
