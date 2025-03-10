@@ -20,13 +20,10 @@ const Form = () => {
   const [alertSuccesses, setAlertSuccesses] = useState<(string | JSX.Element)[] | null>(null)
 
   useEffect(() => {
-    if (sessionStorage.getItem('isLogged') === 'true') {
-      navigate('/home')
-    }
-
     // Set alerts
     ;['errors', 'warnings', 'successes'].forEach((item) => {
       const message = sessionStorage.getItem(item)
+
       if (message) {
         if (item === 'errors') setAlertErrors([message])
         if (item === 'warnings') setAlertWarnings([message])
@@ -35,8 +32,6 @@ const Form = () => {
         sessionStorage.removeItem(item)
       }
     })
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // schema
@@ -44,7 +39,7 @@ const Form = () => {
   type SchemaProps = z.infer<typeof schema>
 
   const defaultValues = {
-    type: 'email',
+    type: 'username',
     cpf: undefined,
     email: undefined,
     username: undefined,
@@ -81,13 +76,9 @@ const Form = () => {
     setAlertSuccesses(null)
 
     try {
-      // TODO retificar login quando ja logado | não ta substituindo |
       await axios.post('/auth/login', data, {
         withCredentials: true,
       })
-
-      sessionStorage.setItem('isLogged', 'true')
-      window.dispatchEvent(new Event('isLogged'))
 
       navigate('/home')
     } catch (error) {

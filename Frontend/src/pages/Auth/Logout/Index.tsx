@@ -16,9 +16,6 @@ const Logout = () => {
           withCredentials: true,
         })
 
-        sessionStorage.setItem('isLogged', 'false')
-        window.dispatchEvent(new Event('isLogged'))
-
         sessionStorage.setItem('successes', data.message)
 
         navigate('/login')
