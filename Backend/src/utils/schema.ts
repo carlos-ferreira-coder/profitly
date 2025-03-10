@@ -103,12 +103,16 @@ export const userUpdateSchema = z.object({
   uuid: zodUuid('usuário'),
   username: zodString('nome de usuário', true),
   active: zodBoolean('ativo'),
-  hourlyRate: zodRegex('valor da hora', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, false).optional(),
+  hourlyRate: zodRegex('valor da hora', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, false)
+    .nullable()
+    .optional(),
   authUuid: zodUuid('cargo/função'),
   name: zodString('nome', true),
   email: zodEmail('email', true),
-  phone: zodRegex('contato', /^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).optional(),
-  address: zodString('endereço', false).optional(),
+  phone: zodRegex('contato', /^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false)
+    .nullable()
+    .optional(),
+  address: zodString('endereço', false).nullable().optional(),
 })
 
 export const userUpdatePasswordSchema = z
