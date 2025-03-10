@@ -17,6 +17,6 @@ router.get('/check', authCheck)
 router.get('/select/:key', authSelect)
 router.post('/create', authCreate)
 router.put('/update', authUpdate)
-router.delete('/delete/:id', authDelete)
+router.delete('/delete/:uuid', authDelete)
 
 export default router
