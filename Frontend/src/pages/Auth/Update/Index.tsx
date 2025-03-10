@@ -7,10 +7,12 @@ import { AuthProps } from '../../../types/Database'
 import { api as axios, handleAxiosError } from '../../../services/Axios'
 import Form from './Form'
 import Loader from '../../../components/Loader'
+import Alert from '../../../components/Alert/Index'
 
 const Update = () => {
   const { uuid } = useParams()
   const [auth, setAuth] = useState<AuthProps | null>(null)
+  const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
 
   // Get auth
   useEffect(() => {
@@ -24,7 +26,7 @@ const Update = () => {
 
         setAuth(resAuth)
       } catch (error) {
-        console.log(handleAxiosError(error))
+        setAlertErrors([handleAxiosError(error)])
       }
     })()
   }, [uuid])
@@ -169,6 +171,7 @@ const Update = () => {
                     Editar Cargo / Função
                   </h2>
 
+                  {alertErrors && <Alert type="danger" size="lg" data={alertErrors} />}
                   <Form auth={auth} />
                 </div>
               </div>

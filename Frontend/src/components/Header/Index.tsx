@@ -19,6 +19,7 @@ const Header = () => {
   useEffect(() => {
     ;(async () => {
       try {
+        // TODO retificar
         if (isLogged) {
           const [thisUser, thisAuth] = await Promise.all([
             axios.get('/user/select/this', { withCredentials: true }),

@@ -31,6 +31,8 @@ const Form = ({ auth }: { auth: AuthProps }) => {
     financial: auth.financial,
   }
 
+  console.log(defaultValues)
+
   // Hookform
   const {
     control,

@@ -18,11 +18,13 @@ const Delete = () => {
   useEffect(() => {
     ;(async () => {
       try {
-        const { data } = await axios.get(`/auth/select/${uuid}`, {
+        const {
+          data: { 0: resAuth },
+        } = await axios.get(`/auth/select/${uuid}`, {
           withCredentials: true,
         })
 
-        setAuth(data[0])
+        setAuth(resAuth)
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])
       }
