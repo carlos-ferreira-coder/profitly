@@ -20,9 +20,12 @@ const Form = () => {
   const [alertSuccesses, setAlertSuccesses] = useState<(string | JSX.Element)[] | null>(null)
 
   useEffect(() => {
+    /*
     if (window.localStorage.getItem('isLogged') === 'true') {
       navigate('/home')
     }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    */
 
     // Set alerts
     ;['errors', 'warnings', 'successes'].forEach((item) => {
@@ -35,8 +38,6 @@ const Form = () => {
         sessionStorage.removeItem(item)
       }
     })
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // schema
