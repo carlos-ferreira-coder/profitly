@@ -376,6 +376,9 @@ export const userUpdatePassword = async (req: Request, res: Response): Promise<v
       return
     }
 
+    console.log('Token: ' + token.uuid)
+    console.log('Body: ' + body.data.uuid)
+
     // check if user has authorization
     if (!(await authorization('personal', token.authUuid))) {
       // check if is the main user
