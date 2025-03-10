@@ -59,7 +59,7 @@ export const statusDeleteSchema = z.object({
   uuid: zodUuid('status'),
   name: zodString('nome', true),
   description: zodString('descrição', true),
-  priority: zodRegex('prioridade', /^\d+$/, true),
+  priority: zodString('prioridade', true),
 })
 
 export const userCreateSchema = z
