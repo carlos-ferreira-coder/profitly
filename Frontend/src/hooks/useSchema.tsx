@@ -48,11 +48,9 @@ export const userCreateSchema = z
     password: zodPassword('senha'),
     passwordCheck: zodRegex('senha', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
     active: zodBoolean('ativo'),
-    hourlyRate: zodRegex(
-      'valor da hora',
-      /^$|R?\$?\s?\d{1,3}(\.\d{3})*(,\d{1,2})?$/,
-      false
-    ).transform((s) => (s === '' ? undefined : s)),
+    hourlyRate: zodRegex('valor da hora', /^$|R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, false).transform(
+      (s) => (s === '' ? undefined : s)
+    ),
     authUuid: zodUuid('cargo/função'),
     cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true),
     name: zodString('nome completo', true),
@@ -76,11 +74,9 @@ export const userUpdateSchema = z.object({
   uuid: zodUuid('usuário'),
   username: zodString('nome de usuário', true),
   active: zodBoolean('ativo'),
-  hourlyRate: zodRegex(
-    'valor da hora',
-    /^$|R?\$?\s?\d{1,3}(\.\d{3})*(,\d{1,2})?$/,
-    false
-  ).transform((s) => (s === '' ? undefined : s)),
+  hourlyRate: zodRegex('valor da hora', /^$|R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, false).transform(
+    (s) => (s === '' ? undefined : s)
+  ),
   authUuid: zodUuid('cargo/função'),
   cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true),
   name: zodString('nome completo', true),
