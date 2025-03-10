@@ -19,7 +19,24 @@ const Header = () => {
   useEffect(() => {
     ;(async () => {
       try {
-        // TODO retificar
+        const [thisUser, thisAuth] = await Promise.all([
+          axios.get('/user/select/this', { withCredentials: true }),
+          axios.get('/auth/select/this', { withCredentials: true }),
+        ])
+
+        setUser(thisUser.data[0])
+        setAuth(thisAuth.data[0])
+      } catch (error) {
+        setUser(null)
+        setAuth(null)
+        setErrors([handleAxiosError(error)])
+      }
+    })()
+  }, [])
+
+  useEffect(() => {
+    ;(async () => {
+      try {
         if (isLogged) {
           const [thisUser, thisAuth] = await Promise.all([
             axios.get('/user/select/this', { withCredentials: true }),

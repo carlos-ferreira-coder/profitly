@@ -117,7 +117,7 @@ export const pages: PageProps[] = [
     title: 'Login',
     route: '/login',
     protection: [],
-    useIn: ['Settings'],
+    useIn: [], // TODO RETIFICAR ERRO NO TOKEN PARA INSERIR NO 'Settings'
     icon: faArrowRightToBracket,
     component: Login,
   },
