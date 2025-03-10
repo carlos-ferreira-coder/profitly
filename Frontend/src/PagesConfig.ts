@@ -117,7 +117,7 @@ export const pages: PageProps[] = [
     title: 'Login',
     route: '/login',
     protection: [],
-    useIn: ['Settings'],
+    useIn: [],
     icon: faArrowRightToBracket,
     component: Login,
   },

@@ -19,8 +19,12 @@ const Form = () => {
   const [alertWarnings, setAlertWarnings] = useState<(string | JSX.Element)[] | null>(null)
   const [alertSuccesses, setAlertSuccesses] = useState<(string | JSX.Element)[] | null>(null)
 
-  // Set alerts
   useEffect(() => {
+    if (window.localStorage.getItem('isLogged') === 'true') {
+      navigate('/home')
+    }
+
+    // Set alerts
     ;['errors', 'warnings', 'successes'].forEach((item) => {
       const message = sessionStorage.getItem(item)
       if (message) {
@@ -31,6 +35,8 @@ const Form = () => {
         sessionStorage.removeItem(item)
       }
     })
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // schema
