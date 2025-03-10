@@ -54,6 +54,18 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return
     }
 
+    // clear cookies
+    if (req.cookies?.token) {
+      res.clearCookie('token', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        priority: 'high',
+        path: '/',
+        domain: 'server-g7vl.onrender.com',
+      })
+    }
+
     // create jwt token
     const token = jwt.sign(
       {
