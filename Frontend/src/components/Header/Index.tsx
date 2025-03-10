@@ -13,7 +13,7 @@ const Header = () => {
   const [isLogged, setIsLogged] = useState<boolean>(sessionStorage.getItem('logged') === 'true')
 
   window.addEventListener('isLogged', () => {
-    setIsLogged(window.localStorage.getItem('isLogged') === 'true')
+    setIsLogged(sessionStorage.getItem('isLogged') === 'true')
   })
 
   useEffect(() => {
