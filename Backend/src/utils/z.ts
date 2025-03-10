@@ -55,6 +55,20 @@ export const zodString = (name: string, nonempty: boolean) => {
   return schema
 }
 
+export const zodNumber = (name: string, min: number | null) => {
+  const schema = z.number({
+    message: `O(a) ${name} deve ser um número`,
+  })
+
+  if (min) {
+    return schema.min(min, {
+      message: `Informe um(a) ${name} válido(a)`,
+    })
+  }
+
+  return schema
+}
+
 export const zodRegex = (name: string, regex: RegExp, nonempty: boolean) => {
   const schema = z
     .string({

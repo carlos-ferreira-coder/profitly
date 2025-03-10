@@ -3,6 +3,7 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core'
 import {
   faArrowRightFromBracket,
   faArrowRightToBracket,
+  faBarsProgress,
   faHouse,
   faQuestion,
   faUserGear,
@@ -22,6 +23,10 @@ import AuthSelect from './pages/Auth/Select/Index'
 import AuthCreate from './pages/Auth/Create/Index'
 import AuthUpdate from './pages/Auth/Update/Index'
 import AuthDelete from './pages/Auth/Delete/Index'
+import StatusSelect from './pages/Status/Select/Index'
+import StatusCreate from './pages/Status/Create/Index'
+import StatusUpdate from './pages/Status/Update/Index'
+import StatusDelete from './pages/Status/Delete/Index'
 
 export type PageProps = {
   icon: IconProp
@@ -104,6 +109,38 @@ export const pages: PageProps[] = [
     useIn: [],
     icon: faQuestion,
     component: AuthDelete,
+  },
+  {
+    title: 'Status',
+    route: '/status/select',
+    protection: ['logged', 'admin'],
+    useIn: ['Settings'],
+    icon: faBarsProgress,
+    component: StatusSelect,
+  },
+  {
+    title: 'Cadastrar Status',
+    route: '/status/create',
+    protection: ['logged', 'admin'],
+    useIn: [],
+    icon: faQuestion,
+    component: StatusCreate,
+  },
+  {
+    title: 'Editar Status',
+    route: '/status/update/:id',
+    protection: ['logged', 'admin'],
+    useIn: [],
+    icon: faQuestion,
+    component: StatusUpdate,
+  },
+  {
+    title: 'Deletar Status',
+    route: '/status/delete/:id',
+    protection: ['logged', 'admin'],
+    useIn: [],
+    icon: faQuestion,
+    component: StatusDelete,
   },
   {
     title: 'Login',

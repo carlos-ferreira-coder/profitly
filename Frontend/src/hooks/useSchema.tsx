@@ -42,6 +42,26 @@ export const authCreateSchema = z.object({
   financial: zodBoolean('autorização de informações financeiras'),
 })
 
+export const statusCreateSchema = z.object({
+  name: zodString('nome', true),
+  description: zodString('descrição', true),
+  priority: zodRegex('prioridade', /^\d+$/, true).transform((s) => parseInt(s)),
+})
+
+export const statusUpdateSchema = z.object({
+  uuid: zodUuid('status'),
+  name: zodString('nome', true),
+  description: zodString('descrição', true),
+  priority: zodRegex('prioridade', /^\d+$/, true).transform((s) => parseInt(s)),
+})
+
+export const statusDeleteSchema = z.object({
+  uuid: zodUuid('status'),
+  name: zodString('nome', true),
+  description: zodString('descrição', true),
+  priority: zodRegex('prioridade', /^\d+$/, true),
+})
+
 export const userCreateSchema = z
   .object({
     username: zodString('nome de usuário', true),

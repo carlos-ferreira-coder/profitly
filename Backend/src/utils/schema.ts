@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { zodBoolean, zodEmail, zodRegex, zodString, zodUuid } from '@utils/z'
+import { zodBoolean, zodEmail, zodNumber, zodRegex, zodString, zodUuid } from '@utils/z'
 
 export const keySchema = z.object({
   key: zodRegex(
@@ -60,6 +60,25 @@ export const authUpdateSchema = z.object({
   project: zodBoolean('autorização de editar projetos'),
   personal: zodBoolean('autorização de informações pessoais'),
   financial: zodBoolean('autorização de informações financeiras'),
+})
+
+export const statusSelectSchema = z.object({
+  name: zodString('nome', false).optional(),
+  description: zodString('descrição', false).optional(),
+  priority: zodString('prioridade', false).optional(),
+})
+
+export const statusCreateSchema = z.object({
+  name: zodString('nome', true),
+  description: zodString('descrição', true),
+  priority: zodNumber('prioridade', 1),
+})
+
+export const statusUpdateSchema = z.object({
+  uuid: zodUuid('status'),
+  name: zodString('nome', true),
+  description: zodString('descrição', true),
+  priority: zodNumber('prioridade', 1),
 })
 
 export const userSelectSchema = z.object({

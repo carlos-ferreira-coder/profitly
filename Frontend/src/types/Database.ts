@@ -7,6 +7,13 @@ export type AuthProps = {
   financial: boolean
 }
 
+export type StatusProps = {
+  uuid: string
+  name: string
+  description: string
+  priority: number
+}
+
 export type UserProps = {
   uuid: string
   username: string
