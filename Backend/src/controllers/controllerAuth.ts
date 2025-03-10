@@ -244,6 +244,11 @@ export const authCreate = async (req: Request, res: Response): Promise<void> => 
 export const authUpdate = async (req: Request, res: Response): Promise<void> => {
   try {
     // check schema
+    console.log(`Params: ${req.body}`)
+    console.log(`Params string: ${JSON.stringify(req.body)}`)
+    console.log(`Params: ${authUpdateSchema}`)
+    console.log(`Params string: ${JSON.stringify(authUpdateSchema)}`)
+
     const body = authUpdateSchema.safeParse(req.body)
     if (!body.success) {
       res.status(401).json({ message: `Body inválido: ${JSON.stringify(body.error.format())}` })
@@ -293,6 +298,11 @@ export const authUpdate = async (req: Request, res: Response): Promise<void> => 
 export const authDelete = async (req: Request, res: Response): Promise<void> => {
   try {
     // get uuid
+    console.log(`Params: ${req.params}`)
+    console.log(`Params string: ${JSON.stringify(req.params)}`)
+    console.log(`Params: ${uuidSchema('cargo/função')}`)
+    console.log(`Params string: ${JSON.stringify(uuidSchema('cargo/função'))}`)
+
     const params = uuidSchema('cargo/função').safeParse(req.params)
     if (!params.success) {
       res.status(401).json({ message: `Params inválido: ${JSON.stringify(params.error.format())}` })
