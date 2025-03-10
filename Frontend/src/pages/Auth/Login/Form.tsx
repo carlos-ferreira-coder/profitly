@@ -75,6 +75,10 @@ const Form = () => {
     setAlertSuccesses(null)
 
     try {
+      await axios.get('/auth/logout', {
+        withCredentials: true,
+      })
+      console.log('passou')
       await axios.post('/auth/login', data, {
         withCredentials: true,
       })
