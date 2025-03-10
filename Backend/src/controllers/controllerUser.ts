@@ -15,14 +15,26 @@ import { validateCPF } from '@utils/validate'
 import bcrypt from 'bcrypt'
 import fs from 'fs'
 import path from 'path'
+import { Auth } from '@prisma/client'
 
 const DOMAIN = process.env.DOMAIN || ''
 
-const formatUsers = (users: any[]) => {
-  return users.map((user) => ({
-    ...user,
-    hourlyRate: user.hourlyRate ? numberToCurrency(user.hourlyRate.toNumber(), 'BRL') : null,
-  }))
+const formatUsers = (users: any[], uuid: string, auth: Auth) => {
+  return users.map((user) => {
+    const isMain = user.uuid === uuid
+
+    return {
+      ...user,
+      cpf: auth.personal || isMain ? user.cpf : null,
+      name: auth.personal || isMain ? user.name : null,
+      phone: auth.personal || isMain ? user.phone : null,
+      address: auth.personal || isMain ? user.address : null,
+      hourlyRate:
+        (auth.financial || isMain) && user.hourlyRate
+          ? numberToCurrency(user.hourlyRate.toNumber(), 'BRL')
+          : null,
+    }
+  })
 }
 
 export const userSelect = async (req: Request, res: Response): Promise<void> => {
@@ -54,13 +66,6 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
       res.status(401).json({ message: 'Autorização não encontrada!' })
       return
     }
-    if (params.data.key === 'this') {
-      auth = {
-        ...auth,
-        personal: true,
-        financial: true,
-      }
-    }
 
     // server request
     const users = await prisma.user.findMany({
@@ -69,16 +74,16 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
         username: true,
         active: true,
         photo: true,
-        hourlyRate: auth.financial,
+        hourlyRate: true,
         person: {
           select: {
-            cpf: auth.personal,
+            cpf: true,
             entity: {
               select: {
-                name: auth.personal,
+                name: true,
                 email: true,
                 phone: true,
-                address: auth.personal,
+                address: true,
               },
             },
           },
@@ -122,7 +127,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
       },
     })
 
-    res.status(200).json(formatUsers(users))
+    res.status(200).json(formatUsers(users, token.uuid, auth))
     return
   } catch (e) {
     console.error('Erro no servidor:', e)
