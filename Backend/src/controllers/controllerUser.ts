@@ -149,40 +149,40 @@ export const userCreate = async (req: Request, res: Response): Promise<void> => 
 
     // check if user has authorization
     if (!(await authorization('personal', token.authUuid))) {
-      res.status(403).json({ message: 'Usuário sem autorização para criar esses dados!' })
+      res.status(401).json({ message: 'Usuário sem autorização para criar esses dados!' })
       return
     }
 
     // check if cpf is valid
     if (!validateCPF(body.data.cpf)) {
-      res.status(403).json({ message: 'CPF inválido!' })
+      res.status(401).json({ message: 'CPF inválido!' })
       return
     }
 
     // check if cpf has registered
     const cpf = await prisma.person.findUnique({ where: { cpf: body.data.cpf } })
     if (cpf) {
-      res.status(403).json({ message: 'Esse CPF já foi registrado!' })
+      res.status(401).json({ message: 'Esse CPF já foi registrado!' })
       return
     }
 
     // check if email has registered
     const email = await prisma.entity.findUnique({ where: { email: body.data.email } })
     if (email) {
-      res.status(403).json({ message: 'Esse email já foi registrado!' })
+      res.status(401).json({ message: 'Esse email já foi registrado!' })
       return
     }
 
     // check if username has registered
     const username = await prisma.user.findUnique({ where: { username: body.data.username } })
     if (username) {
-      res.status(403).json({ message: 'Esse nome de usuário já foi registrado!' })
+      res.status(401).json({ message: 'Esse nome de usuário já foi registrado!' })
       return
     }
 
     // check if both passwords are the same
     if (body.data.password !== body.data.passwordCheck) {
-      res.status(403).json({ message: 'A nova senha está diferente da confirmação de senha!' })
+      res.status(401).json({ message: 'A nova senha está diferente da confirmação de senha!' })
       return
     }
 
@@ -193,41 +193,13 @@ export const userCreate = async (req: Request, res: Response): Promise<void> => 
     // check if hourlyRate is required
     const auth = await prisma.auth.findUnique({ where: { uuid: body.data.authUuid } })
     if (!auth) {
-      res.status(404).json({ message: 'Autorização não encontrada!' })
+      res.status(401).json({ message: 'Autorização não encontrada!' })
       return
     }
     if (auth.project && !body.data.hourlyRate) {
-      res.status(403).json({ message: 'Usuário precisa do valor da hora!' })
+      res.status(401).json({ message: 'Usuário precisa do valor da hora!' })
       return
     }
-
-    /*
-    // create resource
-    await prisma.entity.create({
-      data: {
-        name: body.data.name,
-        email: body.data.email,
-        phone: body.data.phone,
-        address: body.data.address,
-        person: {
-          create: {
-            cpf: body.data.cpf,
-            user: {
-              create: {
-                username: body.data.username,
-                password: hashPassword,
-                active: body.data.active,
-                hourlyRate: body.data.hourlyRate
-                  ? currencyToNumber(body.data.hourlyRate, 'BRL')
-                  : null,
-                authUuid: body.data.authUuid,
-              },
-            },
-          },
-        },
-      },
-    })
-    */
 
     const entity = await prisma.entity.create({
       data: {
@@ -331,30 +303,6 @@ export const userUpdate = async (req: Request, res: Response): Promise<void> => 
       res.status(401).json({ message: 'Usuário precisa do valor da hora!' })
       return
     }
-
-    /*
-    // create resource
-    const userUpdated = await prisma.user.update({
-      data: {
-        username: body.data.username,
-        active: body.data.active,
-        hourlyRate: body.data.hourlyRate
-          ? currencyToNumber(body.data.hourlyRate, 'BRL')
-          : undefined,
-        authUuid: body.data.authUuid,
-        person: {
-          entity: {
-            name: body.data.name,
-            email: body.data.email,
-            phone: body.data.phone,
-          },
-        },
-      },
-      where: {
-        uuid: body.data.uuid,
-      },
-    })
-    */
 
     const userUpdated = await prisma.user.update({
       data: {
@@ -460,7 +408,7 @@ export const userUpdatePassword = async (req: Request, res: Response): Promise<v
 
     // check that the passwords are the same
     if (body.data.password !== body.data.passwordCheck) {
-      res.status(403).json({ message: 'Confirme a nova senha!' })
+      res.status(401).json({ message: 'Confirme a nova senha!' })
       return
     }
 
@@ -522,7 +470,7 @@ export const userUpdatePhoto = async (req: Request, res: Response): Promise<void
     if (!(await authorization('personal', token.authUuid))) {
       // check if is the main user
       if (token.uuid !== body.data.uuid) {
-        res.status(403).json({ message: 'Usuário sem autorização para alterar a foto!' })
+        res.status(401).json({ message: 'Usuário sem autorização para alterar a foto!' })
         return
       }
     }
@@ -570,14 +518,14 @@ export const userDeletePhoto = async (req: Request, res: Response): Promise<void
     // check if has token
     const token = req.user
     if (!token) {
-      res.status(404).json({ message: 'Token não encontrado!' })
+      res.status(401).json({ message: 'Token não encontrado!' })
       return
     }
 
     // check if user is registered
     const user = await prisma.user.findUnique({ where: { uuid: body.data.uuid } })
     if (!user) {
-      res.status(404).json({ message: 'Usuário não econtrado!' })
+      res.status(401).json({ message: 'Usuário não econtrado!' })
       return
     }
 
@@ -585,7 +533,7 @@ export const userDeletePhoto = async (req: Request, res: Response): Promise<void
     if (!(await authorization('personal', token.authUuid))) {
       // check if is the main user
       if (token.uuid !== body.data.uuid) {
-        res.status(403).json({ message: 'Usuário sem autorização para deletar a foto!' })
+        res.status(401).json({ message: 'Usuário sem autorização para deletar a foto!' })
         return
       }
     }

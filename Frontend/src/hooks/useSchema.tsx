@@ -91,7 +91,7 @@ export const userUpdatePasswordSchema = (auth: boolean) => {
   return z
     .object({
       uuid: zodUuid('usuário'),
-      passwordCurrent: zodRegex('senha', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, !auth).transform(
+      passwordCurrent: zodRegex('senha', /^$|^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, !auth).transform(
         (s) => (s === '' ? undefined : s)
       ),
       password: zodPassword('senha'),
