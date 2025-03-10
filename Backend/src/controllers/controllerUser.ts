@@ -75,6 +75,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
         active: true,
         photo: true,
         hourlyRate: true,
+        authUuid: true,
         person: {
           select: {
             cpf: true,
