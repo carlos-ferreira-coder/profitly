@@ -75,10 +75,7 @@ const Form = () => {
     setAlertSuccesses(null)
 
     try {
-      await axios.get('/auth/logout', {
-        withCredentials: true,
-      })
-      console.log('passou')
+      // TODO retificar login quando ja logado | não ta substituindo |
       await axios.post('/auth/login', data, {
         withCredentials: true,
       })

@@ -19,7 +19,7 @@ import { Auth } from '@prisma/client'
 
 const DOMAIN = process.env.DOMAIN || ''
 
-const formatUsers = (users: any[], uuid: string, auth: Auth) => {
+const responseUsers = (users: any[], uuid: string, auth: Auth) => {
   return users.map((user) => {
     const isMain = user.uuid === uuid
 
@@ -127,7 +127,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
       },
     })
 
-    res.status(200).json(formatUsers(users, token.uuid, auth))
+    res.status(200).json(responseUsers(users, token.uuid, auth))
     return
   } catch (e) {
     console.error('Erro no servidor:', e)
