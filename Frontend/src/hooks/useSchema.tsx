@@ -91,11 +91,13 @@ export const userUpdatePasswordSchema = (auth: boolean) => {
   return z
     .object({
       uuid: zodUuid('usuário'),
-      passwordCurrent: zodRegex('senha', /^$|^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, !auth).transform(
-        (s) => (s === '' ? undefined : s)
-      ),
-      password: zodPassword('senha'),
-      passwordCheck: zodRegex('senha', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
+      passwordCurrent: auth
+        ? zodRegex('senha antiga', /^$/, false).optional()
+        : zodRegex('senha antiga', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true).transform((s) =>
+            s === '' ? undefined : s
+          ),
+      password: zodPassword('senha nova'),
+      passwordCheck: zodRegex('senha de confirmação', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
     })
     .superRefine(({ password, passwordCheck }, ctx) => {
       if (password !== passwordCheck) {

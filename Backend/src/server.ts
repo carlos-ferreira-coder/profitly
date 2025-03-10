@@ -7,7 +7,7 @@ import routerAuth from '@routers/routerAuth'
 import routerUser from '@routers/routerUser'
 
 const PORT = process.env.PORT || 3000
-const DOMAIN = process.env.RENDER_EXTERNAL_URL || 'http://localhost'
+const DOMAIN = process.env.RENDER_EXTERNAL_URL || ''
 const JWT_SECRET = process.env.JWT_SECRET || ''
 
 const corsOptions = {
