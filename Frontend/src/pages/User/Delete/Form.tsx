@@ -71,7 +71,7 @@ const Form = ({ user }: { user: UserProps }) => {
       if (error instanceof AxiosError && error.response?.status === 418) {
         sessionStorage.setItem('errors', handleAxiosError(error))
 
-        window.localStorage.setItem('isLogged', 'false')
+        sessionStorage.setItem('isLogged', 'false')
         window.dispatchEvent(new Event('isLogged'))
 
         navigate('/login')
