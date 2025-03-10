@@ -128,7 +128,7 @@ export const pages: PageProps[] = [
   },
   {
     title: 'Editar Status',
-    route: '/status/update/:id',
+    route: '/status/update/:uuid',
     protection: ['logged', 'admin'],
     useIn: [],
     icon: faQuestion,
@@ -136,7 +136,7 @@ export const pages: PageProps[] = [
   },
   {
     title: 'Deletar Status',
-    route: '/status/delete/:id',
+    route: '/status/delete/:uuid',
     protection: ['logged', 'admin'],
     useIn: [],
     icon: faQuestion,

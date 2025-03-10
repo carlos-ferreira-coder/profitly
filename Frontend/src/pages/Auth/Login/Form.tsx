@@ -21,6 +21,7 @@ const Form = () => {
 
   useEffect(() => {
     /*
+    TODO navigate em logged
     if (window.localStorage.getItem('isLogged') === 'true') {
       navigate('/home')
     }
