@@ -328,6 +328,7 @@ export const userUpdate = async (req: Request, res: Response): Promise<void> => 
         name: body.data.name,
         email: body.data.email,
         phone: body.data.phone,
+        address: body.data.address,
       },
       where: {
         id: userUpdated.id,
