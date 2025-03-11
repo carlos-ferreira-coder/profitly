@@ -12,6 +12,71 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { ClientProps } from '../../../types/Database'
 
+interface Entity {
+  name: string
+  email: string
+  phone?: string
+  address?: string
+}
+
+const ClientTypeInfo = ({ client }: { client: ClientProps }) => (
+  <p>
+    <b>Tipo: </b> {client.enterprise ? 'Empresa' : 'Pessoa'}
+  </p>
+)
+
+const ClientEntityInfo = ({ client, entity }: { client: ClientProps; entity: Entity }) => {
+  return (
+    <>
+      <p>
+        <b>Nome: </b>
+        {entity.name}
+        {client.active ? (
+          <FontAwesomeIcon icon={faCircleCheck} className="ml-2 text-success" />
+        ) : (
+          <FontAwesomeIcon icon={faCircleXmark} className="ml-2 text-danger" />
+        )}
+      </p>
+      {client.enterprise ? (
+        <>
+          <p>
+            <b>Nome Fantasia: </b> {client.enterprise?.fantasy}
+          </p>
+          <p>
+            <b>CNPJ: </b> {client.enterprise?.fantasy}
+          </p>
+        </>
+      ) : (
+        <>
+          <p>
+            <b>CPF: </b> {client.person?.cpf}
+          </p>
+        </>
+      )}
+    </>
+  )
+}
+
+const ClientContactInfo = ({ entity }: { entity: Entity }) => {
+  return (
+    <>
+      <p>
+        <b>Email: </b> {entity.email}
+      </p>
+      {entity.phone && (
+        <p>
+          <b>Contato: </b> {entity.phone}
+        </p>
+      )}
+      {entity.address && (
+        <p>
+          <b>Endereço: </b> {entity.address}
+        </p>
+      )}
+    </>
+  )
+}
+
 const List = ({ clients }: { clients: ClientProps[] }) => {
   const itemsPerPage = 10
   const navigate = useNavigate()
@@ -31,54 +96,30 @@ const List = ({ clients }: { clients: ClientProps[] }) => {
       {pageRange.map((key) => {
         const client = clients[key]
         const entity = (client.enterprise?.entity || client.person?.entity)!
-        const isEnterprise = !!client.enterprise
 
         return (
           <div
             key={client.uuid}
             className="grid grid-cols-6 lg:grid-cols-7 gap-2 my-3 px-3 lg:px-5 py-3 text-sm text-black dark:text-white shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
           >
-            <div className="col-span-2 flex flex-col justify-center space-y-2">
-              <p>
-                <b>Tipo: </b> {isEnterprise ? 'Empresa' : 'Pessoa'}
-              </p>
-              <p>
-                <b>{isEnterprise ? 'CNPJ' : 'CPF'}: </b>
-                {isEnterprise ? client.enterprise?.cnpj : client.person?.cpf}
-              </p>
+            <div className="col-span-5 lg:hidden flex flex-col justify-center space-y-2">
+              <ClientTypeInfo client={client} />
+
+              <ClientEntityInfo client={client} entity={entity} />
+
+              <ClientContactInfo entity={entity} />
+            </div>
+
+            <div className="col-span-1 flex flex-col justify-center space-y-2">
+              <ClientTypeInfo client={client} />
+            </div>
+
+            <div className="col-span-3 flex flex-col justify-center space-y-2">
+              <ClientEntityInfo client={client} entity={entity} />
             </div>
 
             <div className="col-span-2 flex flex-col justify-center space-y-2">
-              <p>
-                <b>Nome: </b>
-                {entity.name}
-                {client.active ? (
-                  <FontAwesomeIcon icon={faCircleCheck} className="ml-2 text-success" />
-                ) : (
-                  <FontAwesomeIcon icon={faCircleXmark} className="ml-2 text-danger" />
-                )}
-              </p>
-              {isEnterprise && (
-                <p>
-                  <b>Nome Fantasia: </b> {client.enterprise?.fantasy}
-                </p>
-              )}
-            </div>
-
-            <div className="col-span-2 flex flex-col justify-center space-y-2">
-              <p>
-                <b>Email: </b> {entity.email}
-              </p>
-              {entity.phone && (
-                <p>
-                  <b>Contato: </b> {entity.phone}
-                </p>
-              )}
-              {entity.address && (
-                <p>
-                  <b>Endereço: </b> {entity.address}
-                </p>
-              )}
+              <ClientContactInfo entity={entity} />
             </div>
 
             <div className="col-span-1 flex flex-col justify-center items-center space-y-6 lg:space-y-2">
