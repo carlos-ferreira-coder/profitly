@@ -14,6 +14,7 @@ export const loginSchema = z
     email: zodEmail('usuário', false).optional(),
     username: zodString('nome de usuário', false).optional(),
     password: zodRegex('senha', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
+    rememberMe: zodBoolean('manter logado'),
   })
   .superRefine(({ cpf, email, username }, ctx) => {
     if (!(cpf || email || username)) {

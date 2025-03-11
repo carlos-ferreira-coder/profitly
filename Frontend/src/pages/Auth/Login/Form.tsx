@@ -12,6 +12,7 @@ import { Select } from '../../../components/Form/Select'
 import { loginSchema } from '../../../hooks/useSchema'
 import { useUser } from '../../../context/UserContext'
 import { useAuth } from '../../../context/AuthContext'
+import { Checkbox } from '../../../components/Form/Checkbox'
 
 const Form = () => {
   const navigate = useNavigate()
@@ -47,6 +48,7 @@ const Form = () => {
     email: undefined,
     username: undefined,
     password: '',
+    rememberMe: false,
   }
 
   // Hookform
@@ -203,6 +205,17 @@ const Form = () => {
         </div>
         {errors.password && (
           <Alert type="danger" size="sm" data={[errors.password.message || '']} />
+        )}
+      </div>
+
+      <div className="mb-6">
+        <Controller
+          name="rememberMe"
+          control={control}
+          render={({ field }) => <Checkbox label=" Manter-me logado " {...field} />}
+        />
+        {errors.rememberMe && (
+          <Alert type="danger" size="sm" data={[errors.rememberMe.message || '']} />
         )}
       </div>
 

@@ -71,6 +71,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       priority: 'high',
       path: '/',
       domain: DOMAIN,
+      maxAge: body.data.rememberMe ? 604800000 : undefined, // 1 week
     })
 
     res.status(201).json({ message: 'Logado com sucesso.' })
