@@ -38,9 +38,7 @@ export const statusSelect = async (req: Request, res: Response): Promise<void> =
         uuid: params.data.key === 'all' ? undefined : params.data.key,
         name: { contains: query.data.name },
         description: { contains: query.data.description },
-        priority: query.data.priority?.split(',').length
-          ? { in: query.data.priority.split(',').map((s) => parseInt(s)) }
-          : undefined,
+        priority: query.data.priority ? { in: query.data.priority } : undefined,
       },
     })
 

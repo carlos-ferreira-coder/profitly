@@ -91,7 +91,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
               ? token.uuid
               : params.data.key,
         username: { contains: query.data.username },
-        active: query.data.active ? query.data.active === 'true' : undefined,
+        active: query.data.active?.length === 1 ? query.data.active[0] : undefined,
         hourlyRate: {
           gte: query.data.hourlyRateMin
             ? currencyToNumber(query.data.hourlyRateMin, 'BRL')

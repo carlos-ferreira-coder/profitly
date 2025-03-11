@@ -43,7 +43,16 @@ export const authCheckSchema = z.object({
 
 export const authSelectSchema = z.object({
   name: zodString('nome', false).optional(),
-  auth: zodString('cargo/função', false).optional(),
+  auth: zodRegex(
+    'cargo/função',
+    /^(admin|project|personal|financial)(,(admin|project|personal|financial))?(,(admin|project|personal|financial))?(,(admin|project|personal|financial))?$/,
+    false,
+  ).optional(),
+  notAuth: zodRegex(
+    'cargo/função',
+    /^(admin|project|personal|financial)(,(admin|project|personal|financial))?(,(admin|project|personal|financial))?(,(admin|project|personal|financial))?$/,
+    false,
+  ).optional(),
 })
 
 export const authCreateSchema = z.object({
@@ -66,7 +75,9 @@ export const authUpdateSchema = z.object({
 export const statusSelectSchema = z.object({
   name: zodString('nome', false).optional(),
   description: zodString('descrição', false).optional(),
-  priority: zodString('prioridade', false).optional(),
+  priority: zodRegex('prioridade', /^\d+(,\d+)*$/, false)
+    .transform((s) => s.split(',').map((i) => parseInt(i, 10)))
+    .optional(),
 })
 
 export const statusCreateSchema = z.object({
@@ -84,14 +95,25 @@ export const statusUpdateSchema = z.object({
 
 export const userSelectSchema = z.object({
   username: zodString('nome de usuário', false).optional(),
-  active: zodRegex('ativo', /^true$|^false$/, false).optional(),
+  active: zodRegex('ativo', /^(false|true)(,(false|true))?$/, false)
+    .transform((s) => s.split(',').map((i) => i === 'true'))
+    .optional(),
   hourlyRateMin: zodString('valor da hora', false).optional(),
   hourlyRateMax: zodString('valor da hora', false).optional(),
-  auth: zodString('cargo/função', false).optional(),
+  auth: zodRegex(
+    'cargo/função',
+    /^(admin|project|personal|financial)(,(admin|project|personal|financial))?(,(admin|project|personal|financial))?(,(admin|project|personal|financial))?$/,
+    false,
+  ).optional(),
+  notAuth: zodRegex(
+    'cargo/função',
+    /^(admin|project|personal|financial)(,(admin|project|personal|financial))?(,(admin|project|personal|financial))?(,(admin|project|personal|financial))?$/,
+    false,
+  ).optional(),
   cpf: zodString('cpf', false).optional(),
   name: zodString('nome', false).optional(),
   email: zodString('email', false).optional(),
-  phone: zodString('telefone', false).optional(),
+  phone: zodString('contato', false).optional(),
   address: zodString('endereço', false).optional(),
 })
 
@@ -103,7 +125,7 @@ export const userCreateSchema = z
     active: zodBoolean('ativo'),
     hourlyRate: zodRegex('valor da hora', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, false).optional(),
     authUuid: zodUuid('cargo/função'),
-    cpf: zodString('cpf', true),
+    cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true),
     name: zodString('nome', true),
     email: zodEmail('email', true),
     phone: zodRegex('contato', /^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).optional(),
@@ -171,8 +193,12 @@ export const userUpdatePhotoSchema = z.object({
 })
 
 export const clientSelectSchema = z.object({
-  active: zodRegex('ativo', /^true$|^false$/, false).optional(),
-  type: zodRegex('tipo', /^Person$|^Enterprise$/, false).optional(),
+  active: zodRegex('ativo', /^(false|true)(,(false|true))?$/, false)
+    .transform((s) => s.split(',').map((i) => i === 'true'))
+    .optional(),
+  type: zodRegex('tipo', /^(Person|Enterprise)(,(Person|Enterprise))?$/, false)
+    .transform((s) => s.split(','))
+    .optional(),
   cpf: zodString('cpf', false).optional(),
   cnpj: zodString('cnpj', false).optional(),
   fantasy: zodString('nome fantasia', false).optional(),

@@ -182,13 +182,13 @@ export const authSelect = async (req: Request, res: Response): Promise<void> => 
             : params.data.key === 'this'
               ? userToken.authUuid
               : params.data.key,
-        name: query.data.name?.split(',').length ? { in: query.data.name.split(',') } : undefined,
+        name: { contains: query.data.name },
         admin: query.data.auth?.includes('admin') ? true : undefined,
         project: query.data.auth?.includes('project') ? true : undefined,
         personal: query.data.auth?.includes('personal') ? true : undefined,
         financial: query.data.auth?.includes('financial') ? true : undefined,
       },
-    })
+    }) // TODO inserir notAuth no where
     if (!auth) {
       res.status(401).json({ message: 'Autorização não encontrada!' })
       return
