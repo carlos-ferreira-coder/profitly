@@ -157,7 +157,7 @@ const Form = ({ client }: { client: ClientProps }) => {
             <Controller
               name="active"
               control={control}
-              render={({ field }) => <Switcher disabled {...field} />}
+              render={({ field }) => <Switcher {...field} />}
             />
           </div>
         </div>
