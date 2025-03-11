@@ -68,16 +68,8 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
       where: {
         uuid: params.data.key === 'all' ? undefined : params.data.key,
         active: query.data.active ? query.data.active === 'true' : undefined,
-        /*
-        OR: [
-          query.data.type === 'Person'
-            ? { person: { isNot: null } }
-            : query.data.type === 'Enterprise'
-              ? { enterprise: { isNot: null } }
-              : {},
-        ],*/
         person:
-          query.data.type === 'Person'
+          query.data.type === 'Person' || query.data.type === undefined
             ? {
                 cpf: { contains: query.data.cpf },
                 entity: {
@@ -89,7 +81,7 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
               }
             : undefined,
         enterprise:
-          query.data.type === 'Enterprise'
+          query.data.type === 'Enterprise' || query.data.type === undefined
             ? {
                 cnpj: { contains: query.data.cnpj },
                 fantasy: { contains: query.data.fantasy },
