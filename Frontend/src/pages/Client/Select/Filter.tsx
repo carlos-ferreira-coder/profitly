@@ -22,8 +22,8 @@ const Filter = ({
       name: string
       value: boolean
     }[]
-    allStatus: boolean
-    status: {
+    allActive: boolean
+    active: {
       key: boolean
       name: string
       value: boolean
@@ -163,7 +163,7 @@ const Filter = ({
 
         <div className="mb-5.5">
           <label
-            htmlFor="allStatus"
+            htmlFor="allActive"
             className="mb-3 block text-sm font-medium text-black dark:text-white"
           >
             Status
@@ -171,7 +171,7 @@ const Filter = ({
           <div className="relative">
             <div className="mb-1">
               <Controller
-                name="allStatus"
+                name="allActive"
                 control={control}
                 render={({ field }) => (
                   <Checkbox
@@ -181,8 +181,8 @@ const Filter = ({
                     onChange={(e) => {
                       const isChecked = e.target.checked
 
-                      setValue('status.0.value', isChecked)
-                      setValue('status.1.value', isChecked)
+                      setValue('active.0.value', isChecked)
+                      setValue('active.1.value', isChecked)
 
                       field.onChange(isChecked)
                     }}
@@ -193,12 +193,12 @@ const Filter = ({
 
             <div className="ml-2 pl-3 border-l-2">
               <Controller
-                name="status.0.value"
+                name="active.0.value"
                 control={control}
                 render={({ field }) => <Checkbox label="Ativo" {...field} />}
               />
               <Controller
-                name="status.1.value"
+                name="active.1.value"
                 control={control}
                 render={({ field }) => <Checkbox label="Inativo" {...field} />}
               />
