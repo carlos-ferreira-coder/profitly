@@ -110,15 +110,15 @@ const List = ({ clients }: { clients: ClientProps[] }) => {
               <ClientContactInfo entity={entity} />
             </div>
 
-            <div className="col-span-1 flex flex-col justify-center space-y-2">
+            <div className="col-span-1 hidden lg:flex flex-col justify-center space-y-2">
               <ClientTypeInfo client={client} />
             </div>
 
-            <div className="col-span-3 flex flex-col justify-center space-y-2">
+            <div className="col-span-3 hidden lg:flex flex-col justify-center space-y-2">
               <ClientEntityInfo client={client} entity={entity} />
             </div>
 
-            <div className="col-span-2 flex flex-col justify-center space-y-2">
+            <div className="col-span-2 hidden lg:flex flex-col justify-center space-y-2">
               <ClientContactInfo entity={entity} />
             </div>
 
