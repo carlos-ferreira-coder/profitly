@@ -203,10 +203,12 @@ export const clientUpdateSchema = z
     fantasy: zodString('nome fantasia', true).optional(),
     name: zodString('nome completo', true),
     email: zodEmail('email', true),
-    phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).transform((s) =>
-      s === '' ? undefined : s
-    ),
-    address: zodString('endereço', false).transform((s) => (s === '' ? undefined : s)),
+    phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false)
+      .transform((s) => (s === '' ? undefined : s))
+      .nullable(),
+    address: zodString('endereço', false)
+      .transform((s) => (s === '' ? undefined : s))
+      .nullable(),
   })
   .superRefine(({ cnpj, fantasy }, ctx) => {
     if (!cnpj && fantasy) {
