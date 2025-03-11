@@ -24,7 +24,7 @@ const List = ({ clients }: { clients: ClientProps[] }) => {
     <>
       <div className="flex justify-end">
         <Button color="success" className="w-50 h-8" onClick={() => navigate('/client/create/')}>
-          <FontAwesomeIcon icon={faPlus} className="mr-1" /> Adicionar Usuário
+          <FontAwesomeIcon icon={faPlus} className="mr-1" /> Adicionar Cliente
         </Button>
       </div>
 

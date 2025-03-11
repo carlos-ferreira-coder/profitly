@@ -68,13 +68,14 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
       where: {
         uuid: params.data.key === 'all' ? undefined : params.data.key,
         active: query.data.active ? query.data.active === 'true' : undefined,
+        /*
         OR: [
           query.data.type === 'Person'
             ? { person: { isNot: null } }
             : query.data.type === 'Enterprise'
               ? { enterprise: { isNot: null } }
               : {},
-        ],
+        ],*/
         person:
           query.data.type === 'Person'
             ? {
