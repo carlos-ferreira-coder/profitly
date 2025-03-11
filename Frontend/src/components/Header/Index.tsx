@@ -9,24 +9,34 @@ import NavigateHeader from './NavigateHeader'
 const Header = () => {
   const [user, setUser] = useState<UserProps | null>(null)
   const [auth, setAuth] = useState<AuthProps | null>(null)
-  const [errors, setErrors] = useState<string[] | null>(null)
 
   useEffect(() => {
-    ;(async () => {
+    const isLogged = async () => {
       try {
-        const [thisUser, thisAuth] = await Promise.all([
-          axios.get('/user/select/this', { withCredentials: true }),
-          axios.get('/auth/select/this', { withCredentials: true }),
-        ])
+        if (localStorage.getItem('token') === 'true') {
+          const [thisUser, thisAuth] = await Promise.all([
+            axios.get('/user/select/this', { withCredentials: true }),
+            axios.get('/auth/select/this', { withCredentials: true }),
+          ])
 
-        setUser(thisUser.data[0])
-        setAuth(thisAuth.data[0])
+          setUser(thisUser.data[0])
+          setAuth(thisAuth.data[0])
+        } else {
+          setUser(null)
+          setAuth(null)
+        }
       } catch (error) {
-        setUser(null)
-        setAuth(null)
-        setErrors([handleAxiosError(error)])
+        console.error(handleAxiosError(error))
       }
-    })()
+    }
+
+    isLogged()
+
+    window.addEventListener('storage', isLogged)
+
+    return () => {
+      window.removeEventListener('storage', isLogged)
+    }
   }, [])
 
   return (
@@ -35,7 +45,7 @@ const Header = () => {
         <div className="left-0 mt-2.5 mb-2.5">{auth && <DropdownNavigate auth={auth} />}</div>
 
         <div className="hidden h-full md:flex md:items-center md:justify-between md:gap-1.5 lg:gap-3 xl:gap-5">
-          {auth && user ? <NavigateHeader auth={auth}></NavigateHeader> : errors}
+          {auth && user && <NavigateHeader auth={auth}></NavigateHeader>}
         </div>
 
         <div className="flex items-center gap-3 2xsm:gap-5 mt-2.5 mb-2.5">

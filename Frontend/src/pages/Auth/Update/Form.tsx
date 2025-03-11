@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { AuthProps } from '../../../types/Database'
 import { Checkbox } from '../../../components/Form/Checkbox'
+import { AxiosError } from 'axios'
 
 const Form = ({ auth }: { auth: AuthProps }) => {
   const navigate = useNavigate()
@@ -72,6 +73,14 @@ const Form = ({ auth }: { auth: AuthProps }) => {
         </Button>,
       ])
     } catch (error) {
+      if (error instanceof AxiosError && error.response?.status === 418) {
+        localStorage.setItem('token', 'false')
+        window.dispatchEvent(new StorageEvent('storage', { key: 'token' }))
+
+        sessionStorage.setItem('errors', handleAxiosError(error))
+
+        navigate('/login')
+      }
       setAlertErrors([handleAxiosError(error)])
     }
 

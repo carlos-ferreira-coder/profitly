@@ -16,6 +16,9 @@ const Logout = () => {
           withCredentials: true,
         })
 
+        localStorage.setItem('token', 'false')
+        window.dispatchEvent(new StorageEvent('storage', { key: 'token' }))
+
         sessionStorage.setItem('successes', data.message)
 
         navigate('/login')

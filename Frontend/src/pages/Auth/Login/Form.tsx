@@ -80,6 +80,9 @@ const Form = () => {
         withCredentials: true,
       })
 
+      localStorage.setItem('token', 'true')
+      window.dispatchEvent(new StorageEvent('storage', { key: 'token' }))
+
       navigate('/home')
     } catch (error) {
       setAlertErrors([handleAxiosError(error)])

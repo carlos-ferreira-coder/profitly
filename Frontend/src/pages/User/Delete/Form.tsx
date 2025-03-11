@@ -69,13 +69,17 @@ const Form = ({ user }: { user: UserProps }) => {
       setStatus('complete')
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 418) {
+        localStorage.setItem('token', 'false')
+        window.dispatchEvent(new StorageEvent('storage', { key: 'token' }))
+
         sessionStorage.setItem('errors', handleAxiosError(error))
 
         navigate('/login')
       }
       setAlertErrors([handleAxiosError(error)])
-      setStatus('idle')
     }
+
+    setStatus('idle')
   }
 
   return (
