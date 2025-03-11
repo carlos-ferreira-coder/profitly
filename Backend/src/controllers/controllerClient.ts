@@ -39,6 +39,9 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
       address: { contains: query.data.address },
     }
 
+    console.log('query' + query.data)
+    console.log('query STRINGFY' + JSON.stringify(query.data))
+
     // server request
     const clients = await prisma.client.findMany({
       include: {
@@ -56,6 +59,7 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
       where: {
         uuid: params.data.key === 'all' ? undefined : params.data.key,
         active: query.data.active?.length === 1 ? query.data.active[0] : undefined,
+        /*
         person: {
           cpf: { contains: query.data.cpf },
           entity: entityFilter,
@@ -65,6 +69,7 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
           fantasy: { contains: query.data.fantasy },
           entity: entityFilter,
         },
+        */
       },
     })
 
