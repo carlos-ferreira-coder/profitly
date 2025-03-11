@@ -100,9 +100,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
             ? currencyToNumber(query.data.hourlyRateMax, 'BRL')
             : undefined,
         },
-        authUuid: query.data.auth?.split(',').length
-          ? { in: query.data.auth.split(',') }
-          : undefined,
+        authUuid: query.data.auth?.length ? { in: query.data.auth } : undefined,
         person: {
           cpf: { contains: query.data.cpf },
           entity: {

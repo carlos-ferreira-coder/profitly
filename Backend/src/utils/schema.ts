@@ -104,7 +104,9 @@ export const userSelectSchema = z.object({
     'uuid(s) de permissões',
     /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
     false,
-  ).optional(),
+  )
+    .transform((s) => s.split(','))
+    .optional(),
   cpf: zodString('cpf', false).optional(),
   name: zodString('nome', false).optional(),
   email: zodString('email', false).optional(),
