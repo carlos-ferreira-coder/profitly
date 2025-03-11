@@ -76,23 +76,10 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
         photo: true,
         hourlyRate: true,
         authUuid: true,
+        auth: true,
         person: {
-          select: {
-            cpf: true,
-            entity: {
-              select: {
-                name: true,
-                email: true,
-                phone: true,
-                address: true,
-              },
-            },
-          },
-        },
-        auth: {
-          select: {
-            uuid: true,
-            name: true,
+          include: {
+            entity: true,
           },
         },
       },

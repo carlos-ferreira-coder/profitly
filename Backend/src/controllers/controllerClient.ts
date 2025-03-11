@@ -32,39 +32,6 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
       return
     }
 
-    /*
-    const select = {
-      uuid: true,
-      active: true,
-      person: {
-        select: {
-          cpf: true,
-          entity: {
-            select: {
-              name: true,
-              email: true,
-              phone: true,
-              address: true,
-            },
-          },
-        },
-      },
-      enterprise: {
-        select: {
-          cnpj: true,
-          fantasy: true,
-          entity: {
-            select: {
-              name: true,
-              email: true,
-              phone: true,
-              address: true,
-            },
-          },
-        },
-      },
-    }*/
-
     const entityFilter = {
       cpf: { contains: query.data.cpf },
       entity: {
@@ -77,7 +44,18 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
 
     // server request
     const clients = await prisma.client.findMany({
-      //select: select,
+      include: {
+        person: {
+          include: {
+            entity: true,
+          },
+        },
+        enterprise: {
+          include: {
+            entity: true,
+          },
+        },
+      },
       where: {
         uuid: params.data.key === 'all' ? undefined : params.data.key,
         active: query.data.active ? query.data.active === 'true' : undefined,
