@@ -161,3 +161,81 @@ export const userDeleteSchema = z.object({
   name: zodString('nome completo', true),
   email: zodEmail('email', true),
 })
+
+export const clientCreateSchema = z
+  .object({
+    active: zodBoolean('ativo'),
+    type: zodRegex('tipo', /^(Person|Enterprise)$/, true),
+    cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true).optional(),
+    cnpj: zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, true).optional(),
+    fantasy: zodString('nome fantasia', true).optional(),
+    name: zodString('nome completo', true),
+    email: zodEmail('email', true),
+    phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).transform((s) =>
+      s === '' ? undefined : s
+    ),
+    address: zodString('endereço', false).transform((s) => (s === '' ? undefined : s)),
+  })
+  .superRefine(({ cpf, cnpj, fantasy }, ctx) => {
+    if (!(cpf || (cnpj && fantasy))) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'O cliente precisa ser pessoa fisica ou juridica!',
+        path: ['cpf', 'cnpj'],
+      })
+    }
+
+    if (cpf && cnpj) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Cadastre separadamente pessoa fisica e juridica!',
+        path: ['cpf', 'cnpj'],
+      })
+    }
+  })
+
+export const clientUpdateSchema = z
+  .object({
+    uuid: zodUuid('cliente'),
+    active: zodBoolean('ativo'),
+    cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true).optional(),
+    cnpj: zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, true).optional(),
+    fantasy: zodString('nome fantasia', true).optional(),
+    name: zodString('nome completo', true),
+    email: zodEmail('email', true),
+    phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).transform((s) =>
+      s === '' ? undefined : s
+    ),
+    address: zodString('endereço', false).transform((s) => (s === '' ? undefined : s)),
+  })
+  .superRefine(({ cnpj, fantasy }, ctx) => {
+    if (!cnpj && fantasy) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'O cnpj é obrigatório!',
+        path: ['cnpj'],
+      })
+    }
+
+    if (cnpj && !fantasy) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'O nome fantasia é obrigatório!',
+        path: ['fantasy'],
+      })
+    }
+  })
+
+export const clientDeleteSchema = z.object({
+  uuid: zodUuid('cliente'),
+  active: zodBoolean('ativo'),
+  cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true).optional(),
+  cnpj: zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, true).optional(),
+  fantasy: zodString('nome fantasia', true).optional(),
+  name: zodString('nome completo', true),
+  email: zodEmail('email', true),
+  phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).transform((s) =>
+    s === '' ? undefined : s
+  ),
+  address: zodString('endereço', false).transform((s) => (s === '' ? undefined : s)),
+})

@@ -24,6 +24,8 @@ const Form = () => {
   const [alertSuccesses, setAlertSuccesses] = useState<(string | JSX.Element)[] | null>(null)
 
   useEffect(() => {
+    // TODO verificar se login sobre login da erro
+
     // Set alerts
     ;['errors', 'warnings', 'successes'].forEach((item) => {
       const message = sessionStorage.getItem(item)

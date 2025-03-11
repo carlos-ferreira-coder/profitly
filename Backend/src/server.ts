@@ -6,6 +6,7 @@ import { auth } from '@middlewares/auth'
 import routerAuth from '@routers/routerAuth'
 import routerUser from '@routers/routerUser'
 import routerStatus from '@routers/routerStatus'
+import routerClient from '@routers/routerClient'
 
 const PORT = process.env.PORT || 3000
 const DOMAIN = process.env.RENDER_EXTERNAL_URL || ''
@@ -27,6 +28,7 @@ app.use(cookieParser(JWT_SECRET))
 app.use('/auth', routerAuth)
 app.use('/user', auth, routerUser)
 app.use('/status', auth, routerStatus)
+app.use('/client', auth, routerClient)
 
 app.use('/img/user', auth, express.static('src/images/users'))
 
