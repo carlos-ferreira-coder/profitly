@@ -32,67 +32,57 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
       return
     }
 
-    // server request
-    const clients = await prisma.client.findMany({
-      select: {
-        uuid: true,
-        active: true,
-        person: {
-          select: {
-            cpf: true,
-            entity: {
-              select: {
-                name: true,
-                email: true,
-                phone: true,
-                address: true,
-              },
-            },
-          },
-        },
-        enterprise: {
-          select: {
-            cnpj: true,
-            fantasy: true,
-            entity: {
-              select: {
-                name: true,
-                email: true,
-                phone: true,
-                address: true,
-              },
+    /*
+    const select = {
+      uuid: true,
+      active: true,
+      person: {
+        select: {
+          cpf: true,
+          entity: {
+            select: {
+              name: true,
+              email: true,
+              phone: true,
+              address: true,
             },
           },
         },
       },
+      enterprise: {
+        select: {
+          cnpj: true,
+          fantasy: true,
+          entity: {
+            select: {
+              name: true,
+              email: true,
+              phone: true,
+              address: true,
+            },
+          },
+        },
+      },
+    }*/
+
+    const entityFilter = {
+      cpf: { contains: query.data.cpf },
+      entity: {
+        name: { contains: query.data.name },
+        email: { contains: query.data.email },
+        phone: { contains: query.data.phone },
+        address: { contains: query.data.address },
+      },
+    }
+
+    // server request
+    const clients = await prisma.client.findMany({
+      //select: select,
       where: {
         uuid: params.data.key === 'all' ? undefined : params.data.key,
         active: query.data.active ? query.data.active === 'true' : undefined,
-        person:
-          query.data.type === 'Person' || query.data.type === undefined
-            ? {
-                cpf: { contains: query.data.cpf },
-                entity: {
-                  name: { contains: query.data.name },
-                  email: { contains: query.data.email },
-                  phone: { contains: query.data.phone },
-                  address: { contains: query.data.address },
-                },
-              }
-            : undefined,
-        enterprise:
-          query.data.type === 'Enterprise' || query.data.type === undefined
-            ? {
-                cnpj: { contains: query.data.cnpj },
-                fantasy: { contains: query.data.fantasy },
-                entity: {
-                  name: { contains: query.data.name },
-                  email: { contains: query.data.email },
-                  phone: { contains: query.data.phone },
-                  address: { contains: query.data.address },
-                },
-              }
-            : undefined,
+        person: !query.data.type || query.data.type === 'Person' ? entityFilter : undefined,
+        enterprise: !query.data.type || query.data.type === 'Enterprise' ? entityFilter : undefined,
       },
     })
 
