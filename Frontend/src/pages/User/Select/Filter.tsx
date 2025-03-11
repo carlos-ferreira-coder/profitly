@@ -50,8 +50,8 @@ const Filter = ({
     address: '',
     hourlyRateMin: '',
     hourlyRateMax: '',
-    allStatus: true,
-    status: [
+    allActive: true,
+    active: [
       { key: true, name: 'active', value: true },
       { key: false, name: 'inactive', value: true },
     ],
@@ -284,7 +284,7 @@ const Filter = ({
             htmlFor="allActive"
             className="mb-3 block text-sm font-medium text-black dark:text-white"
           >
-            Status
+            Ativo
           </label>
           <div className="relative">
             <div className="mb-1">

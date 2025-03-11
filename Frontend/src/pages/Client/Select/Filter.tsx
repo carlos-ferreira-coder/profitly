@@ -43,8 +43,8 @@ const Filter = ({
       { key: 'Person', name: 'Person', value: true },
       { key: 'Enterprise', name: 'Enterprise', value: true },
     ],
-    allStatus: true,
-    status: [
+    allActive: true,
+    active: [
       { key: true, name: 'active', value: true },
       { key: false, name: 'inactive', value: true },
     ],
