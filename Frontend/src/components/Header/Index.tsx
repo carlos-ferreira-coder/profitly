@@ -1,43 +1,13 @@
 import DropdownNavigate from './DropdownNavigate'
 import DropdownUser from './DropdownUser'
 import DarkModeSwitcher from './DarkModeSwitcher'
-import { api as axios, handleAxiosError } from '../../services/Axios'
-import { useEffect, useState } from 'react'
-import { AuthProps, UserProps } from '../../types/Database'
 import NavigateHeader from './NavigateHeader'
+import { useUser } from '../../context/UserContext'
+import { useAuth } from '../../context/AuthContext'
 
 const Header = () => {
-  const [user, setUser] = useState<UserProps | null>(null)
-  const [auth, setAuth] = useState<AuthProps | null>(null)
-
-  useEffect(() => {
-    const isLogged = async () => {
-      try {
-        if (localStorage.getItem('token') === 'true') {
-          const [thisUser, thisAuth] = await Promise.all([
-            axios.get('/user/select/this', { withCredentials: true }),
-            axios.get('/auth/select/this', { withCredentials: true }),
-          ])
-
-          setUser(thisUser.data[0])
-          setAuth(thisAuth.data[0])
-        } else {
-          setUser(null)
-          setAuth(null)
-        }
-      } catch (error) {
-        console.error(handleAxiosError(error))
-      }
-    }
-
-    isLogged()
-
-    window.addEventListener('storage', isLogged)
-
-    return () => {
-      window.removeEventListener('storage', isLogged)
-    }
-  }, [])
+  const { user } = useUser()
+  const { auth } = useAuth()
 
   return (
     <header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
@@ -45,7 +15,7 @@ const Header = () => {
         <div className="left-0 mt-2.5 mb-2.5">{auth && <DropdownNavigate auth={auth} />}</div>
 
         <div className="hidden h-full md:flex md:items-center md:justify-between md:gap-1.5 lg:gap-3 xl:gap-5">
-          {auth && user && <NavigateHeader auth={auth}></NavigateHeader>}
+          {user && auth && <NavigateHeader auth={auth} />}
         </div>
 
         <div className="flex items-center gap-3 2xsm:gap-5 mt-2.5 mb-2.5">

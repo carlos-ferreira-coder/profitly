@@ -10,10 +10,13 @@ import Alert from '../../../components/Alert/Index'
 import Button from '../../../components/Form/Button'
 import { Select } from '../../../components/Form/Select'
 import { loginSchema } from '../../../hooks/useSchema'
+import { useUser } from '../../../context/UserContext'
+import { useAuth } from '../../../context/AuthContext'
 
 const Form = () => {
   const navigate = useNavigate()
-
+  const { setUser } = useUser()
+  const { setAuth } = useAuth()
   const [request, setRequest] = useState<'idle' | 'request'>('idle')
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
   const [alertWarnings, setAlertWarnings] = useState<(string | JSX.Element)[] | null>(null)
@@ -80,8 +83,13 @@ const Form = () => {
         withCredentials: true,
       })
 
-      localStorage.setItem('token', 'true')
-      window.dispatchEvent(new StorageEvent('storage', { key: 'token' }))
+      const [thisUser, thisAuth] = await Promise.all([
+        axios.get('/user/select/this', { withCredentials: true }),
+        axios.get('/auth/select/this', { withCredentials: true }),
+      ])
+
+      setUser(thisUser.data[0])
+      setAuth(thisAuth.data[0])
 
       navigate('/home')
     } catch (error) {

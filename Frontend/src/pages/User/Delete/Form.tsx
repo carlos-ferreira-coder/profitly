@@ -12,9 +12,13 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { userDeleteSchema } from '../../../hooks/useSchema'
 import { UserProps } from '../../../types/Database'
+import { useUser } from '../../../context/UserContext'
+import { useAuth } from '../../../context/AuthContext'
 
 const Form = ({ user }: { user: UserProps }) => {
   const navigate = useNavigate()
+  const { setUser } = useUser()
+  const { setAuth } = useAuth()
   const [status, setStatus] = useState<'idle' | 'request' | 'complete'>('idle')
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
   const [alertSuccesses, setAlertSuccesses] = useState<(string | JSX.Element)[] | null>(null)
@@ -69,8 +73,8 @@ const Form = ({ user }: { user: UserProps }) => {
       setStatus('complete')
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 418) {
-        localStorage.setItem('token', 'false')
-        window.dispatchEvent(new StorageEvent('storage', { key: 'token' }))
+        setUser(null)
+        setAuth(null)
 
         sessionStorage.setItem('errors', handleAxiosError(error))
 

@@ -12,9 +12,13 @@ import { useState } from 'react'
 import { AuthProps } from '../../../types/Database'
 import { Checkbox } from '../../../components/Form/Checkbox'
 import { AxiosError } from 'axios'
+import { useUser } from '../../../context/UserContext'
+import { useAuth } from '../../../context/AuthContext'
 
 const Form = ({ auth }: { auth: AuthProps }) => {
   const navigate = useNavigate()
+  const { setUser } = useUser()
+  const { setAuth } = useAuth()
   const [status, setStatus] = useState<'idle' | 'request'>('idle')
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
   const [alertSuccesses, setAlertSuccesses] = useState<(string | JSX.Element)[] | null>(null)
@@ -74,8 +78,8 @@ const Form = ({ auth }: { auth: AuthProps }) => {
       ])
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 418) {
-        localStorage.setItem('token', 'false')
-        window.dispatchEvent(new StorageEvent('storage', { key: 'token' }))
+        setUser(null)
+        setAuth(null)
 
         sessionStorage.setItem('errors', handleAxiosError(error))
 

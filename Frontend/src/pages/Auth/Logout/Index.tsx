@@ -3,9 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import Alert from '../../../components/Alert/Index'
 import { api as axios, handleAxiosError } from '../../../services/Axios'
 import Loader from '../../../components/Loader'
+import { useUser } from '../../../context/UserContext'
+import { useAuth } from '../../../context/AuthContext'
 
 const Logout = () => {
   const navigate = useNavigate()
+  const { setUser } = useUser()
+  const { setAuth } = useAuth()
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
 
   // logout on backend
@@ -16,8 +20,8 @@ const Logout = () => {
           withCredentials: true,
         })
 
-        localStorage.setItem('token', 'false')
-        window.dispatchEvent(new StorageEvent('storage', { key: 'token' }))
+        setUser(null)
+        setAuth(null)
 
         sessionStorage.setItem('successes', data.message)
 
@@ -26,7 +30,7 @@ const Logout = () => {
         setAlertErrors([handleAxiosError(error)])
       }
     })()
-  }, [navigate])
+  }, [navigate, setUser, setAuth])
 
   return (
     <div className="mx-auto max-w-150">
