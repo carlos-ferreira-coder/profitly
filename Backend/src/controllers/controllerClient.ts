@@ -33,13 +33,10 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
     }
 
     const entityFilter = {
-      cpf: { contains: query.data.cpf },
-      entity: {
-        name: { contains: query.data.name },
-        email: { contains: query.data.email },
-        phone: { contains: query.data.phone },
-        address: { contains: query.data.address },
-      },
+      name: { contains: query.data.name },
+      email: { contains: query.data.email },
+      phone: { contains: query.data.phone },
+      address: { contains: query.data.address },
     }
 
     // server request
@@ -59,8 +56,21 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
       where: {
         uuid: params.data.key === 'all' ? undefined : params.data.key,
         active: query.data.active ? query.data.active === 'true' : undefined,
-        person: entityFilter,
-        enterprise: entityFilter,
+        person:
+          !query.data.type || query.data.type === 'Person'
+            ? {
+                cpf: { contains: query.data.cpf },
+                entity: entityFilter,
+              }
+            : undefined,
+        enterprise:
+          !query.data.type || query.data.type === 'Enterprise'
+            ? {
+                cnpj: { contains: query.data.cnpj },
+                fantasy: { contains: query.data.fantasy },
+                entity: entityFilter,
+              }
+            : undefined,
       },
     })
 
