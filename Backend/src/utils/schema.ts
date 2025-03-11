@@ -45,12 +45,12 @@ export const authSelectSchema = z.object({
   name: zodString('nome', false).optional(),
   auth: zodRegex(
     'cargo/função',
-    /^(admin|project|personal|financial)(,(admin|project|personal|financial))?(,(admin|project|personal|financial))?(,(admin|project|personal|financial))?$/,
+    /^(admin|project|personal|financial)(,(admin|project|personal|financial))*$/,
     false,
   ).optional(),
   notAuth: zodRegex(
     'cargo/função',
-    /^(admin|project|personal|financial)(,(admin|project|personal|financial))?(,(admin|project|personal|financial))?(,(admin|project|personal|financial))?$/,
+    /^(admin|project|personal|financial)(,(admin|project|personal|financial))*$/,
     false,
   ).optional(),
 })
@@ -101,13 +101,8 @@ export const userSelectSchema = z.object({
   hourlyRateMin: zodString('valor da hora', false).optional(),
   hourlyRateMax: zodString('valor da hora', false).optional(),
   auth: zodRegex(
-    'cargo/função',
-    /^(admin|project|personal|financial)(,(admin|project|personal|financial))?(,(admin|project|personal|financial))?(,(admin|project|personal|financial))?$/,
-    false,
-  ).optional(),
-  notAuth: zodRegex(
-    'cargo/função',
-    /^(admin|project|personal|financial)(,(admin|project|personal|financial))?(,(admin|project|personal|financial))?(,(admin|project|personal|financial))?$/,
+    'uuid(s) de permissões',
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
     false,
   ).optional(),
   cpf: zodString('cpf', false).optional(),
