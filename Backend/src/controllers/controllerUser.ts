@@ -67,9 +67,6 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
       return
     }
 
-    console.log('Active:' + query.data.active)
-    console.log('Auth:' + query.data.auth)
-
     // server request
     const users = await prisma.user.findMany({
       select: {

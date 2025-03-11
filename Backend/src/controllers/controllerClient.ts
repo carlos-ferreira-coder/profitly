@@ -56,21 +56,15 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
       where: {
         uuid: params.data.key === 'all' ? undefined : params.data.key,
         active: query.data.active?.length === 1 ? query.data.active[0] : undefined,
-        person:
-          !query.data.type || query.data.type.includes('Person')
-            ? {
-                cpf: { contains: query.data.cpf },
-                entity: entityFilter,
-              }
-            : undefined,
-        enterprise:
-          !query.data.type || query.data.type.includes('Enterprise')
-            ? {
-                cnpj: { contains: query.data.cnpj },
-                fantasy: { contains: query.data.fantasy },
-                entity: entityFilter,
-              }
-            : undefined,
+        person: {
+          cpf: { contains: query.data.cpf },
+          entity: entityFilter,
+        },
+        enterprise: {
+          cnpj: { contains: query.data.cnpj },
+          fantasy: { contains: query.data.fantasy },
+          entity: entityFilter,
+        },
       },
     })
 
