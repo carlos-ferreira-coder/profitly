@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import { prisma } from '@/server'
 import { validateCPF, validateCNPJ } from '@utils/validate'
-import z from 'zod'
 import {
   clientCreateSchema,
   clientSelectSchema,

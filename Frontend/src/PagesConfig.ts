@@ -6,6 +6,7 @@ import {
   faBarsProgress,
   faHouse,
   faQuestion,
+  faUser,
   faUserGear,
   faUserPen,
   faUserTie,
@@ -15,6 +16,10 @@ import { AuthProps } from './types/Database'
 import Home from './pages/Home/Index'
 import Login from './pages/Auth/Login/Index'
 import Logout from './pages/Auth/Logout/Index'
+import ClientSelect from './pages/Client/Select/Index'
+import ClientCreate from './pages/Client/Create/Index'
+import ClientUpdate from './pages/Client/Update/Index'
+import ClientDelete from './pages/Client/Delete/Index'
 import UserSelect from './pages/User/Select/Index'
 import UserCreate from './pages/User/Create/Index'
 import UserUpdate from './pages/User/Update/Index'
@@ -45,6 +50,38 @@ export const pages: PageProps[] = [
     useIn: ['Navigate'],
     icon: faHouse,
     component: Home,
+  },
+  {
+    title: 'Clientes',
+    route: '/client/select',
+    protection: ['logged'],
+    useIn: ['Navigate'],
+    icon: faUser,
+    component: ClientSelect,
+  },
+  {
+    title: 'Cadastrar Cliente',
+    route: '/client/create',
+    protection: ['logged'],
+    useIn: [],
+    icon: faQuestion,
+    component: ClientCreate,
+  },
+  {
+    title: 'Editar Cliente',
+    route: '/client/update/:uuid',
+    protection: ['logged'],
+    useIn: [],
+    icon: faQuestion,
+    component: ClientUpdate,
+  },
+  {
+    title: 'Deletar Cliente',
+    route: '/client/delete/:uuid',
+    protection: ['logged'],
+    useIn: [],
+    icon: faQuestion,
+    component: ClientDelete,
   },
   {
     title: 'Usuários',
