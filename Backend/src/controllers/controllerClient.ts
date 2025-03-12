@@ -32,6 +32,13 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
       return
     }
 
+    const entityFilter = {
+      name: { contains: query.data.name },
+      email: { contains: query.data.email },
+      phone: { contains: query.data.phone },
+      address: { contains: query.data.address },
+    }
+
     // server request
     const clients = await prisma.client.findMany({
       include: {
@@ -49,25 +56,23 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
       where: {
         uuid: params.data.key === 'all' ? undefined : params.data.key,
         active: query.data.active?.length === 1 ? query.data.active[0] : undefined,
-        person: {
-          cpf: { contains: query.data.cpf },
-          entity: {
-            name: { contains: query.data.name },
-            email: { contains: query.data.email },
-            phone: { contains: query.data.phone },
-            address: { contains: query.data.address },
+        OR: [
+          {
+            enterprise: null,
+            person: {
+              cpf: { contains: query.data.cpf },
+              entity: entityFilter,
+            },
           },
-        },
-        enterprise: {
-          cnpj: { contains: query.data.cnpj },
-          fantasy: { contains: query.data.fantasy },
-          entity: {
-            name: { contains: query.data.name },
-            email: { contains: query.data.email },
-            phone: { contains: query.data.phone },
-            address: { contains: query.data.address },
+          {
+            person: null,
+            enterprise: {
+              cnpj: { contains: query.data.cnpj },
+              fantasy: { contains: query.data.fantasy },
+              entity: entityFilter,
+            },
           },
-        },
+        ],
       },
     })
 
