@@ -43,12 +43,15 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
     const clients = await prisma.client.findMany({
       include: {
         person: {
-          include: {
+          select: {
+            cpf: true,
             entity: true,
           },
         },
         enterprise: {
-          include: {
+          select: {
+            cnpj: true,
+            fantasy: true,
             entity: true,
           },
         },
