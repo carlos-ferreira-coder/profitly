@@ -182,7 +182,7 @@ export const authSelect = async (req: Request, res: Response): Promise<void> => 
             : params.data.key === 'this'
               ? userToken.authUuid
               : params.data.key,
-        name: { contains: query.data.name },
+        name: query.data.name ? { contains: query.data.name } : undefined,
         admin: query.data.auth?.includes('admin') ? true : undefined,
         project: query.data.auth?.includes('project') ? true : undefined,
         personal: query.data.auth?.includes('personal') ? true : undefined,

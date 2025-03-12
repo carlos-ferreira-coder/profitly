@@ -61,20 +61,24 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
             ? { person: { is: null } }
             : {
                 person: {
-                  cpf: query.data.cpf ? { contains: query.data.cpf } : undefined,
-                  entity: entityFilter,
+                  where: {
+                    cpf: query.data.cpf ? { contains: query.data.cpf } : undefined,
+                    entity: entityFilter,
+                  },
                 },
               },
           query.data.cpf
             ? { enterprise: { is: null } }
             : {
                 enterprise: {
-                  cnpj: query.data.cnpj ? { contains: query.data.cnpj } : undefined,
-                  fantasy: query.data.fantasy ? { contains: query.data.fantasy } : undefined,
-                  entity: entityFilter,
+                  where: {
+                    cnpj: query.data.cnpj ? { contains: query.data.cnpj } : undefined,
+                    fantasy: query.data.fantasy ? { contains: query.data.fantasy } : undefined,
+                    entity: entityFilter,
+                  },
                 },
               },
-        ],
+        ].filter(Boolean),
       },
     })
 
