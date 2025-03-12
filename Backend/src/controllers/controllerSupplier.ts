@@ -291,8 +291,8 @@ export const supplierDelete = async (req: Request, res: Response): Promise<void>
 
     // create resource
     const supplierDeleted = await prisma.supplier.delete({ where: { uuid: params.data.uuid } })
-    await prisma.person.delete({ where: { id: supplierDeleted.id } })
     await prisma.enterprise.delete({ where: { id: supplierDeleted.id } })
+    await prisma.person.delete({ where: { id: supplierDeleted.id } })
     await prisma.entity.delete({ where: { id: supplierDeleted.id } })
 
     res.status(201).json({ message: 'O fornecedor foi deletado.' })

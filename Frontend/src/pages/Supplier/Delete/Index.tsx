@@ -14,15 +14,13 @@ const Delete = () => {
   const [supplier, setSupplier] = useState<SupplierProps | null>(null)
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
 
-  // Get supplier
+  // Get client
   useEffect(() => {
     ;(async () => {
       try {
         const {
-          data: {
-            0: { resSupplier },
-          },
-        } = await axios.get(`/supplier/select/${uuid}`, {
+          data: { 0: resSupplier },
+        } = await axios.get(`/client/select/${uuid}`, {
           withCredentials: true,
         })
 

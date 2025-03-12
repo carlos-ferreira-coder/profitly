@@ -291,8 +291,8 @@ export const clientDelete = async (req: Request, res: Response): Promise<void> =
 
     // create resource
     const clientDeleted = await prisma.client.delete({ where: { uuid: params.data.uuid } })
-    await prisma.person.delete({ where: { id: clientDeleted.id } })
     await prisma.enterprise.delete({ where: { id: clientDeleted.id } })
+    await prisma.person.delete({ where: { id: clientDeleted.id } })
     await prisma.entity.delete({ where: { id: clientDeleted.id } })
 
     res.status(201).json({ message: 'O cliente foi deletado.' })
