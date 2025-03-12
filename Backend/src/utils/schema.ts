@@ -266,3 +266,81 @@ export const clientUpdateSchema = z
       })
     }
   })
+
+export const supplierSelectSchema = z.object({
+  active: zodRegex('ativo', /^(false|true)(,(false|true))?$/, false)
+    .transform((s) => s.split(',').map((i) => i === 'true'))
+    .optional(),
+  type: zodRegex('tipo', /^(Person|Enterprise)(,(Person|Enterprise))?$/, false)
+    .transform((s) => s.split(','))
+    .optional(),
+  cpf: zodString('cpf', false).optional(),
+  cnpj: zodString('cnpj', false).optional(),
+  fantasy: zodString('nome fantasia', false).optional(),
+  name: zodString('nome', false).optional(),
+  email: zodString('email', false).optional(),
+  phone: zodString('telefone', false).optional(),
+  address: zodString('endereço', false).optional(),
+})
+
+export const supplierCreateSchema = z
+  .object({
+    active: zodBoolean('ativo'),
+    type: zodRegex('tipo', /^(Person|Enterprise)$/, true),
+    cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true).optional(),
+    cnpj: zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, true).optional(),
+    fantasy: zodString('nome fantasia', true).optional(),
+    name: zodString('nome completo', true),
+    email: zodEmail('email', true),
+    phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).optional(),
+    address: zodString('endereço', false).optional(),
+  })
+  .superRefine(({ cpf, cnpj, fantasy }, ctx) => {
+    if (!(cpf || (cnpj && fantasy))) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'O cliente precisa ser pessoa fisica ou juridica!',
+        path: ['cpf', 'cnpj'],
+      })
+    }
+
+    if (cpf && cnpj) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Cadastre separadamente pessoa fisica e juridica!',
+        path: ['cpf', 'cnpj'],
+      })
+    }
+  })
+
+export const supplierUpdateSchema = z
+  .object({
+    uuid: zodUuid('fornecedor'),
+    active: zodBoolean('ativo'),
+    cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true).optional(),
+    cnpj: zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, true).optional(),
+    fantasy: zodString('nome fantasia', true).optional(),
+    name: zodString('nome completo', true),
+    email: zodEmail('email', true),
+    phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false)
+      .nullable()
+      .optional(),
+    address: zodString('endereço', false).nullable().optional(),
+  })
+  .superRefine(({ cnpj, fantasy }, ctx) => {
+    if (!cnpj && fantasy) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'O cnpj é obrigatório!',
+        path: ['cnpj'],
+      })
+    }
+
+    if (cnpj && !fantasy) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'O nome fantasia é obrigatório!',
+        path: ['fantasy'],
+      })
+    }
+  })

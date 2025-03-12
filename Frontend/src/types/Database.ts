@@ -59,3 +59,27 @@ export type ClientProps = {
     }
   }
 }
+
+export type SupplierProps = {
+  uuid: string
+  active: boolean
+  person?: {
+    cpf: string
+    entity: {
+      name: string
+      email: string
+      phone?: string
+      address?: string
+    }
+  }
+  enterprise?: {
+    cnpj: string
+    fantasy: string
+    entity: {
+      name: string
+      email: string
+      phone?: string
+      address?: string
+    }
+  }
+}

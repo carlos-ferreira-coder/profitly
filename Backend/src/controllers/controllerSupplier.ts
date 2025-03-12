@@ -2,14 +2,14 @@ import { Request, Response } from 'express'
 import { prisma } from '@/server'
 import { validateCPF, validateCNPJ } from '@utils/validate'
 import {
-  clientCreateSchema,
-  clientSelectSchema,
-  clientUpdateSchema,
+  supplierCreateSchema,
+  supplierSelectSchema,
+  supplierUpdateSchema,
   keySchema,
   uuidSchema,
 } from '@utils/schema'
 
-export const clientSelect = async (req: Request, res: Response): Promise<void> => {
+export const supplierSelect = async (req: Request, res: Response): Promise<void> => {
   try {
     // check params
     const params = keySchema.safeParse(req.params)
@@ -19,7 +19,7 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
     }
 
     // check query
-    const query = clientSelectSchema.safeParse(req.query)
+    const query = supplierSelectSchema.safeParse(req.query)
     if (!query.success) {
       res.status(401).json({ message: `Query inválido: ${JSON.stringify(query.error.format())}` })
       return
@@ -41,7 +41,7 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
 
     // TODO retificar cpf, cnpj e fantasy
     // server request
-    const clients = await prisma.client.findMany({
+    const suppliers = await prisma.supplier.findMany({
       include: {
         person: {
           include: {
@@ -79,7 +79,7 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
       },
     })
 
-    res.status(200).json(clients)
+    res.status(200).json(suppliers)
     return
   } catch (e) {
     console.log(e)
@@ -88,10 +88,10 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
   }
 }
 
-export const clientCreate = async (req: Request, res: Response): Promise<void> => {
+export const supplierCreate = async (req: Request, res: Response): Promise<void> => {
   try {
     // check schema
-    const body = clientCreateSchema.safeParse(req.body)
+    const body = supplierCreateSchema.safeParse(req.body)
     if (!body.success) {
       res.status(401).json({ message: `Body inválido: ${JSON.stringify(body.error.format())}` })
       return
@@ -167,7 +167,7 @@ export const clientCreate = async (req: Request, res: Response): Promise<void> =
         },
       })
     }
-    await prisma.client.create({
+    await prisma.supplier.create({
       data: {
         id: entity.id,
         active: body.data.active,
@@ -176,7 +176,7 @@ export const clientCreate = async (req: Request, res: Response): Promise<void> =
       },
     })
 
-    res.status(201).json({ message: 'O cliente foi cadastrado.' })
+    res.status(201).json({ message: 'O fornecedor foi cadastrado.' })
     return
   } catch (e) {
     console.log(e)
@@ -185,10 +185,10 @@ export const clientCreate = async (req: Request, res: Response): Promise<void> =
   }
 }
 
-export const clientUpdate = async (req: Request, res: Response): Promise<void> => {
+export const supplierUpdate = async (req: Request, res: Response): Promise<void> => {
   try {
     // check schema
-    const body = clientUpdateSchema.safeParse(req.body)
+    const body = supplierUpdateSchema.safeParse(req.body)
     if (!body.success) {
       res.status(401).json({ message: `Body inválido: ${JSON.stringify(body.error.format())}` })
       return
@@ -201,22 +201,22 @@ export const clientUpdate = async (req: Request, res: Response): Promise<void> =
       return
     }
 
-    // check if client exist
-    const client = await prisma.client.findUnique({ where: { uuid: body.data.uuid } })
-    if (!client) {
-      res.status(404).json({ message: 'Cliente não econtrado!' })
+    // check if supplier exist
+    const supplier = await prisma.supplier.findUnique({ where: { uuid: body.data.uuid } })
+    if (!supplier) {
+      res.status(404).json({ message: 'Fornecedor não econtrado!' })
       return
     }
 
     // check if email has registered
     const email = await prisma.entity.findUnique({ where: { email: body.data.email } })
-    if (email && email.id !== client.id) {
+    if (email && email.id !== supplier.id) {
       res.status(401).json({ message: 'Esse email já foi registrado!' })
       return
     }
 
     // create resource
-    const clientUpdated = await prisma.client.update({
+    const supplierUpdated = await prisma.supplier.update({
       data: {
         active: body.data.active,
       },
@@ -231,7 +231,7 @@ export const clientUpdate = async (req: Request, res: Response): Promise<void> =
           fantasy: body.data.fantasy,
         },
         where: {
-          id: clientUpdated.id,
+          id: supplierUpdated.id,
         },
       })
     }
@@ -241,7 +241,7 @@ export const clientUpdate = async (req: Request, res: Response): Promise<void> =
           cpf: body.data.cpf,
         },
         where: {
-          id: clientUpdated.id,
+          id: supplierUpdated.id,
         },
       })
     }
@@ -253,11 +253,11 @@ export const clientUpdate = async (req: Request, res: Response): Promise<void> =
         address: body.data.address,
       },
       where: {
-        id: clientUpdated.id,
+        id: supplierUpdated.id,
       },
     })
 
-    res.status(201).json({ message: 'As informações do cliente foram atualizadas.' })
+    res.status(201).json({ message: 'As informações do fornecedor foram atualizadas.' })
     return
   } catch (e) {
     console.log(e)
@@ -266,10 +266,10 @@ export const clientUpdate = async (req: Request, res: Response): Promise<void> =
   }
 }
 
-export const clientDelete = async (req: Request, res: Response): Promise<void> => {
+export const supplierDelete = async (req: Request, res: Response): Promise<void> => {
   try {
     // get uuid
-    const params = uuidSchema('cliente').safeParse(req.params)
+    const params = uuidSchema('suppliere').safeParse(req.params)
     if (!params.success) {
       res.status(401).json({ message: `Params inválido: ${JSON.stringify(params.error.format())}` })
       return
@@ -282,17 +282,17 @@ export const clientDelete = async (req: Request, res: Response): Promise<void> =
       return
     }
 
-    // check if client exist
-    const client = await prisma.client.findUnique({ where: { uuid: params.data.uuid } })
-    if (!client) {
-      res.status(401).json({ message: 'Cliente não econtrado!' })
+    // check if supplier exist
+    const supplier = await prisma.supplier.findUnique({ where: { uuid: params.data.uuid } })
+    if (!supplier) {
+      res.status(401).json({ message: 'Fornecedor não econtrado!' })
       return
     }
 
     // create resource
-    await prisma.client.delete({ where: { uuid: params.data.uuid } })
+    await prisma.supplier.delete({ where: { uuid: params.data.uuid } })
 
-    res.status(201).json({ message: 'O cliente foi deletado.' })
+    res.status(201).json({ message: 'O fornecedor foi deletado.' })
     return
   } catch (e) {
     console.log(e)

@@ -5,6 +5,7 @@ import {
   faArrowRightToBracket,
   faBarsProgress,
   faHouse,
+  faParachuteBox,
   faQuestion,
   faUser,
   faUserGear,
@@ -32,6 +33,10 @@ import StatusSelect from './pages/Status/Select/Index'
 import StatusCreate from './pages/Status/Create/Index'
 import StatusUpdate from './pages/Status/Update/Index'
 import StatusDelete from './pages/Status/Delete/Index'
+import SupplierSelect from './pages/Supplier/Select/Index'
+import SupplierCreate from './pages/Supplier/Create/Index'
+import SupplierUpdate from './pages/Supplier/Update/Index'
+import SupplierDelete from './pages/Supplier/Delete/Index'
 
 export type PageProps = {
   icon: IconProp
@@ -114,6 +119,38 @@ export const pages: PageProps[] = [
     useIn: [],
     icon: faUserXmark,
     component: UserDelete,
+  },
+  {
+    title: 'Fornecedores',
+    route: '/supplier/select',
+    protection: ['logged'],
+    useIn: ['Navigate'],
+    icon: faParachuteBox,
+    component: SupplierSelect,
+  },
+  {
+    title: 'Cadastrar Fornecedor',
+    route: '/supplier/create',
+    protection: ['logged'],
+    useIn: [],
+    icon: faQuestion,
+    component: SupplierCreate,
+  },
+  {
+    title: 'Editar Fornecedor',
+    route: '/supplier/update/:uuid',
+    protection: ['logged'],
+    useIn: [],
+    icon: faQuestion,
+    component: SupplierUpdate,
+  },
+  {
+    title: 'Deletar Fornecedor',
+    route: '/supplier/delete/:uuid',
+    protection: ['logged'],
+    useIn: [],
+    icon: faQuestion,
+    component: SupplierDelete,
   },
   {
     title: 'Cargos/Funções',
