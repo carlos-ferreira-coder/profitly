@@ -244,8 +244,10 @@ export const clientUpdateSchema = z
     fantasy: zodString('nome fantasia', true).optional(),
     name: zodString('nome completo', true),
     email: zodEmail('email', true),
-    phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).optional(),
-    address: zodString('endereço', false).optional(),
+    phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false)
+      .nullable()
+      .optional(),
+    address: zodString('endereço', false).nullable().optional(),
   })
   .superRefine(({ cnpj, fantasy }, ctx) => {
     if (!cnpj && fantasy) {

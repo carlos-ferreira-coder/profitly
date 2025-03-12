@@ -39,9 +39,6 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
       address: { contains: query.data.address },
     }
 
-    console.log('query' + query.data)
-    console.log('query STRINGFY' + JSON.stringify(query.data))
-
     // server request
     const clients = await prisma.client.findMany({
       include: {
