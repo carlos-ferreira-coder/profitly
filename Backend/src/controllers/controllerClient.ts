@@ -32,6 +32,13 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
       return
     }
 
+    const entityFilter = {
+      name: query.data.name ? { contains: query.data.name } : undefined,
+      email: query.data.email ? { contains: query.data.email } : undefined,
+      phone: query.data.phone ? { contains: query.data.phone } : undefined,
+      address: query.data.address ? { contains: query.data.address } : undefined,
+    }
+
     // server request
     const clients = await prisma.client.findMany({
       include: {
@@ -54,27 +61,17 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
             ? { person: { is: null } }
             : {
                 person: {
-                  cpf: { contains: query.data.cpf },
-                  entity: {
-                    name: { contains: query.data.name },
-                    email: { contains: query.data.email },
-                    phone: { contains: query.data.phone },
-                    address: { contains: query.data.address },
-                  },
+                  cpf: query.data.cpf ? { contains: query.data.cpf } : undefined,
+                  entity: entityFilter,
                 },
               },
           query.data.cpf
             ? { enterprise: { is: null } }
             : {
                 enterprise: {
-                  cnpj: { contains: query.data.cnpj },
-                  fantasy: { contains: query.data.fantasy },
-                  entity: {
-                    name: { contains: query.data.name },
-                    email: { contains: query.data.email },
-                    phone: { contains: query.data.phone },
-                    address: { contains: query.data.address },
-                  },
+                  cnpj: query.data.cnpj ? { contains: query.data.cnpj } : undefined,
+                  fantasy: query.data.fantasy ? { contains: query.data.fantasy } : undefined,
+                  entity: entityFilter,
                 },
               },
         ],

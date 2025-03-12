@@ -36,8 +36,8 @@ export const statusSelect = async (req: Request, res: Response): Promise<void> =
     const status = await prisma.status.findMany({
       where: {
         uuid: params.data.key === 'all' ? undefined : params.data.key,
-        name: { contains: query.data.name },
-        description: { contains: query.data.description },
+        name: query.data.name ? { contains: query.data.name } : undefined,
+        description: query.data.description ? { contains: query.data.description } : undefined,
         priority: query.data.priority ? { in: query.data.priority } : undefined,
       },
     })

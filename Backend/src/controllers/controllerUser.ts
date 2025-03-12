@@ -90,7 +90,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
             : params.data.key === 'this'
               ? token.uuid
               : params.data.key,
-        username: { contains: query.data.username },
+        username: query.data.username ? { contains: query.data.username } : undefined,
         active: query.data.active?.length === 1 ? query.data.active[0] : undefined,
         hourlyRate: {
           gte: query.data.hourlyRateMin
@@ -102,12 +102,12 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
         },
         authUuid: query.data.auth?.length ? { in: query.data.auth } : undefined,
         person: {
-          cpf: { contains: query.data.cpf },
+          cpf: query.data.cpf ? { contains: query.data.cpf } : undefined,
           entity: {
-            name: { contains: query.data.name },
-            email: { contains: query.data.email },
-            phone: { contains: query.data.phone },
-            address: { contains: query.data.address },
+            name: query.data.name ? { contains: query.data.name } : undefined,
+            email: query.data.email ? { contains: query.data.email } : undefined,
+            phone: query.data.phone ? { contains: query.data.phone } : undefined,
+            address: query.data.address ? { contains: query.data.address } : undefined,
           },
         },
       },
