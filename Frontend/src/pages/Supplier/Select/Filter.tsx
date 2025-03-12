@@ -66,7 +66,7 @@ const Filter = ({
   const handleReset = () => {
     if (location.search) {
       reset(defaultValues)
-      navigate('/client/select')
+      navigate('/supplier/select')
     }
   }
 
@@ -109,7 +109,7 @@ const Filter = ({
     if (location.search === urlQuery) {
       setFiltering('idle')
     } else {
-      navigate(`/client/select${urlQuery}`)
+      navigate(`/supplier/select${urlQuery}`)
     }
   }
 

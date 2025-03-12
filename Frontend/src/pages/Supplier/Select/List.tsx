@@ -89,7 +89,7 @@ const List = ({ suppliers }: { suppliers: SupplierProps[] }) => {
     <>
       <div className="flex justify-end">
         <Button color="success" className="w-50 h-8" onClick={() => navigate('/supplier/create/')}>
-          <FontAwesomeIcon icon={faPlus} className="mr-1" /> Adicionar Suppliere
+          <FontAwesomeIcon icon={faPlus} className="mr-1" /> Adicionar Fornecedor
         </Button>
       </div>
 
