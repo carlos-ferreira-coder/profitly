@@ -50,29 +50,33 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
         uuid: params.data.key === 'all' ? undefined : params.data.key,
         active: query.data.active?.length === 1 ? query.data.active[0] : undefined,
         OR: [
-          {
-            person: {
-              cpf: { contains: query.data.cpf },
-              entity: {
-                name: { contains: query.data.name },
-                email: { contains: query.data.email },
-                phone: { contains: query.data.phone },
-                address: { contains: query.data.address },
+          query.data.cnpj || query.data.fantasy
+            ? { person: { is: null } }
+            : {
+                person: {
+                  cpf: { contains: query.data.cpf },
+                  entity: {
+                    name: { contains: query.data.name },
+                    email: { contains: query.data.email },
+                    phone: { contains: query.data.phone },
+                    address: { contains: query.data.address },
+                  },
+                },
               },
-            },
-          },
-          {
-            enterprise: {
-              cnpj: { contains: query.data.cnpj },
-              fantasy: { contains: query.data.fantasy },
-              entity: {
-                name: { contains: query.data.name },
-                email: { contains: query.data.email },
-                phone: { contains: query.data.phone },
-                address: { contains: query.data.address },
+          query.data.cpf
+            ? { enterprise: { is: null } }
+            : {
+                enterprise: {
+                  cnpj: { contains: query.data.cnpj },
+                  fantasy: { contains: query.data.fantasy },
+                  entity: {
+                    name: { contains: query.data.name },
+                    email: { contains: query.data.email },
+                    phone: { contains: query.data.phone },
+                    address: { contains: query.data.address },
+                  },
+                },
               },
-            },
-          },
         ],
       },
     })
