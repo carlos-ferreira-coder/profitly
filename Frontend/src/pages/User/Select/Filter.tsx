@@ -4,18 +4,18 @@ import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Input, InputNumeric } from '../../../components/Form/Input'
 import { Checkbox } from '../../../components/Form/Checkbox'
+import { useAuth } from '../../../context/AuthContext'
 
 const Filter = ({
   auths,
-  auth,
   filtering,
   setFiltering,
 }: {
   auths: AuthProps[]
-  auth: AuthProps
   filtering: 'idle' | 'filter' | 'reset'
   setFiltering: (value: 'idle' | 'filter' | 'reset') => void
 }) => {
+  const { auth } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -151,7 +151,7 @@ const Filter = ({
           </div>
         </div>
 
-        {auth.personal && (
+        {auth?.personal && (
           <>
             <div className="mb-5.5">
               <label
@@ -185,7 +185,7 @@ const Filter = ({
           </div>
         </div>
 
-        {auth.personal && (
+        {auth?.personal && (
           <>
             <div className="mb-5.5">
               <label

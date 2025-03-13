@@ -121,14 +121,27 @@ const SupplierSearch = ({
               </Button>
             ) : (
               (search
-                ? suppliers.filter(
-                    (supplier) =>
-                      supplier.person?.cpf.includes(search) ||
-                      supplier.enterprise?.cnpj.includes(search) ||
-                      supplier.enterprise?.fantasy.includes(search) ||
-                      supplier.person?.entity.name.includes(search) ||
-                      supplier.enterprise?.entity.name.includes(search)
-                  )
+                ? suppliers.filter((supplier) => {
+                    const normalizeString = (str?: string) => {
+                      if (!str) return ''
+
+                      return str
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .trim()
+                        .toLowerCase()
+                    }
+
+                    const normalizedSearch = normalizeString(search)
+
+                    return (
+                      normalizeString(supplier.person?.cpf).includes(normalizedSearch) ||
+                      normalizeString(supplier.enterprise?.cnpj).includes(normalizedSearch) ||
+                      normalizeString(supplier.enterprise?.fantasy).includes(normalizedSearch) ||
+                      normalizeString(supplier.person?.entity.name).includes(normalizedSearch) ||
+                      normalizeString(supplier.enterprise?.entity.name).includes(normalizedSearch)
+                    )
+                  })
                 : suppliers
               ).map((supplier) => (
                 <div

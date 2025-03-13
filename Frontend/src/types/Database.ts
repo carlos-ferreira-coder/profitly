@@ -71,11 +71,26 @@ export type ProjectProps = {
   client: ClientProps
   status: StatusProps
   budget: BudgetProps
+
+  // metods
+  beginDate: string
+  endDate: string
+  prevTotal: string
+  prevCost: string
+  prevRevenue: string
+  total: string
+  cost: string
+  revenue: string
+  currentIncome: string
+  currentExpense: string
+  currentRevenue: string
 }
 
 export type BudgetProps = {
   uuid: string
-  register: string
+  register?: string
+  project: ProjectProps
+  task: TaskProps[]
 }
 
 export type TaskProps = {
@@ -96,13 +111,13 @@ export type TaskProps = {
 
 export type TaskExpenseProps = {
   uuid: string
-  cost: number
+  amount: string
   task: TaskProps
 }
 
 export type TaskActivityProps = {
   uuid: string
-  hourlyRate: number
+  hourlyRate: string
   task: TaskProps
 }
 

@@ -121,14 +121,27 @@ const ClientSearch = ({
               </Button>
             ) : (
               (search
-                ? clients.filter(
-                    (client) =>
-                      client.person?.cpf.includes(search) ||
-                      client.enterprise?.cnpj.includes(search) ||
-                      client.enterprise?.fantasy.includes(search) ||
-                      client.person?.entity.name.includes(search) ||
-                      client.enterprise?.entity.name.includes(search)
-                  )
+                ? clients.filter((client) => {
+                    const normalizeString = (str?: string) => {
+                      if (!str) return ''
+
+                      return str
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .trim()
+                        .toLowerCase()
+                    }
+
+                    const normalizedSearch = normalizeString(search)
+
+                    return (
+                      normalizeString(client.person?.cpf).includes(normalizedSearch) ||
+                      normalizeString(client.enterprise?.cnpj).includes(normalizedSearch) ||
+                      normalizeString(client.enterprise?.fantasy).includes(normalizedSearch) ||
+                      normalizeString(client.person?.entity.name).includes(normalizedSearch) ||
+                      normalizeString(client.enterprise?.entity.name).includes(normalizedSearch)
+                    )
+                  })
                 : clients
               ).map((client) => (
                 <div

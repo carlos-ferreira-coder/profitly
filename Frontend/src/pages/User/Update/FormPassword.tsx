@@ -8,17 +8,17 @@ import { Input } from '../../../components/Form/Input'
 import { faLock, faLockOpen, faUnlock } from '@fortawesome/free-solid-svg-icons'
 import Button from '../../../components/Form/Button'
 import { userUpdatePasswordSchema } from '../../../hooks/useSchema'
-import { UserProps } from '../../../types/Database'
+import { AuthProps, UserProps } from '../../../types/Database'
 import { useNavigate } from 'react-router-dom'
 
-const FormPassword = ({ user, auth }: { user: UserProps; auth: boolean }) => {
+const FormPassword = ({ user, auth }: { user: UserProps; auth: AuthProps | null }) => {
   const navigate = useNavigate()
   const [status, setStatus] = useState<'idle' | 'request'>('idle')
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
   const [alertSuccesses, setAlertSuccesses] = useState<(string | JSX.Element)[] | null>(null)
 
   // Password schema
-  const schema = userUpdatePasswordSchema(auth)
+  const schema = userUpdatePasswordSchema(auth?.personal || false)
   type SchemaProps = z.infer<typeof schema>
 
   const defaultValues = {

@@ -101,10 +101,24 @@ const UserSearch = ({
               </Button>
             ) : (
               (search
-                ? users.filter(
-                    (user) =>
-                      user.username.includes(search) || user.person.entity.email.includes(search)
-                  )
+                ? users.filter((user) => {
+                    const normalizeString = (str?: string) => {
+                      if (!str) return ''
+
+                      return str
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .trim()
+                        .toLowerCase()
+                    }
+
+                    const normalizedSearch = normalizeString(search)
+
+                    return (
+                      normalizeString(user.username).includes(normalizedSearch) ||
+                      normalizeString(user.person.entity.email).includes(normalizedSearch)
+                    )
+                  })
                 : users
               ).map((user) => (
                 <div

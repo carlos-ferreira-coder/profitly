@@ -7,10 +7,11 @@ import { faCircleCheck, faCircleXmark } from '@fortawesome/free-regular-svg-icon
 import { useNavigate } from 'react-router-dom'
 import { AuthProps, UserProps } from '../../../types/Database'
 import { userPhotoURL } from '../../../services/Axios'
+import { useAuth } from '../../../context/AuthContext'
 
-const UserInfo = ({ user, auth }: { user: UserProps; auth: AuthProps }) => (
+const UserInfo = ({ user, auth }: { user: UserProps; auth: AuthProps | null }) => (
   <>
-    {auth.personal && (
+    {auth?.personal && (
       <p>
         <b>CPF: </b> {user.person.cpf}
       </p>
@@ -18,7 +19,7 @@ const UserInfo = ({ user, auth }: { user: UserProps; auth: AuthProps }) => (
     <p>
       <b>Nome de usuário: </b> {user.username}
     </p>
-    {auth.personal && (
+    {auth?.personal && (
       <p>
         <b>Nome Completo: </b> {user.person.entity.name}
       </p>
@@ -26,7 +27,7 @@ const UserInfo = ({ user, auth }: { user: UserProps; auth: AuthProps }) => (
     <p>
       <b>Cargo/Função: </b> {user.auth.name}
     </p>
-    {auth.financial && user.hourlyRate && (
+    {auth?.financial && user.hourlyRate && (
       <p>
         <b>Valor da hora: </b> {user.hourlyRate}
       </p>
@@ -34,12 +35,12 @@ const UserInfo = ({ user, auth }: { user: UserProps; auth: AuthProps }) => (
   </>
 )
 
-const UserContactInfo = ({ user, auth }: { user: UserProps; auth: AuthProps }) => (
+const UserContactInfo = ({ user, auth }: { user: UserProps; auth: AuthProps | null }) => (
   <>
     <p>
       <b>Email: </b> {user.person.entity.email}
     </p>
-    {auth.personal && (
+    {auth?.personal && (
       <>
         <p>
           <b>Contato: </b> {user.person.entity.phone}
@@ -52,7 +53,9 @@ const UserContactInfo = ({ user, auth }: { user: UserProps; auth: AuthProps }) =
   </>
 )
 
-const List = ({ users, auth }: { users: UserProps[]; auth: AuthProps }) => {
+const List = ({ users }: { users: UserProps[] }) => {
+  const { auth } = useAuth()
+
   const itemsPerPage = 10
   const navigate = useNavigate()
   const [currentPage, setCurrentPage] = useState<number>(0)

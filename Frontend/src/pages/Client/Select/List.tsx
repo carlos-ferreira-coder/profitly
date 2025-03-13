@@ -10,14 +10,7 @@ import {
   faTrashCan,
 } from '@fortawesome/free-solid-svg-icons'
 import { useNavigate } from 'react-router-dom'
-import { ClientProps } from '../../../types/Database'
-
-interface Entity {
-  name: string
-  email: string
-  phone?: string
-  address?: string
-}
+import { ClientProps, EntityProps } from '../../../types/Database'
 
 const ClientTypeInfo = ({ client }: { client: ClientProps }) => (
   <p>
@@ -25,7 +18,7 @@ const ClientTypeInfo = ({ client }: { client: ClientProps }) => (
   </p>
 )
 
-const ClientEntityInfo = ({ client, entity }: { client: ClientProps; entity: Entity }) => (
+const ClientEntityInfo = ({ client, entity }: { client: ClientProps; entity: EntityProps }) => (
   <>
     <p>
       <b>Nome: </b>
@@ -55,7 +48,7 @@ const ClientEntityInfo = ({ client, entity }: { client: ClientProps; entity: Ent
   </>
 )
 
-const ClientContactInfo = ({ entity }: { entity: Entity }) => (
+const ClientContactInfo = ({ entity }: { entity: EntityProps }) => (
   <>
     <p>
       <b>Email: </b> {entity.email}

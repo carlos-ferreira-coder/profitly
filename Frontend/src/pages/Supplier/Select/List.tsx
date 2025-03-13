@@ -10,14 +10,7 @@ import {
   faTrashCan,
 } from '@fortawesome/free-solid-svg-icons'
 import { useNavigate } from 'react-router-dom'
-import { SupplierProps } from '../../../types/Database'
-
-interface Entity {
-  name: string
-  email: string
-  phone?: string
-  address?: string
-}
+import { EntityProps, SupplierProps } from '../../../types/Database'
 
 const SupplierTypeInfo = ({ supplier }: { supplier: SupplierProps }) => (
   <p>
@@ -25,7 +18,13 @@ const SupplierTypeInfo = ({ supplier }: { supplier: SupplierProps }) => (
   </p>
 )
 
-const SupplierEntityInfo = ({ supplier, entity }: { supplier: SupplierProps; entity: Entity }) => {
+const SupplierEntityInfo = ({
+  supplier,
+  entity,
+}: {
+  supplier: SupplierProps
+  entity: EntityProps
+}) => {
   return (
     <>
       <p>
@@ -57,7 +56,7 @@ const SupplierEntityInfo = ({ supplier, entity }: { supplier: SupplierProps; ent
   )
 }
 
-const SupplierContactInfo = ({ entity }: { entity: Entity }) => {
+const SupplierContactInfo = ({ entity }: { entity: EntityProps }) => {
   return (
     <>
       <p>

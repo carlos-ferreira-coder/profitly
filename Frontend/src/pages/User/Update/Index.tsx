@@ -9,10 +9,11 @@ import FormPassword from './FormPassword'
 import Loader from '../../../components/Loader'
 import Alert from '../../../components/Alert/Index'
 import { Options } from '../../../components/Form/Select'
+import { useAuth } from '../../../context/AuthContext'
 
 const Update = () => {
+  const { auth } = useAuth()
   const { uuid } = useParams()
-  const [auth, setAuth] = useState<AuthProps | null>(null)
   const [user, setUser] = useState<UserProps | null>(null)
   const [authOptions, setAuthOptions] = useState<Options[] | null>(null)
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
@@ -37,15 +38,7 @@ const Update = () => {
   useEffect(() => {
     ;(async () => {
       try {
-        const [
-          {
-            data: [resAuth],
-          },
-          { data: resAuths },
-        ] = await Promise.all([
-          axios.get('/auth/select/this', { withCredentials: true }),
-          axios.get('/auth/select/all', { withCredentials: true }),
-        ])
+        const { data: resAuths } = await axios.get('/auth/select/all', { withCredentials: true })
 
         // Configure options
         const options: Options[] = [
@@ -56,7 +49,6 @@ const Update = () => {
           })),
         ]
 
-        setAuth(resAuth)
         setAuthOptions(options)
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])
@@ -87,9 +79,9 @@ const Update = () => {
             <div className="border-b border-stroke py-4 px-7 dark:border-strokedark">
               <h3 className="font-medium text-black dark:text-white">Alterar Senha</h3>
             </div>
-            {user && auth ? (
+            {user ? (
               <div className="p-7">
-                <FormPassword user={user} auth={auth.personal} />
+                <FormPassword user={user} auth={auth} />
               </div>
             ) : (
               <Loader />

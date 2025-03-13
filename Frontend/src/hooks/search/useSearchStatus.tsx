@@ -1,46 +1,77 @@
 import { useEffect, useState } from 'react'
 import { Input } from '../../components/Form/Input'
-import { ProjectProps } from '../../types/Database'
+import { StatusProps } from '../../types/Database'
 import { api as axios, handleAxiosError } from '../../services/Axios'
 import Alert from '../../components/Alert/Index'
 import Loader from '../../components/Loader'
 import Button from '../../components/Form/Button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faAngleRight, faXmark } from '@fortawesome/free-solid-svg-icons'
+import {
+  faAngleRight,
+  faAnglesDown,
+  faAnglesRight,
+  faAnglesUp,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons'
 
-const ProjectInfo = ({ project }: { project: ProjectProps }) => (
+const StatusInfo = ({ status }: { status: StatusProps }) => (
   <>
-    <div className="col-span-5">
+    <div className="col-span-5 flex flex-col justify-center space-y-1">
       <p>
-        <b>Nome: </b> {project.name}
+        <b>Nome: </b> {status.name}
       </p>
       <p>
-        <b>Descrição: </b> {project.description}
+        <b>Descrição: </b> {status.description}
+      </p>
+      <p>
+        <b>Prioridade: </b> {status.priority}
+      </p>
+      <p
+        className={`p-1 w-4/6 text-center text-white shadow-1 rounded-md border border-stroke dark:border-strokedark ${
+          status.priority < 4 ? 'bg-danger' : status.priority < 8 ? 'bg-warning' : 'bg-success'
+        }`}
+      >
+        {status.priority < 4 ? (
+          <>
+            <FontAwesomeIcon icon={faAnglesUp} className="mr-2" />
+            Alta
+          </>
+        ) : status.priority < 8 ? (
+          <>
+            <FontAwesomeIcon icon={faAnglesRight} className="mr-2" />
+            Média
+          </>
+        ) : (
+          <>
+            <FontAwesomeIcon icon={faAnglesDown} className="mr-2" />
+            Baixa
+          </>
+        )}
       </p>
     </div>
   </>
 )
 
-const ProjectSearch = ({
-  project,
-  setProject,
+const StatusSearch = ({
+  status,
+  setStatus,
 }: {
-  project: ProjectProps | null
-  setProject: (value: ProjectProps | null) => void
+  status: StatusProps | null
+  setStatus: (value: StatusProps | null) => void
 }) => {
   const [search, setSearch] = useState<string | null>('')
-  const [projects, setProjects] = useState<ProjectProps[] | null>(null)
+  const [statuss, setStatuss] = useState<StatusProps[] | null>(null)
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
 
-  // Get projects
+  // Get statuss
   useEffect(() => {
     ;(async () => {
       try {
-        const { data } = await axios.get('project/select/all', {
+        const { data } = await axios.get('status/select/all', {
           withCredentials: true,
         })
 
-        setProjects(data)
+        setStatuss(data)
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])
       }
@@ -48,14 +79,14 @@ const ProjectSearch = ({
   }, [])
 
   useEffect(() => {
-    if (!project) setSearch('')
-  }, [project])
+    if (!status) setSearch('')
+  }, [status])
 
   return (
     <>
-      {project ? (
-        <div className="grid grid-cols-6 p-3 text-sm text-black dark:text-white shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50">
-          <ProjectInfo project={project} />
+      {status ? (
+        <div className="grid grid-cols-6 gap-1 p-3 text-sm text-black dark:text-white shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50">
+          <StatusInfo status={status} />
 
           <div className="col-span-1 flex flex-col justify-center items-center">
             <Button
@@ -63,7 +94,7 @@ const ProjectSearch = ({
               type="button"
               className="w-8 h-8"
               onClick={() => {
-                setProject(null)
+                setStatus(null)
                 setSearch('')
               }}
             >
@@ -81,7 +112,7 @@ const ProjectSearch = ({
             onChange={(e) => setSearch(e.target.value)}
           />
 
-          {projects ? (
+          {statuss ? (
             search === '' ? (
               <Button
                 color="primary"
@@ -93,7 +124,7 @@ const ProjectSearch = ({
               </Button>
             ) : (
               (search
-                ? projects.filter((project) => {
+                ? statuss.filter((status) => {
                     const normalizeString = (str?: string) => {
                       if (!str) return ''
 
@@ -107,24 +138,27 @@ const ProjectSearch = ({
                     const normalizedSearch = normalizeString(search)
 
                     return (
-                      normalizeString(project.name).includes(normalizedSearch) ||
-                      normalizeString(project.description).includes(normalizedSearch)
+                      normalizeString(status.name).includes(normalizedSearch) ||
+                      normalizeString(status.description).includes(normalizedSearch) ||
+                      (normalizedSearch === 'alta' && status.priority < 4) ||
+                      (normalizedSearch === 'media' && status.priority < 8) ||
+                      (normalizedSearch === 'baixa' && status.priority >= 8)
                     )
                   })
-                : projects
-              ).map((project) => (
+                : statuss
+              ).map((status) => (
                 <div
-                  key={project.uuid}
-                  className="grid grid-cols-6 mt-2 w-full p-3 shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
+                  key={status.uuid}
+                  className="grid grid-cols-9 mt-2 w-full gap-1 p-3 shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
                 >
-                  <ProjectInfo project={project} />
+                  <StatusInfo status={status} />
 
                   <div className="col-span-1 flex flex-col justify-center items-center">
                     <Button
                       color="primary"
                       type="button"
                       className="w-8 h-8"
-                      onClick={() => setProject(project)}
+                      onClick={() => setStatus(status)}
                     >
                       <FontAwesomeIcon icon={faAngleRight} />
                     </Button>
@@ -141,4 +175,4 @@ const ProjectSearch = ({
   )
 }
 
-export default ProjectSearch
+export default StatusSearch

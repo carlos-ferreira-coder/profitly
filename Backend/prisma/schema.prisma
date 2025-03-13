@@ -130,7 +130,7 @@ model Project {
 model Budget {
   id       Int       @id @default(autoincrement())
   uuid     String    @unique @default(uuid()) @db.Uuid
-  register DateTime
+  register DateTime?
   Project  Project[]
   Task     Task[]
 }
@@ -159,7 +159,7 @@ model Task {
 model TaskExpense {
   id      Int       @id @default(autoincrement())
   uuid    String    @unique @default(uuid()) @db.Uuid
-  cost    Decimal   @db.Decimal(15, 2)
+  amount  Decimal   @db.Decimal(15, 2)
   task    Task      @relation(fields: [id], references: [id], onDelete: Cascade)
   Expense Expense[]
 }
