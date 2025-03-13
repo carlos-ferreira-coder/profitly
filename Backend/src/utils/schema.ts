@@ -349,10 +349,103 @@ export const supplierUpdateSchema = z
     }
   })
 
-export const transactionSelectSchema = z.object({
-  type: zodRegex('tipo', /^(Bill|Income|Refund|Loan)(,(Bill|Income|Refund|Loan))*$/, false)
+export const billSelectSchema = z.object({
+  name: zodString('nome', false).optional(),
+  description: zodString('descrição', false).optional(),
+  registerMin: zodString('registro', false).optional(),
+  registerMax: zodString('registro', false).optional(),
+  dateMin: zodString('data', false).optional(),
+  dateMax: zodString('data', false).optional(),
+  amountMin: zodString('quantia', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
+    .optional(),
+  amountMax: zodString('quantia', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
+    .optional(),
+  userUuid: zodRegex(
+    'uuid(s) de usuário',
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
+    false,
+  )
     .transform((s) => s.split(','))
     .optional(),
+  projectUuid: zodRegex(
+    'uuid(s) de projetos',
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
+    false,
+  )
+    .transform((s) => s.split(','))
+    .optional(),
+  supplierUuid: zodRegex(
+    'uuid(s) de fornecedor',
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
+    false,
+  )
+    .transform((s) => s.split(','))
+    .optional(),
+})
+
+export const billCreateSchema = z.object({
+  name: zodString('nome', true),
+  description: zodString('descrição', true),
+  date: zodString('data', true).transform((s) => new Date(s)),
+  amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true).transform((s) =>
+    currencyToNumber(s, 'BRL'),
+  ),
+  userUuid: zodUuid('cargo/função'),
+  projectUuid: zodUuid('cargo/função').optional(),
+  supplierUuid: zodUuid('cargo/função'),
+})
+
+export const incomeSelectSchema = z.object({
+  name: zodString('nome', false).optional(),
+  description: zodString('descrição', false).optional(),
+  registerMin: zodString('registro', false).optional(),
+  registerMax: zodString('registro', false).optional(),
+  dateMin: zodString('data', false).optional(),
+  dateMax: zodString('data', false).optional(),
+  amountMin: zodString('quantia', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
+    .optional(),
+  amountMax: zodString('quantia', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
+    .optional(),
+  userUuid: zodRegex(
+    'uuid(s) de usuário',
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
+    false,
+  )
+    .transform((s) => s.split(','))
+    .optional(),
+  projectUuid: zodRegex(
+    'uuid(s) de projetos',
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
+    false,
+  )
+    .transform((s) => s.split(','))
+    .optional(),
+  clientUuid: zodRegex(
+    'uuid(s) de cliente',
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
+    false,
+  )
+    .transform((s) => s.split(','))
+    .optional(),
+})
+
+export const incomeCreateSchema = z.object({
+  name: zodString('nome', true),
+  description: zodString('descrição', true),
+  date: zodString('data', true).transform((s) => new Date(s)),
+  amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true).transform((s) =>
+    currencyToNumber(s, 'BRL'),
+  ),
+  userUuid: zodUuid('cargo/função'),
+  projectUuid: zodUuid('cargo/função').optional(),
+  clientUuid: zodUuid('cargo/função'),
+})
+
+export const refundSelectSchema = z.object({
   name: zodString('nome', false).optional(),
   description: zodString('descrição', false).optional(),
   registerMin: zodString('registro', false).optional(),
@@ -393,13 +486,10 @@ export const transactionSelectSchema = z.object({
   )
     .transform((s) => s.split(','))
     .optional(),
-  percentMin: zodString('percentual', false).optional(),
-  percentMax: zodString('percentual', false).optional(),
 })
 
-export const transactionCreateSchema = z
+export const refundCreateSchema = z
   .object({
-    type: zodRegex('tipo', /^(Bill|Income|Refund|Loan)$/, true),
     name: zodString('nome', true),
     description: zodString('descrição', true),
     date: zodString('data', true).transform((s) => new Date(s)),
@@ -410,104 +500,70 @@ export const transactionCreateSchema = z
     projectUuid: zodUuid('cargo/função').optional(),
     clientUuid: zodUuid('cargo/função').optional(),
     supplierUuid: zodUuid('cargo/função').optional(),
-    percent: zodRegex('quantia', /^%\s\d{1,3}(,\d{1,2})?$/, true).optional(),
   })
-  .superRefine(({ type, percent, clientUuid, supplierUuid }, ctx) => {
-    if (type === 'Bill' && !supplierUuid) {
+  .superRefine(({ clientUuid, supplierUuid }, ctx) => {
+    if (!(clientUuid || supplierUuid)) {
       ctx.addIssue({
         code: 'custom',
-        message: 'O(a) fornecedor é obrigatório(a)',
-        path: ['supplierUuid'],
-      })
-    }
-
-    if (type === 'Income' && !clientUuid) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'O(a) cliente é obrigatório(a)',
-        path: ['clientUuid'],
-      })
-    }
-
-    if (type === 'Refund' && !(clientUuid || supplierUuid)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'O(a) cliente ou fornecedor é obrigatório(a)',
+        message: 'O cliente ou fornecedor é obrigatório!',
         path: ['clientUuid', 'supplierUuid'],
       })
     }
-
-    if (type === 'Loan' && !percent) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'O(a) percentual é obrigatório(a)',
-        path: ['percent'],
-      })
-    }
-
-    if (type === 'Loan' && !supplierUuid) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'O(a) fornecedor é obrigatório(a)',
-        path: ['supplierUuid'],
-      })
-    }
   })
 
-export const transactionUpdateSchema = z
-  .object({
-    uuid: zodUuid('trasação'),
-    type: zodRegex('tipo', /^(Bill|Income|Refund|Loan)$/, true),
-    name: zodString('nome', true),
-    description: zodString('descrição', true),
-    date: zodString('data', true).transform((s) => new Date(s)),
-    amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true).transform((s) =>
-      currencyToNumber(s, 'BRL'),
-    ),
-    userUuid: zodUuid('cargo/função'),
-    projectUuid: zodUuid('cargo/função').nullable().optional(),
-    clientUuid: zodUuid('cargo/função').nullable().optional(),
-    supplierUuid: zodUuid('cargo/função').nullable().optional(),
-    percent: zodRegex('quantia', /^%\s\d{1,3}(,\d{1,2})?$/, true).optional(),
-  })
-  .superRefine(({ type, percent, clientUuid, supplierUuid }, ctx) => {
-    if (type === 'Bill' && !supplierUuid) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'O(a) fornecedor é obrigatório(a)',
-        path: ['supplierUuid'],
-      })
-    }
+export const loanSelectSchema = z.object({
+  name: zodString('nome', false).optional(),
+  description: zodString('descrição', false).optional(),
+  registerMin: zodString('registro', false).optional(),
+  registerMax: zodString('registro', false).optional(),
+  dateMin: zodString('data', false).optional(),
+  dateMax: zodString('data', false).optional(),
+  amountMin: zodString('quantia', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
+    .optional(),
+  amountMax: zodString('quantia', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
+    .optional(),
+  userUuid: zodRegex(
+    'uuid(s) de usuário',
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
+    false,
+  )
+    .transform((s) => s.split(','))
+    .optional(),
+  projectUuid: zodRegex(
+    'uuid(s) de projetos',
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
+    false,
+  )
+    .transform((s) => s.split(','))
+    .optional(),
+  supplierUuid: zodRegex(
+    'uuid(s) de fornecedor',
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
+    false,
+  )
+    .transform((s) => s.split(','))
+    .optional(),
+  percentMin: zodString('percentual', false)
+    .transform((s) => parseFloat(s.replace(/[%\s]/g, '').replace(',', '.')))
+    .optional(),
+  percentMax: zodString('percentual', false)
+    .transform((s) => parseFloat(s.replace(/[%\s]/g, '').replace(',', '.')))
+    .optional(),
+})
 
-    if (type === 'Income' && !clientUuid) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'O(a) cliente é obrigatório(a)',
-        path: ['clientUuid'],
-      })
-    }
-
-    if (type === 'Refund' && !(clientUuid || supplierUuid)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'O(a) cliente ou fornecedor é obrigatório(a)',
-        path: ['clientUuid', 'supplierUuid'],
-      })
-    }
-
-    if (type === 'Loan' && !percent) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'O(a) percentual é obrigatório(a)',
-        path: ['percent'],
-      })
-    }
-
-    if (type === 'Loan' && !supplierUuid) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'O(a) fornecedor é obrigatório(a)',
-        path: ['supplierUuid'],
-      })
-    }
-  })
+export const loanCreateSchema = z.object({
+  name: zodString('nome', true),
+  description: zodString('descrição', true),
+  date: zodString('data', true).transform((s) => new Date(s)),
+  amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true).transform((s) =>
+    currencyToNumber(s, 'BRL'),
+  ),
+  userUuid: zodUuid('cargo/função'),
+  projectUuid: zodUuid('cargo/função').optional(),
+  supplierUuid: zodUuid('cargo/função'),
+  percent: zodRegex('quantia', /^%\s\d{1,3}(,\d{1,2})?$/, true).transform((s) =>
+    parseFloat(s.replace(/[%\s]/g, '').replace(',', '.')),
+  ),
+})

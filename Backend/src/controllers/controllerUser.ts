@@ -31,7 +31,7 @@ const responseUsers = (users: any[], uuid: string, auth: Auth) => {
       address: auth.personal || isMain ? user.address : null,
       hourlyRate:
         (auth.financial || isMain) && user.hourlyRate
-          ? numberToCurrency(user.hourlyRate.toNumber(), 'BRL')
+          ? numberToCurrency(user.hourlyRate, 'BRL')
           : null,
     }
   })

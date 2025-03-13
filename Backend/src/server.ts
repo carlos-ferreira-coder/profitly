@@ -8,7 +8,10 @@ import routerUser from '@routers/routerUser'
 import routerStatus from '@routers/routerStatus'
 import routerClient from '@routers/routerClient'
 import routerSupplier from '@routers/routerSupplier'
-import routerTransaction from '@routers/routerTransaction'
+import routerBill from '@routers/routerBill'
+import routerIncome from '@routers/routerIncome'
+import routerRefund from '@routers/routerRefund'
+import routerLoan from '@routers/routerLoan'
 
 const PORT = process.env.PORT || 3000
 const DOMAIN = process.env.RENDER_EXTERNAL_URL || ''
@@ -32,7 +35,10 @@ app.use('/user', auth, routerUser)
 app.use('/status', auth, routerStatus)
 app.use('/client', auth, routerClient)
 app.use('/supplier', auth, routerSupplier)
-app.use('/transaction', auth, routerTransaction)
+app.use('/Bill', auth, routerBill)
+app.use('/Income', auth, routerIncome)
+app.use('/Refund', auth, routerRefund)
+app.use('/Loan', auth, routerLoan)
 
 app.use('/img/user', auth, express.static('src/images/users'))
 
