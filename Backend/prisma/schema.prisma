@@ -219,10 +219,10 @@ model Transaction {
   projectUuid String?  @map("project_uuid") @db.Uuid
   user        User     @relation(fields: [userUuid], references: [uuid], onDelete: Restrict)
   project     Project? @relation(fields: [projectUuid], references: [uuid], onDelete: Restrict)
-  Bill        Bill?
-  Income      Income?
-  Refund      Refund?
-  Loan        Loan?
+  bill        Bill?
+  income      Income?
+  refund      Refund?
+  loan        Loan?
 
   @@unique([id])
 }

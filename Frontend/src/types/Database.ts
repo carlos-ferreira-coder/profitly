@@ -1,3 +1,46 @@
+export type EntityProps = {
+  name: string
+  email: string
+  phone?: string
+  address?: string
+}
+
+export type PersonProps = {
+  cpf: string
+  entity: EntityProps
+}
+
+export type EnterpriseProps = {
+  cnpj: string
+  fantasy: string
+  entity: EntityProps
+}
+
+export type ClientProps = {
+  uuid: string
+  active: boolean
+  person?: PersonProps
+  enterprise?: EnterpriseProps
+}
+
+export type SupplierProps = {
+  uuid: string
+  active: boolean
+  person?: PersonProps
+  enterprise?: EnterpriseProps
+}
+
+export type UserProps = {
+  uuid: string
+  username: string
+  active: boolean
+  photo?: string
+  hourlyRate?: string
+  authUuid: string
+  person: PersonProps
+  auth: AuthProps
+}
+
 export type AuthProps = {
   uuid: string
   name: string
@@ -14,72 +57,123 @@ export type StatusProps = {
   priority: number
 }
 
-export type UserProps = {
+export type ProjectProps = {
   uuid: string
-  username: string
+  name: string
+  description: string
+  register: string
   active: boolean
-  photo?: string
-  hourlyRate?: string
-  authUuid: string
-  person: {
-    cpf: string
-    entity: {
-      name: string
-      email: string
-      phone?: string
-      address?: string
-    }
-  }
-  auth: {
-    uuid: string
-    name: string
-  }
+  userUuid?: string
+  clientUuid: string
+  statusUuid: string
+  budgetUuid: string
+  user?: UserProps
+  client: ClientProps
+  status: StatusProps
+  budget: BudgetProps
 }
 
-export type ClientProps = {
+export type BudgetProps = {
   uuid: string
-  active: boolean
-  person?: {
-    cpf: string
-    entity: {
-      name: string
-      email: string
-      phone?: string
-      address?: string
-    }
-  }
-  enterprise?: {
-    cnpj: string
-    fantasy: string
-    entity: {
-      name: string
-      email: string
-      phone?: string
-      address?: string
-    }
-  }
+  register: string
 }
 
-export type SupplierProps = {
+export type TaskProps = {
+  name: string
+  description: string
+  beginDate: string
+  endDate: string
+  revenue: string
+  statusUuid: string
+  projectUuid: string
+  userUuid?: string
+  budgetUuid?: string
+  status: StatusProps
+  project: ProjectProps
+  user: UserProps
+  budget: BudgetProps
+}
+
+export type TaskExpenseProps = {
   uuid: string
-  active: boolean
-  person?: {
-    cpf: string
-    entity: {
-      name: string
-      email: string
-      phone?: string
-      address?: string
-    }
-  }
-  enterprise?: {
-    cnpj: string
-    fantasy: string
-    entity: {
-      name: string
-      email: string
-      phone?: string
-      address?: string
-    }
-  }
+  cost: number
+  task: TaskProps
+}
+
+export type TaskActivityProps = {
+  uuid: string
+  hourlyRate: number
+  task: TaskProps
+}
+
+export type DoneProps = {
+  name: string
+  description: string
+  register: string
+  userUuid: string
+  user: UserProps
+}
+
+export type ActivityProps = {
+  uuid: string
+  beginDate: string
+  endDate: string
+  hourlyRate: string
+  taskActivityUuid: string
+  taskActivity: string
+  done: DoneProps
+}
+
+export type ExpenseProps = {
+  uuid: string
+  amount: string
+  date: string
+  supplierUuid: string
+  taskExpenseUuid: string
+  supplier: SupplierProps
+  taskExpense: TaskExpenseProps
+  done: DoneProps
+}
+
+export type TransactionProps = {
+  name: string
+  description: string
+  register: string
+  date: string
+  amount: string
+  userUuid: string
+  projectUuid?: string
+  user: UserProps
+  project?: ProjectProps
+}
+
+export type BillProps = {
+  uuid: string
+  supplierUuid: string
+  supplier: SupplierProps
+  transaction: TransactionProps
+}
+
+export type IncomeProps = {
+  uuid: string
+  clientUuid: string
+  client: ClientProps
+  transaction: TransactionProps
+}
+
+export type RefundProps = {
+  uuid: string
+  clientUuid?: string
+  supplierUuid?: string
+  client?: ClientProps
+  supplier?: SupplierProps
+  transaction: TransactionProps
+}
+
+export type LoanProps = {
+  uuid: string
+  percent: string
+  supplierUuid: string
+  supplier: SupplierProps
+  transaction: TransactionProps
 }

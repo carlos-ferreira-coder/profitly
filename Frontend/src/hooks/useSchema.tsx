@@ -325,3 +325,95 @@ export const supplierDeleteSchema = z.object({
     .transform((s) => (s === '' ? undefined : s))
     .nullable(),
 })
+
+export const billCreateSchema = z.object({
+  name: zodString('nome', true),
+  description: zodString('descrição', true),
+  date: zodRegex(
+    'data',
+    /^(0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/(\d{2}) ([01]\d|2[0-3]):[0-5]\d$/,
+    true
+  ).transform((s) => {
+    const [date, time] = s.split(' ')
+    const [hour, minute] = time.split(':')
+    const [day, month, year] = date.split('/')
+
+    return `20${year}-${month}-${day}T${hour}:${minute}:00`
+  }),
+  amount: zodRegex('valor', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
+  userUuid: zodUuid('usuário'),
+  projectUuid: zodUuid('projeto').transform((s) => (s === '' ? undefined : s)),
+  supplierUuid: zodUuid('fornecedor'),
+})
+
+export const incomeCreateSchema = z.object({
+  name: zodString('nome', true),
+  description: zodString('descrição', true),
+  date: zodRegex(
+    'data',
+    /^(0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/(\d{2}) ([01]\d|2[0-3]):[0-5]\d$/,
+    true
+  ).transform((s) => {
+    const [date, time] = s.split(' ')
+    const [hour, minute] = time.split(':')
+    const [day, month, year] = date.split('/')
+
+    return `20${year}-${month}-${day}T${hour}:${minute}:00`
+  }),
+  amount: zodRegex('valor', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
+  userUuid: zodUuid('usuário'),
+  projectUuid: zodUuid('projeto').transform((s) => (s === '' ? undefined : s)),
+  clientUuid: zodUuid('cliente'),
+})
+
+export const refundCreateSchema = z
+  .object({
+    name: zodString('nome', true),
+    description: zodString('descrição', true),
+    date: zodRegex(
+      'data',
+      /^(0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/(\d{2}) ([01]\d|2[0-3]):[0-5]\d$/,
+      true
+    ).transform((s) => {
+      const [date, time] = s.split(' ')
+      const [hour, minute] = time.split(':')
+      const [day, month, year] = date.split('/')
+
+      return `20${year}-${month}-${day}T${hour}:${minute}:00`
+    }),
+    amount: zodRegex('valor', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
+    userUuid: zodUuid('usuário'),
+    projectUuid: zodUuid('projeto').transform((s) => (s === '' ? undefined : s)),
+    clientUuid: zodUuid('cliente').optional(),
+    supplierUuid: zodUuid('fornecedor').optional(),
+  })
+  .superRefine(({ clientUuid, supplierUuid }, ctx) => {
+    if (!(clientUuid || supplierUuid)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'O cliente ou fornecedor é obrigatório!',
+        path: ['clientUuid', 'supplierUuid'],
+      })
+    }
+  })
+
+export const loanCreateSchema = z.object({
+  name: zodString('nome', true),
+  description: zodString('descrição', true),
+  date: zodRegex(
+    'data',
+    /^(0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/(\d{2}) ([01]\d|2[0-3]):[0-5]\d$/,
+    true
+  ).transform((s) => {
+    const [date, time] = s.split(' ')
+    const [hour, minute] = time.split(':')
+    const [day, month, year] = date.split('/')
+
+    return `20${year}-${month}-${day}T${hour}:${minute}:00`
+  }),
+  amount: zodRegex('valor', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
+  userUuid: zodUuid('usuário'),
+  projectUuid: zodUuid('projeto').transform((s) => (s === '' ? undefined : s)),
+  percent: zodRegex('valor', /^%\s\d{1,3}(,\d{1,2})?$/, true),
+  supplierUuid: zodUuid('fornecedor'),
+})

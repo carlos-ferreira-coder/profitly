@@ -12,7 +12,7 @@ const Filter = ({
   setFiltering,
 }: {
   auths: AuthProps[]
-  auth: boolean
+  auth: AuthProps
   filtering: 'idle' | 'filter' | 'reset'
   setFiltering: (value: 'idle' | 'filter' | 'reset') => void
 }) => {
@@ -151,7 +151,7 @@ const Filter = ({
           </div>
         </div>
 
-        {auth && (
+        {auth.personal && (
           <>
             <div className="mb-5.5">
               <label
@@ -185,7 +185,7 @@ const Filter = ({
           </div>
         </div>
 
-        {auth && (
+        {auth.personal && (
           <>
             <div className="mb-5.5">
               <label

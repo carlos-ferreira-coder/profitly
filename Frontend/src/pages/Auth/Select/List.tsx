@@ -6,6 +6,28 @@ import { faPenToSquare, faPlus, faTrashCan } from '@fortawesome/free-solid-svg-i
 import { useNavigate } from 'react-router-dom'
 import { AuthProps } from '../../../types/Database'
 
+const AuthInfo1 = ({ auth }: { auth: AuthProps }) => (
+  <>
+    <p>
+      <b>Administração: </b> {auth.admin === true ? 'sim' : 'não'}
+    </p>
+    <p>
+      <b>Editar Projetos: </b> {auth.project === true ? 'sim' : 'não'}
+    </p>
+  </>
+)
+
+const AuthInfo2 = ({ auth }: { auth: AuthProps }) => (
+  <>
+    <p>
+      <b>Informações pessoais: </b> {auth.personal === true ? 'sim' : 'não'}
+    </p>
+    <p>
+      <b>Informações financeiras: </b> {auth.financial === true ? 'sim' : 'não'}
+    </p>
+  </>
+)
+
 const List = ({ auths }: { auths: AuthProps[] }) => {
   const itemsPerPage = 8
   const navigate = useNavigate()
@@ -25,66 +47,50 @@ const List = ({ auths }: { auths: AuthProps[] }) => {
       </div>
 
       {auths.length &&
-        pageRange.map((key) => (
-          <div
-            key={auths[key].uuid}
-            className="grid grid-cols-4 gap-4 my-3 px-3 lg:px-5 py-3 text-sm text-black dark:text-white shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
-          >
-            <div className="col-span-1 flex flex-col justify-center space-y-1">
-              <b>{auths[key].name}: </b>
-            </div>
+        pageRange.map((key) => {
+          const auth = auths[key]
 
-            <div className="col-span-2 lg:hidden flex flex-col justify-center space-y-1">
-              <p>
-                <b>Administrador: </b> {auths[key].admin === true ? 'sim' : 'não'}
-              </p>
-              <p>
-                <b>Editar Projetos: </b> {auths[key].project === true ? 'sim' : 'não'}
-              </p>
-              <p>
-                <b>Informações pessoais: </b> {auths[key].personal === true ? 'sim' : 'não'}
-              </p>
-              <p>
-                <b>Informações financeiras: </b> {auths[key].financial === true ? 'sim' : 'não'}
-              </p>
-            </div>
+          return (
+            <div
+              key={auth.uuid}
+              className="grid grid-cols-4 gap-4 my-3 px-3 lg:px-5 py-3 text-sm text-black dark:text-white shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
+            >
+              <div className="col-span-1 flex flex-col justify-center space-y-1">
+                <b>{auth.name}: </b>
+              </div>
 
-            <div className="col-span-1 hidden lg:flex flex-col justify-center space-y-1">
-              <p>
-                <b>Administração: </b> {auths[key].admin === true ? 'sim' : 'não'}
-              </p>
-              <p>
-                <b>Editar Projetos: </b> {auths[key].project === true ? 'sim' : 'não'}
-              </p>
-            </div>
-            <div className="col-span-1 hidden lg:flex flex-col justify-center space-y-1">
-              <p>
-                <b>Informações pessoais: </b> {auths[key].personal === true ? 'sim' : 'não'}
-              </p>
-              <p>
-                <b>Informações financeiras: </b> {auths[key].financial === true ? 'sim' : 'não'}
-              </p>
-            </div>
+              <div className="col-span-2 lg:hidden flex flex-col justify-center space-y-1">
+                <AuthInfo1 auth={auth} />
+                <AuthInfo2 auth={auth} />
+              </div>
 
-            <div className="col-span-1 flex flex-col justify-center items-center space-y-2">
-              <Button
-                color="primary"
-                className="w-8 h-8"
-                onClick={() => navigate(`/auth/update/${auths[key].uuid}`)}
-              >
-                <FontAwesomeIcon icon={faPenToSquare} />
-              </Button>
+              <div className="col-span-1 hidden lg:flex flex-col justify-center space-y-1">
+                <AuthInfo1 auth={auth} />
+              </div>
+              <div className="col-span-1 hidden lg:flex flex-col justify-center space-y-1">
+                <AuthInfo2 auth={auth} />
+              </div>
 
-              <Button
-                color="danger"
-                className="w-8 h-8"
-                onClick={() => navigate(`/auth/delete/${auths[key].uuid}`)}
-              >
-                <FontAwesomeIcon icon={faTrashCan} />
-              </Button>
+              <div className="col-span-1 flex flex-col justify-center items-center space-y-2">
+                <Button
+                  color="primary"
+                  className="w-8 h-8"
+                  onClick={() => navigate(`/auth/update/${auths[key].uuid}`)}
+                >
+                  <FontAwesomeIcon icon={faPenToSquare} />
+                </Button>
+
+                <Button
+                  color="danger"
+                  className="w-8 h-8"
+                  onClick={() => navigate(`/auth/delete/${auths[key].uuid}`)}
+                >
+                  <FontAwesomeIcon icon={faTrashCan} />
+                </Button>
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
 
       <Pagination
         itemsLength={auths.length}

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { prisma } from '@/server'
-import { currencyToNumber, numberToCurrency } from '@/utils/currency'
+import { numberToCurrency } from '@/utils/currency'
 import {
   keySchema,
   userCreateSchema,
@@ -93,12 +93,8 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
         username: query.data.username ? { contains: query.data.username } : undefined,
         active: query.data.active?.length === 1 ? query.data.active[0] : undefined,
         hourlyRate: {
-          gte: query.data.hourlyRateMin
-            ? currencyToNumber(query.data.hourlyRateMin, 'BRL')
-            : undefined,
-          lte: query.data.hourlyRateMax
-            ? currencyToNumber(query.data.hourlyRateMax, 'BRL')
-            : undefined,
+          gte: query.data.hourlyRateMin ? query.data.hourlyRateMin : undefined,
+          lte: query.data.hourlyRateMax ? query.data.hourlyRateMax : undefined,
         },
         authUuid: query.data.auth?.length ? { in: query.data.auth } : undefined,
         person: {
@@ -212,7 +208,7 @@ export const userCreate = async (req: Request, res: Response): Promise<void> => 
         username: body.data.username,
         password: hashPassword,
         active: body.data.active,
-        hourlyRate: body.data.hourlyRate ? currencyToNumber(body.data.hourlyRate, 'BRL') : null,
+        hourlyRate: body.data.hourlyRate ? body.data.hourlyRate : null,
         authUuid: body.data.authUuid,
       },
     })
@@ -299,9 +295,7 @@ export const userUpdate = async (req: Request, res: Response): Promise<void> => 
       data: {
         username: body.data.username,
         active: body.data.active,
-        hourlyRate: body.data.hourlyRate
-          ? currencyToNumber(body.data.hourlyRate, 'BRL')
-          : undefined,
+        hourlyRate: body.data.hourlyRate ? body.data.hourlyRate : undefined,
         authUuid: body.data.authUuid,
       },
       where: {

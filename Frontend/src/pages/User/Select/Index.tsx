@@ -66,7 +66,7 @@ const Select = () => {
                 <div className="p-7">
                   <Filter
                     auths={auths}
-                    auth={auth.personal}
+                    auth={auth}
                     filtering={filtering}
                     setFiltering={setFiltering}
                   />
@@ -75,7 +75,7 @@ const Select = () => {
 
               <div className="block w-full md:w-4/6 lg:w-9/12">
                 <div className="p-7">
-                  <List users={users} auth={auth.personal} />
+                  <List users={users} auth={auth} />
                 </div>
               </div>
             </>

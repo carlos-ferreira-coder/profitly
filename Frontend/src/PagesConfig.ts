@@ -37,6 +37,14 @@ import SupplierSelect from './pages/Supplier/Select/Index'
 import SupplierCreate from './pages/Supplier/Create/Index'
 import SupplierUpdate from './pages/Supplier/Update/Index'
 import SupplierDelete from './pages/Supplier/Delete/Index'
+import BillSelect from './pages/Transaction/Bill/Select/Index'
+import BillCreate from './pages/Transaction/Bill/Create/Index'
+import IncomeSelect from './pages/Transaction/Income/Select/Index'
+import IncomeCreate from './pages/Transaction/Income/Create/Index'
+import RefundSelect from './pages/Transaction/Refund/Select/Index'
+import RefundCreate from './pages/Transaction/Refund/Create/Index'
+import LoanSelect from './pages/Transaction/Loan/Select/Index'
+import LoanCreate from './pages/Transaction/Loan/Create/Index'
 
 export type PageProps = {
   icon: IconProp
@@ -55,6 +63,70 @@ export const pages: PageProps[] = [
     useIn: ['Navigate'],
     icon: faHouse,
     component: Home,
+  },
+  {
+    title: 'Despesa',
+    route: '/bill/select',
+    protection: ['logged', 'financial'],
+    useIn: ['Navigate'],
+    icon: faQuestion,
+    component: BillSelect,
+  },
+  {
+    title: 'Cadastrar Despesa',
+    route: '/bill/create',
+    protection: ['logged', 'financial'],
+    useIn: [],
+    icon: faQuestion,
+    component: BillCreate,
+  },
+  {
+    title: 'Receita',
+    route: '/income/select',
+    protection: ['logged', 'financial'],
+    useIn: ['Navigate'],
+    icon: faQuestion,
+    component: IncomeSelect,
+  },
+  {
+    title: 'Cadastrar Receita',
+    route: '/income/create',
+    protection: ['logged', 'financial'],
+    useIn: [],
+    icon: faQuestion,
+    component: IncomeCreate,
+  },
+  {
+    title: 'Reembolso',
+    route: '/refund/select',
+    protection: ['logged', 'financial'],
+    useIn: ['Navigate'],
+    icon: faQuestion,
+    component: RefundSelect,
+  },
+  {
+    title: 'Cadastrar Reembolso',
+    route: '/refund/create',
+    protection: ['logged', 'financial'],
+    useIn: [],
+    icon: faQuestion,
+    component: RefundCreate,
+  },
+  {
+    title: 'Empréstimo',
+    route: '/loan/select',
+    protection: ['logged', 'financial'],
+    useIn: ['Navigate'],
+    icon: faQuestion,
+    component: LoanSelect,
+  },
+  {
+    title: 'Cadastrar Empréstimo',
+    route: '/loan/create',
+    protection: ['logged', 'financial'],
+    useIn: [],
+    icon: faQuestion,
+    component: LoanCreate,
   },
   {
     title: 'Clientes',

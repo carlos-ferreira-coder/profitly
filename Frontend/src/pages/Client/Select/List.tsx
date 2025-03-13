@@ -25,57 +25,53 @@ const ClientTypeInfo = ({ client }: { client: ClientProps }) => (
   </p>
 )
 
-const ClientEntityInfo = ({ client, entity }: { client: ClientProps; entity: Entity }) => {
-  return (
-    <>
-      <p>
-        <b>Nome: </b>
-        {entity.name}
-        {client.active ? (
-          <FontAwesomeIcon icon={faCircleCheck} className="ml-2 text-success" />
-        ) : (
-          <FontAwesomeIcon icon={faCircleXmark} className="ml-2 text-danger" />
-        )}
-      </p>
-      {client.enterprise ? (
-        <>
-          <p>
-            <b>Nome Fantasia: </b> {client.enterprise?.fantasy}
-          </p>
-          <p>
-            <b>CNPJ: </b> {client.enterprise?.fantasy}
-          </p>
-        </>
+const ClientEntityInfo = ({ client, entity }: { client: ClientProps; entity: Entity }) => (
+  <>
+    <p>
+      <b>Nome: </b>
+      {entity.name}
+      {client.active ? (
+        <FontAwesomeIcon icon={faCircleCheck} className="ml-2 text-success" />
       ) : (
-        <>
-          <p>
-            <b>CPF: </b> {client.person?.cpf}
-          </p>
-        </>
+        <FontAwesomeIcon icon={faCircleXmark} className="ml-2 text-danger" />
       )}
-    </>
-  )
-}
+    </p>
+    {client.enterprise ? (
+      <>
+        <p>
+          <b>Nome Fantasia: </b> {client.enterprise?.fantasy}
+        </p>
+        <p>
+          <b>CNPJ: </b> {client.enterprise?.fantasy}
+        </p>
+      </>
+    ) : (
+      <>
+        <p>
+          <b>CPF: </b> {client.person?.cpf}
+        </p>
+      </>
+    )}
+  </>
+)
 
-const ClientContactInfo = ({ entity }: { entity: Entity }) => {
-  return (
-    <>
+const ClientContactInfo = ({ entity }: { entity: Entity }) => (
+  <>
+    <p>
+      <b>Email: </b> {entity.email}
+    </p>
+    {entity.phone && (
       <p>
-        <b>Email: </b> {entity.email}
+        <b>Contato: </b> {entity.phone}
       </p>
-      {entity.phone && (
-        <p>
-          <b>Contato: </b> {entity.phone}
-        </p>
-      )}
-      {entity.address && (
-        <p>
-          <b>Endereço: </b> {entity.address}
-        </p>
-      )}
-    </>
-  )
-}
+    )}
+    {entity.address && (
+      <p>
+        <b>Endereço: </b> {entity.address}
+      </p>
+    )}
+  </>
+)
 
 const List = ({ clients }: { clients: ClientProps[] }) => {
   const itemsPerPage = 10
