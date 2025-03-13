@@ -21,7 +21,7 @@ const responseLoans = (loans: any[]) => {
       register: formatDate(loan.register),
       date: formatDate(loan.date),
       amount: numberToCurrency(loan.amount.toNumber(), 'BRL'),
-      percent: `% ${loan.percent.replace(/[.]/g, ',')}`,
+      percent: `% ${loan.percent.toNumber().replace(/[.]/g, ',')}`,
     }
   })
 }
