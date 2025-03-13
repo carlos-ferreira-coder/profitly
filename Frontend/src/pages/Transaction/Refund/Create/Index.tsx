@@ -1,6 +1,6 @@
 import Breadcrumb from '../../../../components/Breadcrumb'
-import LogoDark from '../../../images/logo/logo-dark.png'
-import Logo from '../../../images/logo/logo.png'
+import LogoDark from '../../../../images/logo/logo-dark.png'
+import Logo from '../../../../images/logo/logo.png'
 import Form from './Form'
 
 const Create = () => {
