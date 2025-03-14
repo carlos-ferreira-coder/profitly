@@ -22,8 +22,6 @@ const Select = () => {
           withCredentials: true,
         })
 
-        console.log(JSON.stringify(data))
-
         setIncomes(data)
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])
