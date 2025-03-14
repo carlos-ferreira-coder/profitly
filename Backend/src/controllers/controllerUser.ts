@@ -364,9 +364,6 @@ export const userUpdatePassword = async (req: Request, res: Response): Promise<v
       return
     }
 
-    console.log('Token: ' + token.uuid)
-    console.log('Body: ' + body.data.uuid)
-
     // check if user has authorization
     if (!(await authorization('personal', token.authUuid))) {
       // check if is the main user
@@ -590,9 +587,9 @@ export const userDelete = async (req: Request, res: Response): Promise<void> => 
     }
 
     // check pending issues
-    const done = await prisma.project.findMany({ where: { userUuid: params.data.uuid } })
-    const transaction = await prisma.project.findMany({ where: { userUuid: params.data.uuid } })
-    if (done || transaction) {
+    const done = await prisma.done.findMany({ where: { userUuid: params.data.uuid } })
+    const transaction = await prisma.transaction.findMany({ where: { userUuid: params.data.uuid } })
+    if (done.length || transaction.length) {
       res.status(401).json({ message: 'O usuário contém pendências!' })
       return
     }

@@ -282,7 +282,7 @@ export const clientDelete = async (req: Request, res: Response): Promise<void> =
     const project = await prisma.project.findMany({ where: { clientUuid: params.data.uuid } })
     const income = await prisma.income.findMany({ where: { clientUuid: params.data.uuid } })
     const refund = await prisma.refund.findMany({ where: { clientUuid: params.data.uuid } })
-    if (project || income || refund) {
+    if (project.length || income.length || refund.length) {
       res.status(401).json({ message: 'O cliente contém pendências!' })
       return
     }

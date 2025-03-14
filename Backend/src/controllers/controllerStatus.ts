@@ -177,7 +177,7 @@ export const statusDelete = async (req: Request, res: Response): Promise<void> =
     // check pending issues
     const project = await prisma.project.findMany({ where: { statusUuid: params.data.uuid } })
     const task = await prisma.task.findMany({ where: { statusUuid: params.data.uuid } })
-    if (project || task) {
+    if (project.length || task.length) {
       res.status(401).json({ message: 'O status contém pendências!' })
       return
     }

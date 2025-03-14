@@ -319,7 +319,7 @@ export const authDelete = async (req: Request, res: Response): Promise<void> => 
 
     // check pending issues
     const user = await prisma.user.findMany({ where: { authUuid: params.data.uuid } })
-    if (user) {
+    if (user.length) {
       res.status(401).json({ message: 'O cargo/função contém pendências!' })
       return
     }

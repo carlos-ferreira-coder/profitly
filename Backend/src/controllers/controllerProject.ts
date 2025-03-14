@@ -314,6 +314,20 @@ export const projectDelete = async (req: Request, res: Response): Promise<void> 
       return
     }
 
+    const task = await prisma.task.findMany({
+      where: {
+        projectUuid: params.data.uuid,
+        budgetUuid: null,
+      },
+    })
+    const transaction = await prisma.transaction.findMany({
+      where: { projectUuid: params.data.uuid },
+    })
+    if (task.length || transaction.length) {
+      res.status(401).json({ message: 'O status contém pendências!' })
+      return
+    }
+
     // create resource
     await prisma.project.delete({ where: { uuid: params.data.uuid } })
     await prisma.budget.delete({ where: { uuid: project.budgetUuid } })
