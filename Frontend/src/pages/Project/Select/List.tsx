@@ -3,9 +3,6 @@ import { Pagination } from '../../../hooks/usePagination'
 import Button from '../../../components/Form/Button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faAnglesDown,
-  faAnglesRight,
-  faAnglesUp,
   faCircleCheck,
   faCircleXmark,
   faFileInvoiceDollar,
@@ -51,32 +48,7 @@ const ProjectInfo = ({ project, auth }: { project: ProjectProps; auth: AuthProps
     </p>
     <p>
       <b>Prioridade: </b>
-      <p
-        className={`p-1 w-4/6 lg:w-5/6 text-center text-white shadow-1 rounded-md border border-stroke dark:border-strokedark ${
-          project.status.priority < 4
-            ? 'bg-danger'
-            : project.status.priority < 8
-            ? 'bg-warning'
-            : 'bg-success'
-        }`}
-      >
-        {project.status.priority < 4 ? (
-          <>
-            <FontAwesomeIcon icon={faAnglesUp} className="mr-2" />
-            Alta
-          </>
-        ) : project.status.priority < 8 ? (
-          <>
-            <FontAwesomeIcon icon={faAnglesRight} className="mr-2" />
-            Média
-          </>
-        ) : (
-          <>
-            <FontAwesomeIcon icon={faAnglesDown} className="mr-2" />
-            Baixa
-          </>
-        )}
-      </p>
+      {project.status.priority < 4 ? 'Alta' : project.status.priority < 8 ? 'Média' : 'Baixa'}
     </p>
 
     {auth?.financial && (
@@ -152,7 +124,7 @@ const List = ({ projects }: { projects: ProjectProps[] }) => {
             key={project.uuid}
             className="grid grid-cols-6 lg:grid-cols-9 gap-2 my-3 px-3 lg:px-5 py-3 text-sm text-black dark:text-white shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
           >
-            <div className="col-span-5 flex flex-col justify-center space-y-1">
+            <div className="col-span-5 flex flex-col justify-center space-y-2">
               <ProjectInfo project={project} auth={auth} />
             </div>
 

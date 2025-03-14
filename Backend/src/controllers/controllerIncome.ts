@@ -109,12 +109,7 @@ export const incomeSelect = async (req: Request, res: Response): Promise<void> =
       },
     })
 
-    console.log(`Incomes: ${JSON.stringify(incomes)}`)
-    console.log(`Response incomes: ${JSON.stringify(responseIncomes(incomes))}`)
-
-    const abacate = responseIncomes(incomes)
-
-    res.status(200).json(abacate)
+    res.status(200).json(responseIncomes(incomes))
     return
   } catch (e) {
     console.log(e)
