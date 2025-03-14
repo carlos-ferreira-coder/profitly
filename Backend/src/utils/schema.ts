@@ -153,8 +153,12 @@ export const userSelectSchema = z.object({
   active: zodRegex('ativo', /^(false|true)(,(false|true))?$/, false)
     .transform((s) => s.split(',').map((i) => i === 'true'))
     .optional(),
-  hourlyRateMin: zodString('valor da hora', false).optional(),
-  hourlyRateMax: zodString('valor da hora', false).optional(),
+  hourlyRateMin: zodString('valor da hora', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
+    .optional(),
+  hourlyRateMax: zodString('valor da hora', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
+    .optional(),
   authUuid: zodRegex(
     'uuid(s) de permissões',
     /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
