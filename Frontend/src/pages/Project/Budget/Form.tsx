@@ -99,14 +99,14 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
 
   // Hookform -> FieldArray
   const { fields, append, remove } = useFieldArray({
-    name: 'task',
+    name: 'tasks',
     control,
   })
 
   useEffect(() => {
     if (status) {
       status.forEach((s, index) => {
-        setValue(`task.${index}.statusUuid`, s ? s.uuid : '')
+        setValue(`tasks.${index}.statusUuid`, s ? s.uuid : '')
       })
     }
   }, [status, setValue])
@@ -114,7 +114,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
   useEffect(() => {
     if (user) {
       user.forEach((u, index) => {
-        setValue(`task.${index}.userUuid`, u ? u.uuid : '')
+        setValue(`tasks.${index}.userUuid`, u ? u.uuid : '')
       })
     }
   }, [user, setValue])
@@ -131,7 +131,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
 
   const Total = ({ control }: { control: Control<SchemaProps> }) => {
     const tasks = useWatch({
-      name: 'task',
+      name: 'tasks',
       control,
     })
 
@@ -216,12 +216,34 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
     setAlertSuccesses(null)
 
     try {
-      const response = await axios.put('/project/budget/update', data, {
-        withCredentials: true,
-      })
+      const taskExpense = data.tasks.filter((task) => 'amount' in task)
+      const taskActivity = data.tasks.filter((task) => 'hourlyRate' in task)
+
+      const budgetTaskExpense = {
+        ...data,
+        tasks: {
+          ...taskExpense,
+        },
+      }
+      const budgetTaskActivity = {
+        ...data,
+        tasks: {
+          ...taskActivity,
+        },
+      }
+
+      const [{ data: resBudgetTaskExpenses }, { data: resBudgetTaskActivity }] = await Promise.all([
+        await axios.put('/budget/task/expense/update', budgetTaskExpense, {
+          withCredentials: true,
+        }),
+        await axios.put('/budget/task/activity/update', budgetTaskActivity, {
+          withCredentials: true,
+        }),
+      ])
 
       setAlertSuccesses([
-        response.data.message,
+        resBudgetTaskExpenses.message,
+        resBudgetTaskActivity.message,
         <Button
           type="button"
           color="success"
@@ -283,29 +305,33 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                   <div className={resume[index] ? 'block' : 'hidden'}>
                     <p>
                       <b>Descrição: </b>
-                      {watch(`task.${index}.description`)}
+                      {watch(`tasks.${index}.description`)}
                     </p>
                     <p>
                       <b>Valor: </b>
-                      {watch(`task.${index}.amount`) &&
+                      {watch(`tasks.${index}.amount`) &&
                         numberToCurrency(
-                          currencyToNumber(watch(`task.${index}.amount`), 'BRL') +
-                            currencyToNumber(watch(`task.${index}.revenue`), 'BRL'),
+                          currencyToNumber(watch(`tasks.${index}.amount`), 'BRL') +
+                            currencyToNumber(watch(`tasks.${index}.revenue`), 'BRL'),
                           'BRL'
                         )}
 
-                      {watch(`task.${index}.hourlyRate`) &&
+                      {watch(`tasks.${index}.hourlyRate`) &&
                         numberToCurrency(
-                          currencyToNumber(watch(`task.${index}.hourlyRate`), 'BRL') *
+                          currencyToNumber(watch(`tasks.${index}.hourlyRate`), 'BRL') *
                             differenceInHours(
-                              parse(watch(`task.${index}.endDate`), 'dd/MM/yy HH:mm', new Date()),
-                              parse(watch(`task.${index}.beginDate`), 'dd/MM/yy HH:mm', new Date())
+                              parse(watch(`tasks.${index}.endDate`), 'dd/MM/yy HH:mm', new Date()),
+                              parse(watch(`tasks.${index}.beginDate`), 'dd/MM/yy HH:mm', new Date())
                             ) +
-                            currencyToNumber(watch(`task.${index}.revenue`), 'BRL') *
+                            currencyToNumber(watch(`tasks.${index}.revenue`), 'BRL') *
                               differenceInHours(
-                                parse(watch(`task.${index}.endDate`), 'dd/MM/yy HH:mm', new Date()),
                                 parse(
-                                  watch(`task.${index}.beginDate`),
+                                  watch(`tasks.${index}.endDate`),
+                                  'dd/MM/yy HH:mm',
+                                  new Date()
+                                ),
+                                parse(
+                                  watch(`tasks.${index}.beginDate`),
                                   'dd/MM/yy HH:mm',
                                   new Date()
                                 )
@@ -321,34 +347,34 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
 
                   <div className={resume[index] ? 'hidden' : 'block'}>
                     <Input
-                      id={`task.${index}.uuid`}
+                      id={`tasks.${index}.uuid`}
                       type="text"
                       hidden
                       disabled
-                      {...register(`task.${index}.uuid`)}
+                      {...register(`tasks.${index}.uuid`)}
                     />
-                    {errors.task?.[index]?.uuid && (
+                    {errors.tasks?.[index]?.uuid && (
                       <Alert
                         type="danger"
                         size="sm"
-                        data={[errors.task?.[index].uuid.message || '']}
+                        data={[errors.tasks?.[index].uuid.message || '']}
                       />
                     )}
 
                     <Input
-                      id={`task.${index}.projectUuid`}
+                      id={`tasks.${index}.projectUuid`}
                       type="text"
                       hidden
                       disabled
-                      {...register(`task.${index}.projectUuid`)}
+                      {...register(`tasks.${index}.projectUuid`)}
                     />
 
                     <Input
-                      id={`task.${index}.budgetUuid`}
+                      id={`tasks.${index}.budgetUuid`}
                       type="text"
                       hidden
                       disabled
-                      {...register(`task.${index}.budgetUuid`)}
+                      {...register(`tasks.${index}.budgetUuid`)}
                     />
 
                     <div className="mb-6">
@@ -360,19 +386,19 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                       </label>
                       <div className="relative">
                         <Input
-                          id={`task.${index}.name`}
+                          id={`tasks.${index}.name`}
                           type="text"
                           icon={faThumbTack}
                           iconPosition="left"
-                          {...register(`task.${index}.name`)}
+                          {...register(`tasks.${index}.name`)}
                           placeholder="Digite o nome"
                         />
                       </div>
-                      {errors.task?.[index]?.name && (
+                      {errors.tasks?.[index]?.name && (
                         <Alert
                           type="danger"
                           size="sm"
-                          data={[errors.task?.[index].name.message || '']}
+                          data={[errors.tasks?.[index].name.message || '']}
                         />
                       )}
                     </div>
@@ -386,19 +412,19 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                       </label>
                       <div className="relative">
                         <Input
-                          id={`task.${index}.description`}
+                          id={`tasks.${index}.description`}
                           type="text"
                           icon={faAlignLeft}
                           iconPosition="left"
-                          {...register(`task.${index}.description`)}
+                          {...register(`tasks.${index}.description`)}
                           placeholder="Digite a descrição"
                         />
                       </div>
-                      {errors.task?.[index]?.description && (
+                      {errors.tasks?.[index]?.description && (
                         <Alert
                           type="danger"
                           size="sm"
-                          data={[errors.task?.[index].description.message || '']}
+                          data={[errors.tasks?.[index].description.message || '']}
                         />
                       )}
                     </div>
@@ -406,18 +432,18 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                     <div className="mb-6">
                       <label
                         className="mb-2.5 block font-medium text-black dark:text-white"
-                        htmlFor={`task.${index}.beginDate`}
+                        htmlFor={`tasks.${index}.beginDate`}
                       >
                         Data inicial <span className="text-danger">*</span>
                       </label>
                       <div className="relative">
                         <Controller
-                          name={`task.${index}.beginDate`}
+                          name={`tasks.${index}.beginDate`}
                           control={control}
                           render={({ field }) => (
                             <InputPattern
                               {...field}
-                              id={`task.${index}.beginDate`}
+                              id={`tasks.${index}.beginDate`}
                               mask="_"
                               icon={faCalendar}
                               iconPosition="left"
@@ -427,11 +453,11 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                           )}
                         />
                       </div>
-                      {errors.task?.[index]?.beginDate && (
+                      {errors.tasks?.[index]?.beginDate && (
                         <Alert
                           type="danger"
                           size="sm"
-                          data={[errors.task?.[index].beginDate.message || '']}
+                          data={[errors.tasks?.[index].beginDate.message || '']}
                         />
                       )}
                     </div>
@@ -439,18 +465,18 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                     <div className="mb-6">
                       <label
                         className="mb-2.5 block font-medium text-black dark:text-white"
-                        htmlFor={`task.${index}.endDate`}
+                        htmlFor={`tasks.${index}.endDate`}
                       >
                         Data final <span className="text-danger">*</span>
                       </label>
                       <div className="relative">
                         <Controller
-                          name={`task.${index}.endDate`}
+                          name={`tasks.${index}.endDate`}
                           control={control}
                           render={({ field }) => (
                             <InputPattern
                               {...field}
-                              id={`task.${index}.endDate`}
+                              id={`tasks.${index}.endDate`}
                               mask="_"
                               icon={faCalendar}
                               iconPosition="left"
@@ -460,31 +486,31 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                           )}
                         />
                       </div>
-                      {errors.task?.[index]?.endDate && (
+                      {errors.tasks?.[index]?.endDate && (
                         <Alert
                           type="danger"
                           size="sm"
-                          data={[errors.task?.[index].endDate.message || '']}
+                          data={[errors.tasks?.[index].endDate.message || '']}
                         />
                       )}
                     </div>
 
-                    {watch(`task.${index}.amount`) && (
+                    {watch(`tasks.${index}.amount`) && (
                       <div className="mb-6">
                         <label
                           className="mb-2.5 block font-medium text-black dark:text-white"
-                          htmlFor={`task.${index}.amount`}
+                          htmlFor={`tasks.${index}.amount`}
                         >
                           Quantia <span className="text-danger">*</span>
                         </label>
                         <div className="relative">
                           <Controller
-                            name={`task.${index}.amount`}
+                            name={`tasks.${index}.amount`}
                             control={control}
                             render={({ field }) => (
                               <InputNumeric
                                 {...field}
-                                id={`task.${index}.amount`}
+                                id={`tasks.${index}.amount`}
                                 icon={faDollarSign}
                                 iconPosition="left"
                                 prefix={'R$ '}
@@ -502,22 +528,22 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                       </div>
                     )}
 
-                    {watch(`task.${index}.hourlyRate`) && (
+                    {watch(`tasks.${index}.hourlyRate`) && (
                       <div className="mb-6">
                         <label
                           className="mb-2.5 block font-medium text-black dark:text-white"
-                          htmlFor={`task.${index}.hourlyRate`}
+                          htmlFor={`tasks.${index}.hourlyRate`}
                         >
                           Valor da Hora <span className="text-danger">*</span>
                         </label>
                         <div className="relative">
                           <Controller
-                            name={`task.${index}.hourlyRate`}
+                            name={`tasks.${index}.hourlyRate`}
                             control={control}
                             render={({ field }) => (
                               <InputNumeric
                                 {...field}
-                                id={`task.${index}.hourlyRate`}
+                                id={`tasks.${index}.hourlyRate`}
                                 icon={faDollarSign}
                                 iconPosition="left"
                                 prefix={'R$ '}
@@ -538,18 +564,18 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                     <div className="mb-6">
                       <label
                         className="mb-2.5 block font-medium text-black dark:text-white"
-                        htmlFor={`task.${index}.revenue`}
+                        htmlFor={`tasks.${index}.revenue`}
                       >
                         Lucro <span className="text-danger">*</span>
                       </label>
                       <div className="relative">
                         <Controller
-                          name={`task.${index}.revenue`}
+                          name={`tasks.${index}.revenue`}
                           control={control}
                           render={({ field }) => (
                             <InputNumeric
                               {...field}
-                              id={`task.${index}.revenue`}
+                              id={`tasks.${index}.revenue`}
                               icon={faDollarSign}
                               iconPosition="left"
                               prefix={'R$ '}
@@ -563,11 +589,11 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                           )}
                         />
                       </div>
-                      {errors.task?.[index]?.revenue && (
+                      {errors.tasks?.[index]?.revenue && (
                         <Alert
                           type="danger"
                           size="sm"
-                          data={[errors.task?.[index].revenue.message || '']}
+                          data={[errors.tasks?.[index].revenue.message || '']}
                         />
                       )}
                     </div>
@@ -575,17 +601,17 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                     <div className="mb-6">
                       <label
                         className="mb-2.5 block font-medium text-black dark:text-white"
-                        htmlFor={`task.${index}.statusUuid`}
+                        htmlFor={`tasks.${index}.statusUuid`}
                       >
                         Status <span className="text-danger">*</span>
                       </label>
                       <div className="relative">
                         <Input
                           type="text"
-                          id={`task.${index}.statusUuid`}
+                          id={`tasks.${index}.statusUuid`}
                           disabled
                           hidden
-                          {...register(`task.${index}.statusUuid`)}
+                          {...register(`tasks.${index}.statusUuid`)}
                         />
 
                         <StatusSearch
@@ -599,11 +625,11 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                           }}
                         />
                       </div>
-                      {errors.task?.[index]?.statusUuid && (
+                      {errors.tasks?.[index]?.statusUuid && (
                         <Alert
                           type="danger"
                           size="sm"
-                          data={[errors.task?.[index].statusUuid.message || '']}
+                          data={[errors.tasks?.[index].statusUuid.message || '']}
                         />
                       )}
                     </div>
@@ -611,17 +637,17 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                     <div className="mb-6">
                       <label
                         className="mb-2.5 block font-medium text-black dark:text-white"
-                        htmlFor={`task.${index}.userUuid`}
+                        htmlFor={`tasks.${index}.userUuid`}
                       >
                         Usuário <span className="text-slate-400">?</span>
                       </label>
                       <div className="relative">
                         <Input
                           type="text"
-                          id={`task.${index}.userUuid`}
+                          id={`tasks.${index}.userUuid`}
                           disabled
                           hidden
-                          {...register(`task.${index}.userUuid`)}
+                          {...register(`tasks.${index}.userUuid`)}
                         />
 
                         <SearchUser
@@ -634,11 +660,11 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                           }}
                         />
                       </div>
-                      {errors.task?.[index]?.userUuid && (
+                      {errors.tasks?.[index]?.userUuid && (
                         <Alert
                           type="danger"
                           size="sm"
-                          data={[errors.task?.[index].userUuid.message || '']}
+                          data={[errors.tasks?.[index].userUuid.message || '']}
                         />
                       )}
                     </div>
@@ -654,8 +680,8 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
             <Loader />
           )}
 
-          {errors.task?.message && (
-            <Alert type="danger" size="lg" data={[errors.task.message || '']} />
+          {errors.tasks?.message && (
+            <Alert type="danger" size="lg" data={[errors.tasks.message || '']} />
           )}
         </div>
       </div>

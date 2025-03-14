@@ -487,7 +487,7 @@ const taskActivitySchema = z
   })
 
 export const tasksSchema = z.object({
-  task: z
+  tasks: z
     .array(z.union([taskExpenseSchema, taskActivitySchema]))
     .min(1, { message: 'Insira as tarefas para prosseguir!' }),
 })
@@ -508,7 +508,7 @@ export const budgetSchema = z.object({
     })
     .nullable()
     .optional(),
-  task: z
+  tasks: z
     .array(z.union([taskExpenseSchema, taskActivitySchema]))
     .min(1, { message: 'Insira as tarefas para prosseguir!' }),
 })

@@ -17,8 +17,8 @@ const Tasks = () => {
     ;(async () => {
       try {
         const [{ data: resTaskExpenses }, { data: resTaskActivity }] = await Promise.all([
-          axios.get(`project/task/expense/select/${uuid}`, { withCredentials: true }),
-          axios.get(`project/task/activity/select/${uuid}`, { withCredentials: true }),
+          axios.get(`task/expense/select/all?projectUuid=${uuid}`, { withCredentials: true }),
+          axios.get(`task/activity/select/all?projectUuid=${uuid}`, { withCredentials: true }),
         ])
 
         setTasks([...resTaskExpenses, ...resTaskActivity])

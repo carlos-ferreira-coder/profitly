@@ -106,6 +106,8 @@ export type TaskProps = {
   project: ProjectProps
   user: UserProps
   budget: BudgetProps
+  taskExpense?: TaskExpenseProps
+  taskActivity?: TaskActivityProps
 }
 
 export type TaskExpenseProps = {

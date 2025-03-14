@@ -18,7 +18,7 @@ const Budget = () => {
       try {
         const {
           data: { 0: resBudget },
-        } = await axios.get(`project/budget/select/${uuid}`, {
+        } = await axios.get(`budget/select/${uuid}`, {
           withCredentials: true,
         })
 

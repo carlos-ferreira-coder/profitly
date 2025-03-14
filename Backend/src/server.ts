@@ -8,6 +8,8 @@ import routerUser from '@routers/routerUser'
 import routerStatus from '@routers/routerStatus'
 import routerClient from '@routers/routerClient'
 import routerProject from '@routers/routerProject'
+import routerBudget from '@routers/routerBudget'
+import routerTasks from '@routers/routerTasks'
 import routerSupplier from '@routers/routerSupplier'
 import routerBill from '@routers/routerBill'
 import routerIncome from '@routers/routerIncome'
@@ -36,11 +38,13 @@ app.use('/user', auth, routerUser)
 app.use('/status', auth, routerStatus)
 app.use('/client', auth, routerClient)
 app.use('/project', auth, routerProject)
+app.use('/budget', auth, routerBudget)
+app.use('/tasks', auth, routerTasks)
 app.use('/supplier', auth, routerSupplier)
-app.use('/Bill', auth, routerBill)
-app.use('/Income', auth, routerIncome)
-app.use('/Refund', auth, routerRefund)
-app.use('/Loan', auth, routerLoan)
+app.use('/bill', auth, routerBill)
+app.use('/income', auth, routerIncome)
+app.use('/refund', auth, routerRefund)
+app.use('/loan', auth, routerLoan)
 
 app.use('/img/user', auth, express.static('src/images/users'))
 
