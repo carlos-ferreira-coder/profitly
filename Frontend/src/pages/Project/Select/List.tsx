@@ -16,7 +16,7 @@ import { AuthProps, ProjectProps } from '../../../types/Database'
 import { currencyToNumber } from '../../../hooks/useCurrency'
 import { useAuth } from '../../../context/AuthContext'
 
-const ProjectInfo = ({ project, auth }: { project: ProjectProps; auth: AuthProps | null }) => (
+const ProjectDescInfo = ({ project }: { project: ProjectProps }) => (
   <>
     <p>
       <b>Nome: </b> {project.name}
@@ -29,20 +29,22 @@ const ProjectInfo = ({ project, auth }: { project: ProjectProps; auth: AuthProps
     <p>
       <b>Descrição: </b> {project.description}
     </p>
+  </>
+)
 
+const ProjectStatsInfo = ({ project }: { project: ProjectProps }) => (
+  <>
     <p>
       <b>Data inicial: </b> {project.beginDate}
     </p>
     <p>
       <b>Data final: </b> {project.endDate}
     </p>
-
     {project.user && (
       <p>
         <b>Usuário: </b> {project.user.username}
       </p>
     )}
-
     <p>
       <b>Status: </b> {project.status.name}
     </p>
@@ -50,51 +52,50 @@ const ProjectInfo = ({ project, auth }: { project: ProjectProps; auth: AuthProps
       <b>Prioridade: </b>
       {project.status.priority < 4 ? 'Alta' : project.status.priority < 8 ? 'Média' : 'Baixa'}
     </p>
-
-    {auth?.financial && (
-      <>
-        <p>
-          <b>Total previsto: </b>
-          {project.prevTotal}
-        </p>
-        <p>
-          <b>Lucro previsto: </b>
-          {project.prevRevenue}
-        </p>
-        <p>
-          <b>Custo previsto: </b>
-          {project.prevCost}
-        </p>
-        <p>
-          <b>Total atual: </b>
-          {project.total}
-        </p>
-        <p>
-          <b>Lucro atual: </b>
-          {project.revenue}
-        </p>
-        <p>
-          <b>Custo atual: </b>
-          {project.cost}
-        </p>
-        <p>
-          <b>Receita corrente: </b>
-          {project.currentIncome}
-        </p>
-        <p>
-          <b>Lucro corrente: </b>
-          {project.currentRevenue}
-        </p>
-        <p>
-          <b>Despesa corrente: </b>
-          {project.currentExpense}
-        </p>
-      </>
-    )}
   </>
 )
 
-// TODO fazer screen lg
+const ProjectPrevInfo = ({ project }: { project: ProjectProps }) => (
+  <>
+    <p>
+      <b>Total previsto: </b> {project.prevTotal}
+    </p>
+    <p>
+      <b>Lucro previsto: </b> {project.prevRevenue}
+    </p>
+    <p>
+      <b>Custo previsto: </b> {project.prevCost}
+    </p>
+  </>
+)
+
+const ProjectActualInfo = ({ project }: { project: ProjectProps }) => (
+  <>
+    <p>
+      <b>Total atual: </b> {project.total}
+    </p>
+    <p>
+      <b>Lucro atual: </b> {project.revenue}
+    </p>
+    <p>
+      <b>Custo atual: </b> {project.cost}
+    </p>
+  </>
+)
+
+const ProjectCurrentInfo = ({ project }: { project: ProjectProps }) => (
+  <>
+    <p>
+      <b>Receita corrente: </b> {project.currentIncome}
+    </p>
+    <p>
+      <b>Lucro corrente: </b> {project.currentRevenue}
+    </p>
+    <p>
+      <b>Despesa corrente: </b> {project.currentExpense}
+    </p>
+  </>
+)
 
 const List = ({ projects }: { projects: ProjectProps[] }) => {
   const { auth } = useAuth()
@@ -122,11 +123,45 @@ const List = ({ projects }: { projects: ProjectProps[] }) => {
         return (
           <div
             key={project.uuid}
-            className="grid grid-cols-6 lg:grid-cols-9 gap-2 my-3 px-3 lg:px-5 py-3 text-sm text-black dark:text-white shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
+            className="grid grid-cols-6 lg:grid-cols-11 gap-2 my-3 px-3 lg:px-5 py-3 text-sm text-black dark:text-white shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
           >
-            <div className="col-span-5 flex flex-col justify-center space-y-2">
-              <ProjectInfo project={project} auth={auth} />
+            <div className="col-span-5 lg:hidden flex flex-col justify-center space-y-2">
+              <ProjectDescInfo project={project} />
+
+              <ProjectStatsInfo project={project} />
+
+              {auth?.financial && (
+                <>
+                  <ProjectPrevInfo project={project} />
+
+                  <ProjectActualInfo project={project} />
+
+                  <ProjectCurrentInfo project={project} />
+                </>
+              )}
             </div>
+
+            <div className="col-span-2 hidden lg:flex flex-col justify-center space-y-2">
+              <ProjectDescInfo project={project} />
+            </div>
+
+            <div className="col-span-2 hidden lg:flex flex-col justify-center space-y-2">
+              <ProjectStatsInfo project={project} />
+            </div>
+
+            {auth?.financial && (
+              <>
+                <div className="col-span-2 hidden lg:flex flex-col justify-center space-y-2">
+                  <ProjectPrevInfo project={project} />
+                </div>
+                <div className="col-span-2 hidden lg:flex flex-col justify-center space-y-2">
+                  <ProjectActualInfo project={project} />
+                </div>
+                <div className="col-span-2 hidden lg:flex flex-col justify-center space-y-2">
+                  <ProjectCurrentInfo project={project} />
+                </div>
+              </>
+            )}
 
             <div className="col-span-1 flex flex-col justify-center items-center space-y-6 lg:space-y-2">
               <Button
