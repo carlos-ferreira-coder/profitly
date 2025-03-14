@@ -54,6 +54,20 @@ export const incomeSelect = async (req: Request, res: Response): Promise<void> =
     // server request
     const incomes = await prisma.income.findMany({
       include: {
+        client: {
+          include: {
+            person: {
+              include: {
+                entity: true,
+              },
+            },
+            enterprise: {
+              include: {
+                entity: true,
+              },
+            },
+          },
+        },
         transaction: true,
       },
       where: {
