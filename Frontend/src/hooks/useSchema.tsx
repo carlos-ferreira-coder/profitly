@@ -335,6 +335,7 @@ const transactionCreateSchema = {
   amount: zodRegex('valor', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
   projectUuid: zodUuid('projeto')
     .transform((s) => (s === '' ? undefined : s))
+    .nullable()
     .optional(),
 }
 
@@ -376,6 +377,7 @@ export const projectCreateSchema = z.object({
   active: zodBoolean('ativo'),
   userUuid: zodUuid('usuário')
     .transform((s) => (s === '' ? undefined : s))
+    .nullable()
     .optional(),
   clientUuid: zodUuid('cliente'),
   statusUuid: zodUuid('status'),

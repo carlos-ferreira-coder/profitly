@@ -128,14 +128,8 @@ export const billCreate = async (req: Request, res: Response): Promise<void> => 
     }
 
     // create resource
-    const bill = await prisma.bill.create({
+    const transaction = await prisma.transaction.create({
       data: {
-        supplierUuid: body.data.supplierUuid,
-      },
-    })
-    await prisma.transaction.create({
-      data: {
-        id: bill.id,
         name: body.data.name,
         description: body.data.description,
         register: new Date(),
@@ -143,6 +137,12 @@ export const billCreate = async (req: Request, res: Response): Promise<void> => 
         amount: body.data.amount,
         userUuid: token.uuid,
         projectUuid: body.data.projectUuid,
+      },
+    })
+    await prisma.bill.create({
+      data: {
+        id: transaction.id,
+        supplierUuid: body.data.supplierUuid,
       },
     })
 

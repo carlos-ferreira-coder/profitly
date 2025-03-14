@@ -133,15 +133,8 @@ export const loanCreate = async (req: Request, res: Response): Promise<void> => 
     }
 
     // create resource
-    const loan = await prisma.loan.create({
+    const transaction = await prisma.transaction.create({
       data: {
-        percent: body.data.percent,
-        supplierUuid: body.data.supplierUuid,
-      },
-    })
-    await prisma.transaction.create({
-      data: {
-        id: loan.id,
         name: body.data.name,
         description: body.data.description,
         register: new Date(),
@@ -149,6 +142,13 @@ export const loanCreate = async (req: Request, res: Response): Promise<void> => 
         amount: body.data.amount,
         userUuid: token.uuid,
         projectUuid: body.data.projectUuid,
+      },
+    })
+    await prisma.loan.create({
+      data: {
+        id: transaction.id,
+        percent: body.data.percent,
+        supplierUuid: body.data.supplierUuid,
       },
     })
 
