@@ -54,7 +54,47 @@ export const refundSelect = async (req: Request, res: Response): Promise<void> =
     // server request
     const refunds = await prisma.refund.findMany({
       include: {
-        transaction: true,
+        client: {
+          include: {
+            person: {
+              include: {
+                entity: true,
+              },
+            },
+            enterprise: {
+              include: {
+                entity: true,
+              },
+            },
+          },
+        },
+        supplier: {
+          include: {
+            person: {
+              include: {
+                entity: true,
+              },
+            },
+            enterprise: {
+              include: {
+                entity: true,
+              },
+            },
+          },
+        },
+        transaction: {
+          include: {
+            user: {
+              include: {
+                person: {
+                  include: {
+                    entity: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
       where: {
         uuid: params.data.key === 'all' ? undefined : params.data.key,

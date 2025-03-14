@@ -54,7 +54,33 @@ export const billSelect = async (req: Request, res: Response): Promise<void> => 
     // server request
     const bills = await prisma.bill.findMany({
       include: {
-        transaction: true,
+        supplier: {
+          include: {
+            person: {
+              include: {
+                entity: true,
+              },
+            },
+            enterprise: {
+              include: {
+                entity: true,
+              },
+            },
+          },
+        },
+        transaction: {
+          include: {
+            user: {
+              include: {
+                person: {
+                  include: {
+                    entity: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
       where: {
         uuid: params.data.key === 'all' ? undefined : params.data.key,

@@ -68,7 +68,19 @@ export const incomeSelect = async (req: Request, res: Response): Promise<void> =
             },
           },
         },
-        transaction: true,
+        transaction: {
+          include: {
+            user: {
+              include: {
+                person: {
+                  include: {
+                    entity: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
       where: {
         uuid: params.data.key === 'all' ? undefined : params.data.key,
