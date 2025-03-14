@@ -21,9 +21,12 @@ const responseIncomes = (incomes: IncomeProps[]) => {
   return incomes.map((income) => {
     return {
       ...income,
-      register: formatDate(income.transaction.register),
-      date: formatDate(income.transaction.date),
-      amount: numberToCurrency(income.transaction.amount.toNumber(), 'BRL'),
+      transaction: {
+        ...income.transaction,
+        register: formatDate(income.transaction.register),
+        date: formatDate(income.transaction.date),
+        amount: numberToCurrency(income.transaction.amount.toNumber(), 'BRL'),
+      },
     }
   })
 }
@@ -109,7 +112,9 @@ export const incomeSelect = async (req: Request, res: Response): Promise<void> =
     console.log(`Incomes: ${JSON.stringify(incomes)}`)
     console.log(`Response incomes: ${JSON.stringify(responseIncomes(incomes))}`)
 
-    res.status(200).json(responseIncomes(incomes))
+    const abacate = responseIncomes(incomes)
+
+    res.status(200).json(abacate)
     return
   } catch (e) {
     console.log(e)
