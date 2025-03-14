@@ -106,8 +106,8 @@ export const incomeSelect = async (req: Request, res: Response): Promise<void> =
       },
     })
 
-    console.log(`Incomes: ${incomes}`)
-    console.log(`Response incomes: ${responseIncomes(incomes)}`)
+    console.log(`Incomes: ${JSON.stringify(incomes)}`)
+    console.log(`Response incomes: ${JSON.stringify(responseIncomes(incomes))}`)
 
     res.status(200).json(responseIncomes(incomes))
     return
