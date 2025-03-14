@@ -58,7 +58,7 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
         uuid: params.data.key === 'all' ? undefined : params.data.key,
         active: query.data.active?.length === 1 ? query.data.active[0] : undefined,
         OR: [
-          query.data.cnpj || query.data.fantasy
+          !query.data.cpf
             ? { person: { is: null } }
             : {
                 person: {
@@ -66,7 +66,7 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
                   entity: entityFilter,
                 },
               },
-          query.data.cpf
+          !(query.data.cnpj || query.data.fantasy)
             ? { enterprise: { is: null } }
             : {
                 enterprise: {
