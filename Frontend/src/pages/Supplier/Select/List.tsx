@@ -39,7 +39,7 @@ const SupplierEntityInfo = ({
       {supplier.enterprise ? (
         <>
           <p>
-            <b>Nome Fantasia: </b> {supplier.enterprise?.fantasy}
+            <b>Nome fantasia: </b> {supplier.enterprise?.fantasy}
           </p>
           <p>
             <b>CNPJ: </b> {supplier.enterprise?.fantasy}

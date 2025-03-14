@@ -32,7 +32,7 @@ const ClientEntityInfo = ({ client, entity }: { client: ClientProps; entity: Ent
     {client.enterprise ? (
       <>
         <p>
-          <b>Nome Fantasia: </b> {client.enterprise?.fantasy}
+          <b>Nome fantasia: </b> {client.enterprise?.fantasy}
         </p>
         <p>
           <b>CNPJ: </b> {client.enterprise?.fantasy}

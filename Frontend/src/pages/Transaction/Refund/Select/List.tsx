@@ -70,7 +70,7 @@ const List = ({ refunds }: { refunds: RefundProps[] }) => {
       <div className="flex justify-end">
         <Button color="success" className="w-50 h-8" onClick={() => navigate('/refund/create/')}>
           <FontAwesomeIcon icon={faPlus} className="mr-1" />
-          Adicionar Despesa
+          Adicionar Reembolso
         </Button>
       </div>
 

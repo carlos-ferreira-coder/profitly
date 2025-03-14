@@ -62,7 +62,7 @@ const List = ({ incomes }: { incomes: IncomeProps[] }) => {
       <div className="flex justify-end">
         <Button color="success" className="w-50 h-8" onClick={() => navigate('/income/create/')}>
           <FontAwesomeIcon icon={faPlus} className="mr-1" />
-          Adicionar receita
+          Adicionar Receita
         </Button>
       </div>
 

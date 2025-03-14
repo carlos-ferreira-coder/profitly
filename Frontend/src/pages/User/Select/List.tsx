@@ -21,7 +21,7 @@ const UserInfo = ({ user, auth }: { user: UserProps; auth: AuthProps | null }) =
     </p>
     {auth?.personal && (
       <p>
-        <b>Nome Completo: </b> {user.person.entity.name}
+        <b>Nome completo: </b> {user.person.entity.name}
       </p>
     )}
     <p>

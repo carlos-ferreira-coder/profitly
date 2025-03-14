@@ -1,8 +1,10 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { AuthProps } from '../../types/Database'
 import { getPagesByUseIn, PageProps } from '../../PagesConfig'
 
 const NavigateHeader = ({ auth }: { auth: AuthProps }) => {
+  const location = useLocation()
+
   return getPagesByUseIn('Navigate', auth).map((page: PageProps) => (
     <div
       key={`${page.route}`}
