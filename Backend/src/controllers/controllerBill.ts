@@ -21,9 +21,12 @@ const responseBills = (bills: BillProps[]) => {
   return bills.map((bill) => {
     return {
       ...bill,
-      register: formatDate(bill.transaction.register),
-      date: formatDate(bill.transaction.date),
-      amount: numberToCurrency(bill.transaction.amount.toNumber(), 'BRL'),
+      transaction: {
+        ...bill.transaction,
+        register: formatDate(bill.transaction.register),
+        date: formatDate(bill.transaction.date),
+        amount: numberToCurrency(bill.transaction.amount.toNumber(), 'BRL'),
+      },
     }
   })
 }

@@ -21,10 +21,13 @@ const responseLoans = (loans: LoanProps[]) => {
   return loans.map((loan) => {
     return {
       ...loan,
-      register: formatDate(loan.transaction.register),
-      date: formatDate(loan.transaction.date),
-      amount: numberToCurrency(loan.transaction.amount.toNumber(), 'BRL'),
-      percent: `% ${loan.percent.toNumber().toString().replace(/[.]/g, ',')}`,
+      transaction: {
+        ...loan.transaction,
+        register: formatDate(loan.transaction.register),
+        date: formatDate(loan.transaction.date),
+        amount: numberToCurrency(loan.transaction.amount.toNumber(), 'BRL'),
+        percent: `% ${loan.percent.toNumber().toString().replace(/[.]/g, ',')}`,
+      },
     }
   })
 }

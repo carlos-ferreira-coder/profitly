@@ -21,9 +21,12 @@ const responseRefunds = (refunds: RefundProps[]) => {
   return refunds.map((refund) => {
     return {
       ...refund,
-      register: formatDate(refund.transaction.register),
-      date: formatDate(refund.transaction.date),
-      amount: numberToCurrency(refund.transaction.amount.toNumber(), 'BRL'),
+      transaction: {
+        ...refund.transaction,
+        register: formatDate(refund.transaction.register),
+        date: formatDate(refund.transaction.date),
+        amount: numberToCurrency(refund.transaction.amount.toNumber(), 'BRL'),
+      },
     }
   })
 }
