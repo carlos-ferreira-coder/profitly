@@ -12,7 +12,7 @@ import {
   faTrashCan,
 } from '@fortawesome/free-solid-svg-icons'
 import { useNavigate } from 'react-router-dom'
-import { AuthProps, ProjectProps } from '../../../types/Database'
+import { ProjectProps } from '../../../types/Database'
 import { currencyToNumber } from '../../../hooks/useCurrency'
 import { useAuth } from '../../../context/AuthContext'
 
@@ -27,7 +27,10 @@ const ProjectDescInfo = ({ project }: { project: ProjectProps }) => (
       )}
     </p>
     <p>
-      <b>Descrição: </b> {project.description}
+      <b>Descrição: </b>{' '}
+      {project.description.length <= 125
+        ? project.description
+        : `${project.description.slice(0, 122)}...`}
     </p>
   </>
 )
