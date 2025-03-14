@@ -171,7 +171,7 @@ const Form = () => {
 
       <div className="mb-6">
         <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="userUuid">
-          Usuário <span className="text-danger">*</span>
+          Usuário <span className="text-slate-400">?</span>
         </label>
         <div className="relative">
           <Input type="text" id="userUuid" disabled hidden {...register('userUuid')} />

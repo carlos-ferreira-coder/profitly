@@ -360,7 +360,6 @@ const transactionCreateSchema = {
   amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true).transform((s) =>
     currencyToNumber(s, 'BRL'),
   ),
-  userUuid: zodUuid('cargo/função'),
   projectUuid: zodUuid('cargo/função').optional(),
 }
 

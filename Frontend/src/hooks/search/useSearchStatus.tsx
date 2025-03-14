@@ -149,7 +149,7 @@ const StatusSearch = ({
               ).map((status) => (
                 <div
                   key={status.uuid}
-                  className="grid grid-cols-9 mt-2 w-full gap-1 p-3 shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
+                  className="grid grid-cols-6 mt-2 w-full gap-1 p-3 shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
                 >
                   <StatusInfo status={status} />
 

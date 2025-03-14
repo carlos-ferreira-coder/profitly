@@ -333,8 +333,9 @@ const transactionCreateSchema = {
     return `20${year}-${month}-${day}T${hour}:${minute}:00`
   }),
   amount: zodRegex('valor', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
-  userUuid: zodUuid('usuário'),
-  projectUuid: zodUuid('projeto').transform((s) => (s === '' ? undefined : s)),
+  projectUuid: zodUuid('projeto')
+    .transform((s) => (s === '' ? undefined : s))
+    .optional(),
 }
 
 export const billCreateSchema = z.object({
@@ -373,7 +374,9 @@ export const projectCreateSchema = z.object({
   name: zodString('nome', true),
   description: zodString('descrição', true),
   active: zodBoolean('ativo'),
-  userUuid: zodUuid('usuário').transform((s) => (s === '' ? undefined : s)),
+  userUuid: zodUuid('usuário')
+    .transform((s) => (s === '' ? undefined : s))
+    .optional(),
   clientUuid: zodUuid('cliente'),
   statusUuid: zodUuid('status'),
 })

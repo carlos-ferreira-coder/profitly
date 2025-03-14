@@ -112,13 +112,6 @@ export const refundCreate = async (req: Request, res: Response): Promise<void> =
       return
     }
 
-    // check if user has registered
-    const user = await prisma.user.findUnique({ where: { uuid: body.data.userUuid } })
-    if (!user) {
-      res.status(401).json({ message: 'Usuário não econtrado!' })
-      return
-    }
-
     // check if project has registered
     if (body.data.projectUuid) {
       const project = await prisma.project.findUnique({ where: { uuid: body.data.projectUuid } })
@@ -157,7 +150,7 @@ export const refundCreate = async (req: Request, res: Response): Promise<void> =
         register: new Date(),
         date: body.data.date,
         amount: body.data.amount,
-        userUuid: body.data.userUuid,
+        userUuid: token.uuid,
         projectUuid: body.data.projectUuid,
       },
     })

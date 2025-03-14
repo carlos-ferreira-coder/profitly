@@ -15,15 +15,13 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { useEffect, useState } from 'react'
 import { loanCreateSchema } from '../../../../hooks/useSchema'
-import { ProjectProps, SupplierProps, UserProps } from '../../../../types/Database'
-import UserSearch from '../../../../hooks/search/useSearchUser'
+import { ProjectProps, SupplierProps } from '../../../../types/Database'
 import ProjectSearch from '../../../../hooks/search/useSearchProject'
 import SupplierSearch from '../../../../hooks/search/useSearchSupplier'
 
 const Form = () => {
   const navigate = useNavigate()
   const [status, setStatus] = useState<'idle' | 'request'>('idle')
-  const [user, setUser] = useState<UserProps | null>(null)
   const [project, setProject] = useState<ProjectProps | null>(null)
   const [supplier, setSupplier] = useState<SupplierProps | null>(null)
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
@@ -38,7 +36,6 @@ const Form = () => {
     description: '',
     date: '',
     amount: '',
-    userUuid: '',
     projectUuid: '',
     supplierUuid: undefined,
     percent: '',
@@ -62,16 +59,11 @@ const Form = () => {
     setAlertErrors(null)
     setAlertSuccesses(null)
 
-    setUser(null)
     setProject(null)
     setSupplier(null)
 
     reset(defaultValues)
   }
-
-  useEffect(() => {
-    setValue('userUuid', user ? user.uuid : '')
-  }, [user, setValue])
 
   useEffect(() => {
     setValue('projectUuid', project ? project.uuid : '')
@@ -228,20 +220,6 @@ const Form = () => {
           />
         </div>
         {errors.percent && <Alert type="danger" size="sm" data={[errors.percent.message || '']} />}
-      </div>
-
-      <div className="mb-6">
-        <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="userUuid">
-          Usuário <span className="text-danger">*</span>
-        </label>
-        <div className="relative">
-          <Input type="text" id="userUuid" disabled hidden {...register('userUuid')} />
-
-          <UserSearch user={user} setUser={setUser} />
-        </div>
-        {errors.userUuid && (
-          <Alert type="danger" size="sm" data={[errors.userUuid.message || '']} />
-        )}
       </div>
 
       <div className="mb-6">

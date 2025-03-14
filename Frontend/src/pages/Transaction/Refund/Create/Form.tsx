@@ -14,8 +14,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { useEffect, useState } from 'react'
 import { refundCreateSchema } from '../../../../hooks/useSchema'
-import { ClientProps, ProjectProps, SupplierProps, UserProps } from '../../../../types/Database'
-import UserSearch from '../../../../hooks/search/useSearchUser'
+import { ClientProps, ProjectProps, SupplierProps } from '../../../../types/Database'
 import ProjectSearch from '../../../../hooks/search/useSearchProject'
 import SupplierSearch from '../../../../hooks/search/useSearchSupplier'
 import ClientSearch from '../../../../hooks/search/useSearchClient'
@@ -23,7 +22,6 @@ import ClientSearch from '../../../../hooks/search/useSearchClient'
 const Form = () => {
   const navigate = useNavigate()
   const [status, setStatus] = useState<'idle' | 'request'>('idle')
-  const [user, setUser] = useState<UserProps | null>(null)
   const [project, setProject] = useState<ProjectProps | null>(null)
   const [supplier, setSupplier] = useState<SupplierProps | null>(null)
   const [client, setClient] = useState<ClientProps | null>(null)
@@ -39,7 +37,6 @@ const Form = () => {
     description: '',
     date: '',
     amount: '',
-    userUuid: '',
     projectUuid: '',
     clientUuid: undefined,
     supplierUuid: undefined,
@@ -63,17 +60,12 @@ const Form = () => {
     setAlertErrors(null)
     setAlertSuccesses(null)
 
-    setUser(null)
     setProject(null)
     setClient(null)
     setSupplier(null)
 
     reset(defaultValues)
   }
-
-  useEffect(() => {
-    setValue('userUuid', user ? user.uuid : '')
-  }, [user, setValue])
 
   useEffect(() => {
     setValue('projectUuid', project ? project.uuid : '')
@@ -207,20 +199,6 @@ const Form = () => {
           />
         </div>
         {errors.amount && <Alert type="danger" size="sm" data={[errors.amount.message || '']} />}
-      </div>
-
-      <div className="mb-6">
-        <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="userUuid">
-          Usuário <span className="text-danger">*</span>
-        </label>
-        <div className="relative">
-          <Input type="text" id="userUuid" disabled hidden {...register('userUuid')} />
-
-          <UserSearch user={user} setUser={setUser} />
-        </div>
-        {errors.userUuid && (
-          <Alert type="danger" size="sm" data={[errors.userUuid.message || '']} />
-        )}
       </div>
 
       <div className="mb-6">

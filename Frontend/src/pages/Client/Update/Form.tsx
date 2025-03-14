@@ -109,6 +109,7 @@ const Form = ({ client }: { client: ClientProps }) => {
                     {...field}
                     id="cnpj"
                     mask="_"
+                    disabled
                     icon={faAddressCard}
                     iconPosition="left"
                     format="##.###.###/####-##"
@@ -132,6 +133,7 @@ const Form = ({ client }: { client: ClientProps }) => {
                     {...field}
                     id="cpf"
                     mask="_"
+                    disabled
                     icon={faAddressCard}
                     iconPosition="left"
                     format="###.###.###-##"
