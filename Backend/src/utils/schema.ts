@@ -94,6 +94,60 @@ export const statusUpdateSchema = z.object({
   priority: zodNumber('prioridade', 1),
 })
 
+const entitySelectSchema = {
+  name: zodString('nome', false).optional(),
+  email: zodString('email', false).optional(),
+  phone: zodString('contato', false).optional(),
+  address: zodString('endereço', false).optional(),
+}
+
+const entityCreateSchema = {
+  name: zodString('nome', true),
+  email: zodEmail('email', true),
+  phone: zodRegex('contato', /^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).optional(),
+  address: zodString('endereço', false).optional(),
+}
+
+const entityUpdateSchema = {
+  name: zodString('nome', true),
+  email: zodEmail('email', true),
+  phone: zodRegex('contato', /^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false)
+    .nullable()
+    .optional(),
+  address: zodString('endereço', false).nullable().optional(),
+}
+
+const personSelectSchema = {
+  cpf: zodString('cpf', false).optional(),
+  ...entitySelectSchema,
+}
+
+const personCreateSchema = {
+  cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true),
+  ...entityCreateSchema,
+}
+
+const personUpdateSchema = {
+  ...entityUpdateSchema,
+}
+
+const enterpriseSelectSchema = {
+  cnpj: zodString('cnpj', false).optional(),
+  fantasy: zodString('nome fantasia', false).optional(),
+  ...entitySelectSchema,
+}
+
+const enterpriseCreateSchema = {
+  cnpj: zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, true).optional(),
+  fantasy: zodString('nome fantasia', true).optional(),
+  ...entityCreateSchema,
+}
+
+const enterpriseUpdateSchema = {
+  fantasy: zodString('nome fantasia', true).optional(),
+  ...entityUpdateSchema,
+}
+
 export const userSelectSchema = z.object({
   username: zodString('nome de usuário', false).optional(),
   active: zodRegex('ativo', /^(false|true)(,(false|true))?$/, false)
@@ -101,18 +155,14 @@ export const userSelectSchema = z.object({
     .optional(),
   hourlyRateMin: zodString('valor da hora', false).optional(),
   hourlyRateMax: zodString('valor da hora', false).optional(),
-  auth: zodRegex(
+  authUuid: zodRegex(
     'uuid(s) de permissões',
     /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
     false,
   )
     .transform((s) => s.split(','))
     .optional(),
-  cpf: zodString('cpf', false).optional(),
-  name: zodString('nome', false).optional(),
-  email: zodString('email', false).optional(),
-  phone: zodString('contato', false).optional(),
-  address: zodString('endereço', false).optional(),
+  ...personSelectSchema,
 })
 
 export const userCreateSchema = z
@@ -125,11 +175,7 @@ export const userCreateSchema = z
       .transform((s) => currencyToNumber(s, 'BRL'))
       .optional(),
     authUuid: zodUuid('cargo/função'),
-    cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true),
-    name: zodString('nome', true),
-    email: zodEmail('email', true),
-    phone: zodRegex('contato', /^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).optional(),
-    address: zodString('endereço', false).optional(),
+    ...personCreateSchema,
   })
   .superRefine(({ password, passwordCheck }, ctx) => {
     if (password !== passwordCheck) {
@@ -150,12 +196,7 @@ export const userUpdateSchema = z.object({
     .nullable()
     .optional(),
   authUuid: zodUuid('cargo/função'),
-  name: zodString('nome', true),
-  email: zodEmail('email', true),
-  phone: zodRegex('contato', /^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false)
-    .nullable()
-    .optional(),
-  address: zodString('endereço', false).nullable().optional(),
+  ...personUpdateSchema,
 })
 
 export const userUpdatePasswordSchema = z
@@ -200,26 +241,16 @@ export const clientSelectSchema = z.object({
   type: zodRegex('tipo', /^(Person|Enterprise)(,(Person|Enterprise))?$/, false)
     .transform((s) => s.split(','))
     .optional(),
-  cpf: zodString('cpf', false).optional(),
-  cnpj: zodString('cnpj', false).optional(),
-  fantasy: zodString('nome fantasia', false).optional(),
-  name: zodString('nome', false).optional(),
-  email: zodString('email', false).optional(),
-  phone: zodString('telefone', false).optional(),
-  address: zodString('endereço', false).optional(),
+  ...personSelectSchema,
+  ...enterpriseSelectSchema,
 })
 
 export const clientCreateSchema = z
   .object({
     active: zodBoolean('ativo'),
     type: zodRegex('tipo', /^(Person|Enterprise)$/, true),
-    cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true).optional(),
-    cnpj: zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, true).optional(),
-    fantasy: zodString('nome fantasia', true).optional(),
-    name: zodString('nome completo', true),
-    email: zodEmail('email', true),
-    phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).optional(),
-    address: zodString('endereço', false).optional(),
+    ...personCreateSchema,
+    ...enterpriseCreateSchema,
   })
   .superRefine(({ cpf, cnpj, fantasy }, ctx) => {
     if (!(cpf || (cnpj && fantasy))) {
@@ -239,37 +270,12 @@ export const clientCreateSchema = z
     }
   })
 
-export const clientUpdateSchema = z
-  .object({
-    uuid: zodUuid('cliente'),
-    active: zodBoolean('ativo'),
-    cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true).optional(),
-    cnpj: zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, true).optional(),
-    fantasy: zodString('nome fantasia', true).optional(),
-    name: zodString('nome completo', true),
-    email: zodEmail('email', true),
-    phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false)
-      .nullable()
-      .optional(),
-    address: zodString('endereço', false).nullable().optional(),
-  })
-  .superRefine(({ cnpj, fantasy }, ctx) => {
-    if (!cnpj && fantasy) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'O cnpj é obrigatório!',
-        path: ['cnpj'],
-      })
-    }
-
-    if (cnpj && !fantasy) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'O nome fantasia é obrigatório!',
-        path: ['fantasy'],
-      })
-    }
-  })
+export const clientUpdateSchema = z.object({
+  uuid: zodUuid('cliente'),
+  active: zodBoolean('ativo'),
+  ...personUpdateSchema,
+  ...enterpriseUpdateSchema,
+})
 
 export const supplierSelectSchema = z.object({
   active: zodRegex('ativo', /^(false|true)(,(false|true))?$/, false)
@@ -278,26 +284,16 @@ export const supplierSelectSchema = z.object({
   type: zodRegex('tipo', /^(Person|Enterprise)(,(Person|Enterprise))?$/, false)
     .transform((s) => s.split(','))
     .optional(),
-  cpf: zodString('cpf', false).optional(),
-  cnpj: zodString('cnpj', false).optional(),
-  fantasy: zodString('nome fantasia', false).optional(),
-  name: zodString('nome', false).optional(),
-  email: zodString('email', false).optional(),
-  phone: zodString('telefone', false).optional(),
-  address: zodString('endereço', false).optional(),
+  ...personSelectSchema,
+  ...enterpriseSelectSchema,
 })
 
 export const supplierCreateSchema = z
   .object({
     active: zodBoolean('ativo'),
     type: zodRegex('tipo', /^(Person|Enterprise)$/, true),
-    cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true).optional(),
-    cnpj: zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, true).optional(),
-    fantasy: zodString('nome fantasia', true).optional(),
-    name: zodString('nome completo', true),
-    email: zodEmail('email', true),
-    phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).optional(),
-    address: zodString('endereço', false).optional(),
+    ...personCreateSchema,
+    ...enterpriseCreateSchema,
   })
   .superRefine(({ cpf, cnpj, fantasy }, ctx) => {
     if (!(cpf || (cnpj && fantasy))) {
@@ -317,39 +313,14 @@ export const supplierCreateSchema = z
     }
   })
 
-export const supplierUpdateSchema = z
-  .object({
-    uuid: zodUuid('fornecedor'),
-    active: zodBoolean('ativo'),
-    cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true).optional(),
-    cnpj: zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, true).optional(),
-    fantasy: zodString('nome fantasia', true).optional(),
-    name: zodString('nome completo', true),
-    email: zodEmail('email', true),
-    phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false)
-      .nullable()
-      .optional(),
-    address: zodString('endereço', false).nullable().optional(),
-  })
-  .superRefine(({ cnpj, fantasy }, ctx) => {
-    if (!cnpj && fantasy) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'O cnpj é obrigatório!',
-        path: ['cnpj'],
-      })
-    }
+export const supplierUpdateSchema = z.object({
+  uuid: zodUuid('fornecedor'),
+  active: zodBoolean('ativo'),
+  ...personUpdateSchema,
+  ...enterpriseUpdateSchema,
+})
 
-    if (cnpj && !fantasy) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'O nome fantasia é obrigatório!',
-        path: ['fantasy'],
-      })
-    }
-  })
-
-export const billSelectSchema = z.object({
+const transactionSelectSchema = {
   name: zodString('nome', false).optional(),
   description: zodString('descrição', false).optional(),
   registerMin: zodString('registro', false).optional(),
@@ -376,6 +347,20 @@ export const billSelectSchema = z.object({
   )
     .transform((s) => s.split(','))
     .optional(),
+}
+
+const transactionCreateSchema = {
+  name: zodString('nome', true),
+  description: zodString('descrição', true),
+  date: zodString('data', true).transform((s) => new Date(s)),
+  amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true).transform((s) =>
+    currencyToNumber(s, 'BRL'),
+  ),
+  userUuid: zodUuid('cargo/função'),
+  projectUuid: zodUuid('cargo/função').optional(),
+}
+
+export const billSelectSchema = z.object({
   supplierUuid: zodRegex(
     'uuid(s) de fornecedor',
     /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
@@ -383,47 +368,15 @@ export const billSelectSchema = z.object({
   )
     .transform((s) => s.split(','))
     .optional(),
+  ...transactionSelectSchema,
 })
 
 export const billCreateSchema = z.object({
-  name: zodString('nome', true),
-  description: zodString('descrição', true),
-  date: zodString('data', true).transform((s) => new Date(s)),
-  amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true).transform((s) =>
-    currencyToNumber(s, 'BRL'),
-  ),
-  userUuid: zodUuid('cargo/função'),
-  projectUuid: zodUuid('cargo/função').optional(),
   supplierUuid: zodUuid('cargo/função'),
+  ...transactionCreateSchema,
 })
 
 export const incomeSelectSchema = z.object({
-  name: zodString('nome', false).optional(),
-  description: zodString('descrição', false).optional(),
-  registerMin: zodString('registro', false).optional(),
-  registerMax: zodString('registro', false).optional(),
-  dateMin: zodString('data', false).optional(),
-  dateMax: zodString('data', false).optional(),
-  amountMin: zodString('quantia', false)
-    .transform((s) => currencyToNumber(s, 'BRL'))
-    .optional(),
-  amountMax: zodString('quantia', false)
-    .transform((s) => currencyToNumber(s, 'BRL'))
-    .optional(),
-  userUuid: zodRegex(
-    'uuid(s) de usuário',
-    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
-    false,
-  )
-    .transform((s) => s.split(','))
-    .optional(),
-  projectUuid: zodRegex(
-    'uuid(s) de projetos',
-    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
-    false,
-  )
-    .transform((s) => s.split(','))
-    .optional(),
   clientUuid: zodRegex(
     'uuid(s) de cliente',
     /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
@@ -431,47 +384,15 @@ export const incomeSelectSchema = z.object({
   )
     .transform((s) => s.split(','))
     .optional(),
+  ...transactionSelectSchema,
 })
 
 export const incomeCreateSchema = z.object({
-  name: zodString('nome', true),
-  description: zodString('descrição', true),
-  date: zodString('data', true).transform((s) => new Date(s)),
-  amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true).transform((s) =>
-    currencyToNumber(s, 'BRL'),
-  ),
-  userUuid: zodUuid('cargo/função'),
-  projectUuid: zodUuid('cargo/função').optional(),
   clientUuid: zodUuid('cargo/função'),
+  ...transactionCreateSchema,
 })
 
 export const refundSelectSchema = z.object({
-  name: zodString('nome', false).optional(),
-  description: zodString('descrição', false).optional(),
-  registerMin: zodString('registro', false).optional(),
-  registerMax: zodString('registro', false).optional(),
-  dateMin: zodString('data', false).optional(),
-  dateMax: zodString('data', false).optional(),
-  amountMin: zodString('quantia', false)
-    .transform((s) => currencyToNumber(s, 'BRL'))
-    .optional(),
-  amountMax: zodString('quantia', false)
-    .transform((s) => currencyToNumber(s, 'BRL'))
-    .optional(),
-  userUuid: zodRegex(
-    'uuid(s) de usuário',
-    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
-    false,
-  )
-    .transform((s) => s.split(','))
-    .optional(),
-  projectUuid: zodRegex(
-    'uuid(s) de projetos',
-    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
-    false,
-  )
-    .transform((s) => s.split(','))
-    .optional(),
   clientUuid: zodRegex(
     'uuid(s) de cliente',
     /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
@@ -486,20 +407,14 @@ export const refundSelectSchema = z.object({
   )
     .transform((s) => s.split(','))
     .optional(),
+  ...transactionSelectSchema,
 })
 
 export const refundCreateSchema = z
   .object({
-    name: zodString('nome', true),
-    description: zodString('descrição', true),
-    date: zodString('data', true).transform((s) => new Date(s)),
-    amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true).transform((s) =>
-      currencyToNumber(s, 'BRL'),
-    ),
-    userUuid: zodUuid('cargo/função'),
-    projectUuid: zodUuid('cargo/função').optional(),
     clientUuid: zodUuid('cargo/função').optional(),
     supplierUuid: zodUuid('cargo/função').optional(),
+    ...transactionCreateSchema,
   })
   .superRefine(({ clientUuid, supplierUuid }, ctx) => {
     if (!(clientUuid || supplierUuid)) {
@@ -512,32 +427,6 @@ export const refundCreateSchema = z
   })
 
 export const loanSelectSchema = z.object({
-  name: zodString('nome', false).optional(),
-  description: zodString('descrição', false).optional(),
-  registerMin: zodString('registro', false).optional(),
-  registerMax: zodString('registro', false).optional(),
-  dateMin: zodString('data', false).optional(),
-  dateMax: zodString('data', false).optional(),
-  amountMin: zodString('quantia', false)
-    .transform((s) => currencyToNumber(s, 'BRL'))
-    .optional(),
-  amountMax: zodString('quantia', false)
-    .transform((s) => currencyToNumber(s, 'BRL'))
-    .optional(),
-  userUuid: zodRegex(
-    'uuid(s) de usuário',
-    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
-    false,
-  )
-    .transform((s) => s.split(','))
-    .optional(),
-  projectUuid: zodRegex(
-    'uuid(s) de projetos',
-    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
-    false,
-  )
-    .transform((s) => s.split(','))
-    .optional(),
   supplierUuid: zodRegex(
     'uuid(s) de fornecedor',
     /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
@@ -551,19 +440,63 @@ export const loanSelectSchema = z.object({
   percentMax: zodString('percentual', false)
     .transform((s) => parseFloat(s.replace(/[%\s]/g, '').replace(',', '.')))
     .optional(),
+  ...transactionSelectSchema,
 })
 
 export const loanCreateSchema = z.object({
-  name: zodString('nome', true),
-  description: zodString('descrição', true),
-  date: zodString('data', true).transform((s) => new Date(s)),
-  amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true).transform((s) =>
-    currencyToNumber(s, 'BRL'),
-  ),
-  userUuid: zodUuid('cargo/função'),
-  projectUuid: zodUuid('cargo/função').optional(),
   supplierUuid: zodUuid('cargo/função'),
   percent: zodRegex('quantia', /^%\s\d{1,3}(,\d{1,2})?$/, true).transform((s) =>
     parseFloat(s.replace(/[%\s]/g, '').replace(',', '.')),
   ),
+  ...transactionCreateSchema,
+})
+
+export const projectSelectSchema = z.object({
+  name: zodString('nome', false).optional(),
+  description: zodString('descrição', false).optional(),
+  registerMin: zodString('registro', false).optional(),
+  registerMax: zodString('registro', false).optional(),
+  active: zodRegex('ativo', /^(false|true)(,(false|true))?$/, false)
+    .transform((s) => s.split(',').map((i) => i === 'true'))
+    .optional(),
+  userUuid: zodRegex(
+    'uuid(s) de usuário',
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
+    false,
+  )
+    .transform((s) => s.split(','))
+    .optional(),
+  clientUuid: zodRegex(
+    'uuid(s) de cliente',
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
+    false,
+  )
+    .transform((s) => s.split(','))
+    .optional(),
+  statusUuid: zodRegex(
+    'uuid(s) de status',
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
+    false,
+  )
+    .transform((s) => s.split(','))
+    .optional(),
+})
+
+export const projectCreateSchema = z.object({
+  name: zodString('nome', true),
+  description: zodString('descrição', true),
+  active: zodBoolean('ativo'),
+  userUuid: zodUuid('usuário').optional(),
+  clientUuid: zodUuid('client'),
+  statusUuid: zodUuid('status'),
+})
+
+export const projectUpdateSchema = z.object({
+  uuid: zodUuid('projeto'),
+  name: zodString('nome', true),
+  description: zodString('descrição', true),
+  active: zodBoolean('ativo'),
+  userUuid: zodUuid('usuário').nullable().optional(),
+  clientUuid: zodUuid('client'),
+  statusUuid: zodUuid('status'),
 })

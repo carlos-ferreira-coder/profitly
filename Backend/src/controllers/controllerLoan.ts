@@ -3,6 +3,9 @@ import { prisma } from '@/server'
 import { loanCreateSchema, loanSelectSchema, keySchema } from '@utils/schema'
 import { numberToCurrency } from '@utils/currency'
 import { authorization } from '@utils/auth'
+import { Loan, Transaction } from '@prisma/client'
+
+type LoanProps = Loan & { transaction: Transaction }
 
 const formatDate = (date: Date) => {
   const year = String(date.getFullYear()).slice(-2)
@@ -14,14 +17,14 @@ const formatDate = (date: Date) => {
   return `${day}/${month}/${year} ${hour}:${minute}`
 }
 
-const responseLoans = (loans: any[]) => {
+const responseLoans = (loans: LoanProps[]) => {
   return loans.map((loan) => {
     return {
       ...loan,
-      register: formatDate(loan.register),
-      date: formatDate(loan.date),
-      amount: numberToCurrency(loan.amount.toNumber(), 'BRL'),
-      percent: `% ${loan.percent.toNumber().replace(/[.]/g, ',')}`,
+      register: formatDate(loan.transaction.register),
+      date: formatDate(loan.transaction.date),
+      amount: numberToCurrency(loan.transaction.amount.toNumber(), 'BRL'),
+      percent: `% ${loan.percent.toNumber().toString().replace(/[.]/g, ',')}`,
     }
   })
 }

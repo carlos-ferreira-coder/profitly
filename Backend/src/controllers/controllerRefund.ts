@@ -3,6 +3,9 @@ import { prisma } from '@/server'
 import { refundCreateSchema, refundSelectSchema, keySchema } from '@utils/schema'
 import { numberToCurrency } from '@utils/currency'
 import { authorization } from '@utils/auth'
+import { Refund, Transaction } from '@prisma/client'
+
+type RefundProps = Refund & { transaction: Transaction }
 
 const formatDate = (date: Date) => {
   const year = String(date.getFullYear()).slice(-2)
@@ -14,13 +17,13 @@ const formatDate = (date: Date) => {
   return `${day}/${month}/${year} ${hour}:${minute}`
 }
 
-const responseRefunds = (refunds: any[]) => {
+const responseRefunds = (refunds: RefundProps[]) => {
   return refunds.map((refund) => {
     return {
       ...refund,
-      register: formatDate(refund.register),
-      date: formatDate(refund.date),
-      amount: numberToCurrency(refund.amount.toNumber(), 'BRL'),
+      register: formatDate(refund.transaction.register),
+      date: formatDate(refund.transaction.date),
+      amount: numberToCurrency(refund.transaction.amount.toNumber(), 'BRL'),
     }
   })
 }

@@ -7,6 +7,7 @@ import routerAuth from '@routers/routerAuth'
 import routerUser from '@routers/routerUser'
 import routerStatus from '@routers/routerStatus'
 import routerClient from '@routers/routerClient'
+import routerProject from '@routers/routerProject'
 import routerSupplier from '@routers/routerSupplier'
 import routerBill from '@routers/routerBill'
 import routerIncome from '@routers/routerIncome'
@@ -34,6 +35,7 @@ app.use('/auth', routerAuth)
 app.use('/user', auth, routerUser)
 app.use('/status', auth, routerStatus)
 app.use('/client', auth, routerClient)
+app.use('/project', auth, routerProject)
 app.use('/supplier', auth, routerSupplier)
 app.use('/Bill', auth, routerBill)
 app.use('/Income', auth, routerIncome)

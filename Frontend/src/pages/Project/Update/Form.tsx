@@ -43,7 +43,7 @@ const Form = ({ project }: { project: ProjectProps }) => {
       setClient(resClient)
       setStatus(resStatus)
 
-      if (project.user) {
+      if (project.userUuid) {
         const {
           data: { 0: resUser },
         } = await axios.get(`user/select/${project.userUuid}`, { withCredentials: true })

@@ -3,6 +3,9 @@ import { prisma } from '@/server'
 import { incomeCreateSchema, incomeSelectSchema, keySchema } from '@utils/schema'
 import { numberToCurrency } from '@utils/currency'
 import { authorization } from '@utils/auth'
+import { Income, Transaction } from '@prisma/client'
+
+type IncomeProps = Income & { transaction: Transaction }
 
 const formatDate = (date: Date) => {
   const year = String(date.getFullYear()).slice(-2)
@@ -14,13 +17,13 @@ const formatDate = (date: Date) => {
   return `${day}/${month}/${year} ${hour}:${minute}`
 }
 
-const responseIncomes = (incomes: any[]) => {
+const responseIncomes = (incomes: IncomeProps[]) => {
   return incomes.map((income) => {
     return {
       ...income,
-      register: formatDate(income.register),
-      date: formatDate(income.date),
-      amount: numberToCurrency(income.amount.toNumber(), 'BRL'),
+      register: formatDate(income.transaction.register),
+      date: formatDate(income.transaction.date),
+      amount: numberToCurrency(income.transaction.amount.toNumber(), 'BRL'),
     }
   })
 }

@@ -224,21 +224,10 @@ export const clientUpdate = async (req: Request, res: Response): Promise<void> =
         uuid: body.data.uuid,
       },
     })
-    if (body.data.cnpj && body.data.fantasy) {
+    if (body.data.fantasy) {
       await prisma.enterprise.update({
         data: {
-          cnpj: body.data.cnpj,
           fantasy: body.data.fantasy,
-        },
-        where: {
-          id: clientUpdated.id,
-        },
-      })
-    }
-    if (body.data.cpf) {
-      await prisma.person.update({
-        data: {
-          cpf: body.data.cpf,
         },
         where: {
           id: clientUpdated.id,
@@ -286,6 +275,15 @@ export const clientDelete = async (req: Request, res: Response): Promise<void> =
     const client = await prisma.client.findUnique({ where: { uuid: params.data.uuid } })
     if (!client) {
       res.status(401).json({ message: 'Cliente não econtrado!' })
+      return
+    }
+
+    // check pending issues
+    const project = await prisma.project.findMany({ where: { clientUuid: params.data.uuid } })
+    const income = await prisma.income.findMany({ where: { clientUuid: params.data.uuid } })
+    const refund = await prisma.refund.findMany({ where: { clientUuid: params.data.uuid } })
+    if (project || income || refund) {
+      res.status(401).json({ message: 'O cliente contém pendências!' })
       return
     }
 

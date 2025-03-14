@@ -15,20 +15,28 @@ import { validateCPF } from '@utils/validate'
 import bcrypt from 'bcrypt'
 import fs from 'fs'
 import path from 'path'
-import { Auth } from '@prisma/client'
+import { User, Auth, Person, Entity } from '@prisma/client'
+
+type UserProps = User & {
+  person: Person & {
+    entity: Entity
+  }
+  auth: Auth
+}
 
 const DOMAIN = process.env.DOMAIN || ''
 
-const responseUsers = (users: any[], uuid: string, auth: Auth) => {
+const responseUsers = (users: UserProps[], uuid: string, auth: Auth) => {
   return users.map((user) => {
     const isMain = user.uuid === uuid
 
     return {
       ...user,
-      cpf: auth.personal || isMain ? user.cpf : null,
-      name: auth.personal || isMain ? user.name : null,
-      phone: auth.personal || isMain ? user.phone : null,
-      address: auth.personal || isMain ? user.address : null,
+      password: null,
+      cpf: auth.personal || isMain ? user.person.cpf : null,
+      name: auth.personal || isMain ? user.person.entity.name : null,
+      phone: auth.personal || isMain ? user.person.entity.phone : null,
+      address: auth.personal || isMain ? user.person.entity.address : null,
       hourlyRate:
         (auth.financial || isMain) && user.hourlyRate
           ? numberToCurrency(user.hourlyRate.toNumber(), 'BRL')
@@ -69,13 +77,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
 
     // server request
     const users = await prisma.user.findMany({
-      select: {
-        uuid: true,
-        username: true,
-        active: true,
-        photo: true,
-        hourlyRate: true,
-        authUuid: true,
+      include: {
         auth: true,
         person: {
           include: {
@@ -96,7 +98,7 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
           gte: query.data.hourlyRateMin ? query.data.hourlyRateMin : undefined,
           lte: query.data.hourlyRateMax ? query.data.hourlyRateMax : undefined,
         },
-        authUuid: query.data.auth?.length ? { in: query.data.auth } : undefined,
+        authUuid: query.data.authUuid?.length ? { in: query.data.authUuid } : undefined,
         person: {
           cpf: query.data.cpf ? { contains: query.data.cpf } : undefined,
           entity: {
@@ -584,6 +586,14 @@ export const userDelete = async (req: Request, res: Response): Promise<void> => 
     const user = await prisma.user.findUnique({ where: { uuid: params.data.uuid } })
     if (!user) {
       res.status(401).json({ message: 'Usuário não econtrado!' })
+      return
+    }
+
+    // check pending issues
+    const done = await prisma.project.findMany({ where: { userUuid: params.data.uuid } })
+    const transaction = await prisma.project.findMany({ where: { userUuid: params.data.uuid } })
+    if (done || transaction) {
+      res.status(401).json({ message: 'O usuário contém pendências!' })
       return
     }
 

@@ -3,6 +3,9 @@ import { prisma } from '@/server'
 import { billCreateSchema, billSelectSchema, keySchema } from '@utils/schema'
 import { numberToCurrency } from '@utils/currency'
 import { authorization } from '@utils/auth'
+import { Bill, Transaction } from '@prisma/client'
+
+type BillProps = Bill & { transaction: Transaction }
 
 const formatDate = (date: Date) => {
   const year = String(date.getFullYear()).slice(-2)
@@ -14,13 +17,13 @@ const formatDate = (date: Date) => {
   return `${day}/${month}/${year} ${hour}:${minute}`
 }
 
-const responseBills = (bills: any[]) => {
+const responseBills = (bills: BillProps[]) => {
   return bills.map((bill) => {
     return {
       ...bill,
-      register: formatDate(bill.register),
-      date: formatDate(bill.date),
-      amount: numberToCurrency(bill.amount.toNumber(), 'BRL'),
+      register: formatDate(bill.transaction.register),
+      date: formatDate(bill.transaction.date),
+      amount: numberToCurrency(bill.transaction.amount.toNumber(), 'BRL'),
     }
   })
 }

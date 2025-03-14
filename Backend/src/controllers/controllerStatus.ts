@@ -174,12 +174,16 @@ export const statusDelete = async (req: Request, res: Response): Promise<void> =
       return
     }
 
+    // check pending issues
+    const project = await prisma.project.findMany({ where: { statusUuid: params.data.uuid } })
+    const task = await prisma.task.findMany({ where: { statusUuid: params.data.uuid } })
+    if (project || task) {
+      res.status(401).json({ message: 'O status contém pendências!' })
+      return
+    }
+
     // create resource
-    await prisma.status.delete({
-      where: {
-        uuid: params.data.uuid,
-      },
-    })
+    await prisma.status.delete({ where: { uuid: params.data.uuid } })
 
     res.status(201).json({ message: 'O status foi deletado.' })
     return

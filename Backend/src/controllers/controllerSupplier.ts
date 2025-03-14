@@ -224,21 +224,10 @@ export const supplierUpdate = async (req: Request, res: Response): Promise<void>
         uuid: body.data.uuid,
       },
     })
-    if (body.data.cnpj && body.data.fantasy) {
+    if (body.data.fantasy) {
       await prisma.enterprise.update({
         data: {
-          cnpj: body.data.cnpj,
           fantasy: body.data.fantasy,
-        },
-        where: {
-          id: supplierUpdated.id,
-        },
-      })
-    }
-    if (body.data.cpf) {
-      await prisma.person.update({
-        data: {
-          cpf: body.data.cpf,
         },
         where: {
           id: supplierUpdated.id,
@@ -286,6 +275,16 @@ export const supplierDelete = async (req: Request, res: Response): Promise<void>
     const supplier = await prisma.supplier.findUnique({ where: { uuid: params.data.uuid } })
     if (!supplier) {
       res.status(401).json({ message: 'Fornecedor não econtrado!' })
+      return
+    }
+
+    // check pending issues
+    const expense = await prisma.expense.findMany({ where: { supplierUuid: params.data.uuid } })
+    const bill = await prisma.bill.findMany({ where: { supplierUuid: params.data.uuid } })
+    const refund = await prisma.refund.findMany({ where: { supplierUuid: params.data.uuid } })
+    const loan = await prisma.loan.findMany({ where: { supplierUuid: params.data.uuid } })
+    if (expense || bill || refund || loan) {
+      res.status(401).json({ message: 'O fornecedor contém pendências!' })
       return
     }
 

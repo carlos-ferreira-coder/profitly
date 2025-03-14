@@ -317,6 +317,13 @@ export const authDelete = async (req: Request, res: Response): Promise<void> => 
       return
     }
 
+    // check pending issues
+    const user = await prisma.user.findMany({ where: { authUuid: params.data.uuid } })
+    if (user) {
+      res.status(401).json({ message: 'O cargo/função contém pendências!' })
+      return
+    }
+
     // create resource
     await prisma.auth.delete({ where: { uuid: params.data.uuid } })
 

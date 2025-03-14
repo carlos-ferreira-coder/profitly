@@ -171,7 +171,7 @@ const Form = ({ project }: { project: ProjectProps }) => {
         )}
       </div>
 
-      <div className="mb-6" style={{ display: project.user ? 'block' : 'none' }}>
+      <div className="mb-6" style={{ display: project.userUuid ? 'block' : 'none' }}>
         <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="user">
           Usuário
         </label>

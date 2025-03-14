@@ -265,30 +265,12 @@ export const clientCreateSchema = z
     }
   })
 
-export const clientUpdateSchema = z
-  .object({
-    uuid: zodUuid('cliente'),
-    active: zodBoolean('ativo'),
-    ...personUpdateSchema(true),
-    ...enterpriseUpdateSchema(true),
-  })
-  .superRefine(({ cnpj, fantasy }, ctx) => {
-    if (!cnpj && fantasy) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'O cnpj é obrigatório!',
-        path: ['cnpj'],
-      })
-    }
-
-    if (cnpj && !fantasy) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'O nome fantasia é obrigatório!',
-        path: ['fantasy'],
-      })
-    }
-  })
+export const clientUpdateSchema = z.object({
+  uuid: zodUuid('cliente'),
+  active: zodBoolean('ativo'),
+  ...personUpdateSchema(true),
+  ...enterpriseUpdateSchema(true),
+})
 
 export const clientDeleteSchema = z.object({
   uuid: zodUuid('cliente'),
@@ -322,30 +304,12 @@ export const supplierCreateSchema = z
     }
   })
 
-export const supplierUpdateSchema = z
-  .object({
-    uuid: zodUuid('fornecedor'),
-    active: zodBoolean('ativo'),
-    ...personUpdateSchema(true),
-    ...enterpriseUpdateSchema(true),
-  })
-  .superRefine(({ cnpj, fantasy }, ctx) => {
-    if (!cnpj && fantasy) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'O cnpj é obrigatório!',
-        path: ['cnpj'],
-      })
-    }
-
-    if (cnpj && !fantasy) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'O nome fantasia é obrigatório!',
-        path: ['fantasy'],
-      })
-    }
-  })
+export const supplierUpdateSchema = z.object({
+  uuid: zodUuid('fornecedor'),
+  active: zodBoolean('ativo'),
+  ...personUpdateSchema(true),
+  ...enterpriseUpdateSchema(true),
+})
 
 export const supplierDeleteSchema = z.object({
   uuid: zodUuid('fornecedor'),

@@ -34,8 +34,8 @@ const Filter = ({
       name: string
       value: boolean
     }[]
-    allAuth: boolean
-    auth: {
+    allAuthUuid: boolean
+    authUuid: {
       key: string
       name: string
       value: boolean
@@ -55,8 +55,8 @@ const Filter = ({
       { key: true, name: 'active', value: true },
       { key: false, name: 'inactive', value: true },
     ],
-    allAuth: true,
-    auth: auths.reduce<{ key: string; name: string; value: boolean }[]>((acc, auth) => {
+    allAuthUuid: true,
+    authUuid: auths.reduce<{ key: string; name: string; value: boolean }[]>((acc, auth) => {
       acc.push({ key: auth.uuid, name: auth.name, value: true })
       return acc
     }, []),
@@ -70,13 +70,13 @@ const Filter = ({
   // FildArray for auth
   const { fields } = useFieldArray({
     control,
-    name: 'auth',
+    name: 'authUuid',
   })
 
   // Watch for auth
   const authWatch = useWatch({
     control,
-    name: 'auth',
+    name: 'authUuid',
   })
 
   // Handle reset
@@ -334,7 +334,7 @@ const Filter = ({
           <div className="relative">
             <div className="mb-1">
               <Controller
-                name="allAuth"
+                name="allAuthUuid"
                 control={control}
                 render={({ field }) => (
                   <Checkbox
@@ -345,7 +345,7 @@ const Filter = ({
                       const isChecked = e.target.checked
 
                       auths.map((_auth, i) => {
-                        setValue(`auth.${i}.value`, isChecked)
+                        setValue(`authUuid.${i}.value`, isChecked)
                       })
 
                       field.onChange(isChecked)
@@ -358,7 +358,7 @@ const Filter = ({
               {fields.map((field, index) => (
                 <Controller
                   key={field.id}
-                  name={`auth.${index}.value`}
+                  name={`authUuid.${index}.value`}
                   control={control}
                   render={({ field }) => <Checkbox label={authWatch?.[index]?.name} {...field} />}
                 />

@@ -13,8 +13,8 @@ model Entity {
   email      String      @unique
   phone      String?
   address    String?
-  Person     Person?
-  Enterprise Enterprise?
+  person     Person?
+  enterprise Enterprise?
 
   @@index([email])
 }
@@ -23,9 +23,9 @@ model Person {
   id       Int       @id @default(autoincrement())
   cpf      String    @unique
   entity   Entity    @relation(fields: [id], references: [id], onDelete: Cascade)
-  User     User?
-  Client   Client?
-  Supplier Supplier?
+  user     User?
+  client   Client?
+  supplier Supplier?
 
   @@index([cpf])
 }
@@ -35,8 +35,8 @@ model Enterprise {
   cnpj     String    @unique
   fantasy  String
   entity   Entity    @relation(fields: [id], references: [id], onDelete: Cascade)
-  Client   Client?
-  Supplier Supplier?
+  client   Client?
+  supplier Supplier?
 
   @@index([cnpj])
 }
@@ -49,9 +49,9 @@ model Client {
   enterpriseId Int?        @unique
   person       Person?     @relation(fields: [personId], references: [id], onDelete: Cascade)
   enterprise   Enterprise? @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
-  Project      Project[]
-  Income       Income[]
-  Refund       Refund[]
+  project      Project[]
+  income       Income[]
+  refund       Refund[]
 }
 
 model Supplier {
@@ -62,10 +62,10 @@ model Supplier {
   enterpriseId Int?        @unique
   person       Person?     @relation(fields: [personId], references: [id], onDelete: Cascade)
   enterprise   Enterprise? @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
-  Expense      Expense[]
-  Bill         Bill[]
-  Refund       Refund[]
-  Loan         Loan[]
+  expense      Expense[]
+  bill         Bill[]
+  refund       Refund[]
+  loan         Loan[]
 }
 
 model User {
@@ -80,9 +80,9 @@ model User {
   person      Person        @relation(fields: [id], references: [id], onDelete: Cascade)
   auth        Auth          @relation(fields: [authUuid], references: [uuid], onDelete: Restrict)
   tasks       Task[]
-  Project     Project[]
-  Done        Done[]
-  Transaction Transaction[]
+  project     Project[]
+  done        Done[]
+  transaction Transaction[]
 
   @@index([username])
 }
@@ -131,8 +131,8 @@ model Budget {
   id       Int       @id @default(autoincrement())
   uuid     String    @unique @default(uuid()) @db.Uuid
   register DateTime?
-  Project  Project[]
-  Task     Task[]
+  project  Project[]
+  task     Task[]
 }
 
 model Task {
@@ -161,7 +161,7 @@ model TaskExpense {
   uuid    String    @unique @default(uuid()) @db.Uuid
   amount  Decimal   @db.Decimal(15, 2)
   task    Task      @relation(fields: [id], references: [id], onDelete: Cascade)
-  Expense Expense[]
+  expense Expense[]
 }
 
 model TaskActivity {
@@ -169,7 +169,7 @@ model TaskActivity {
   uuid       String     @unique @default(uuid()) @db.Uuid
   hourlyRate Decimal    @map("hourly_rate") @db.Decimal(15, 2)
   task       Task       @relation(fields: [id], references: [id], onDelete: Cascade)
-  Activity   Activity[]
+  activity   Activity[]
 }
 
 model Done {
@@ -179,8 +179,8 @@ model Done {
   register    DateTime
   userUuid    String    @map("user_uuid") @db.Uuid
   user        User      @relation(fields: [userUuid], references: [uuid], onDelete: Restrict)
-  Activity    Activity?
-  Expense     Expense?
+  activity    Activity?
+  expense     Expense?
 
   @@unique([id])
 }
