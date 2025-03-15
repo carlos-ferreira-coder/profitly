@@ -33,7 +33,7 @@ const responseBudgets = (budgets: BudgetProps[]) => {
   return budgets.map((budget) => {
     return {
       ...budget,
-      task: budget.tasks.map((task) => {
+      tasks: budget.tasks.map((task) => {
         return {
           ...task,
           beginDate: formatDate(task.beginDate),
