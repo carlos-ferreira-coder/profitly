@@ -74,22 +74,22 @@ export type ProjectProps = {
   // metods
   beginDate: string
   endDate: string
-  prevTotal: string
-  prevCost: string
-  prevRevenue: string
-  total: string
-  cost: string
-  revenue: string
-  currentIncome: string
-  currentExpense: string
-  currentRevenue: string
+  budgetTotal: string
+  budgetCost: string
+  budgetRevenue: string
+  projectTotal: string
+  projectCost: string
+  projectRevenue: string
+  transactionIncome: string
+  transactionExpense: string
+  transactionRevenue: string
 }
 
 export type BudgetProps = {
   uuid: string
   register?: string
   project: ProjectProps
-  task: TaskProps[]
+  tasks: TaskProps[]
 }
 
 export type TaskProps = {
@@ -130,7 +130,7 @@ export type DoneProps = {
   user: UserProps
 }
 
-export type ActivityProps = {
+export type DoneActivityProps = {
   uuid: string
   beginDate: string
   endDate: string
@@ -140,7 +140,7 @@ export type ActivityProps = {
   done: DoneProps
 }
 
-export type ExpenseProps = {
+export type DoneExpenseProps = {
   uuid: string
   amount: string
   date: string
@@ -163,7 +163,7 @@ export type TransactionProps = {
   project?: ProjectProps
 }
 
-export type BillProps = {
+export type ExpenseProps = {
   uuid: string
   supplierUuid: string
   supplier: SupplierProps

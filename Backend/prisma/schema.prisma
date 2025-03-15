@@ -49,40 +49,40 @@ model Client {
   enterpriseId Int?        @unique
   person       Person?     @relation(fields: [personId], references: [id], onDelete: Cascade)
   enterprise   Enterprise? @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
-  project      Project[]
-  income       Income[]
-  refund       Refund[]
+  projects     Project[]
+  incomes      Income[]
+  refunds      Refund[]
 }
 
 model Supplier {
-  id           Int         @id @default(autoincrement())
-  uuid         String      @unique @default(uuid()) @db.Uuid
+  id           Int           @id @default(autoincrement())
+  uuid         String        @unique @default(uuid()) @db.Uuid
   active       Boolean
-  personId     Int?        @unique
-  enterpriseId Int?        @unique
-  person       Person?     @relation(fields: [personId], references: [id], onDelete: Cascade)
-  enterprise   Enterprise? @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
-  expense      Expense[]
-  bill         Bill[]
-  refund       Refund[]
-  loan         Loan[]
+  personId     Int?          @unique
+  enterpriseId Int?          @unique
+  person       Person?       @relation(fields: [personId], references: [id], onDelete: Cascade)
+  enterprise   Enterprise?   @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
+  doneExpenses DoneExpense[]
+  expenses     Expense[]
+  refunds      Refund[]
+  loans        Loan[]
 }
 
 model User {
-  id          Int           @id @default(autoincrement())
-  uuid        String        @unique @default(uuid()) @db.Uuid
-  username    String        @unique
-  password    String
-  active      Boolean
-  photo       String?
-  hourlyRate  Decimal?      @map("hourly_rate") @db.Decimal(15, 2)
-  authUuid    String        @map("auth_uuid") @db.Uuid
-  person      Person        @relation(fields: [id], references: [id], onDelete: Cascade)
-  auth        Auth          @relation(fields: [authUuid], references: [uuid], onDelete: Restrict)
-  tasks       Task[]
-  project     Project[]
-  done        Done[]
-  transaction Transaction[]
+  id           Int           @id @default(autoincrement())
+  uuid         String        @unique @default(uuid()) @db.Uuid
+  username     String        @unique
+  password     String
+  active       Boolean
+  photo        String?
+  hourlyRate   Decimal?      @map("hourly_rate") @db.Decimal(15, 2)
+  authUuid     String        @map("auth_uuid") @db.Uuid
+  person       Person        @relation(fields: [id], references: [id], onDelete: Cascade)
+  auth         Auth          @relation(fields: [authUuid], references: [uuid], onDelete: Restrict)
+  tasks        Task[]
+  projects     Project[]
+  dones        Done[]
+  transactions Transaction[]
 
   @@index([username])
 }
@@ -95,7 +95,7 @@ model Auth {
   project   Boolean
   personal  Boolean
   financial Boolean
-  user      User[]
+  users     User[]
 }
 
 model Status {
@@ -132,7 +132,7 @@ model Budget {
   uuid     String    @unique @default(uuid()) @db.Uuid
   register DateTime?
   project  Project[]
-  task     Task[]
+  tasks    Task[]
 }
 
 model Task {
@@ -150,6 +150,7 @@ model Task {
   project      Project       @relation(fields: [projectUuid], references: [uuid], onDelete: Restrict)
   user         User?         @relation(fields: [userUuid], references: [uuid], onDelete: SetNull)
   budget       Budget?       @relation(fields: [budgetUuid], references: [uuid], onDelete: Cascade)
+  dones        Done[]
   taskExpense  TaskExpense?
   taskActivity TaskActivity?
 
@@ -157,55 +158,51 @@ model Task {
 }
 
 model TaskExpense {
-  id      Int       @id @default(autoincrement())
-  uuid    String    @unique @default(uuid()) @db.Uuid
-  amount  Decimal   @db.Decimal(15, 2)
-  task    Task      @relation(fields: [id], references: [id], onDelete: Cascade)
-  expense Expense[]
+  id     Int     @id @default(autoincrement())
+  uuid   String  @unique @default(uuid()) @db.Uuid
+  amount Decimal @db.Decimal(15, 2)
+  task   Task    @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model TaskActivity {
-  id         Int        @id @default(autoincrement())
-  uuid       String     @unique @default(uuid()) @db.Uuid
-  hourlyRate Decimal    @map("hourly_rate") @db.Decimal(15, 2)
-  task       Task       @relation(fields: [id], references: [id], onDelete: Cascade)
-  activity   Activity[]
+  id         Int     @id @default(autoincrement())
+  uuid       String  @unique @default(uuid()) @db.Uuid
+  hourlyRate Decimal @map("hourly_rate") @db.Decimal(15, 2)
+  task       Task    @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model Done {
-  id          Int       @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   name        String
   description String
   register    DateTime
-  userUuid    String    @map("user_uuid") @db.Uuid
-  user        User      @relation(fields: [userUuid], references: [uuid], onDelete: Restrict)
-  activity    Activity?
-  expense     Expense?
+  taskId      Int
+  userUuid    String        @map("user_uuid") @db.Uuid
+  user        User          @relation(fields: [userUuid], references: [uuid], onDelete: Restrict)
+  task        Task          @relation(fields: [taskId], references: [id], onDelete: Restrict)
+  activity    DoneActivity?
+  expense     DoneExpense?
 
   @@unique([id])
 }
 
-model Activity {
-  id               Int          @id @default(autoincrement())
-  uuid             String       @unique @default(uuid()) @db.Uuid
-  beginDate        DateTime     @map("begin_date")
-  endDate          DateTime     @map("end_date")
-  hourlyRate       Decimal      @map("hourly_rate") @db.Decimal(15, 2)
-  taskActivityUuid String       @map("task_activity_uuid") @db.Uuid
-  taskActivity     TaskActivity @relation(fields: [taskActivityUuid], references: [uuid], onDelete: Restrict)
-  done             Done         @relation(fields: [id], references: [id], onDelete: Cascade)
+model DoneActivity {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid()) @db.Uuid
+  beginDate  DateTime @map("begin_date")
+  endDate    DateTime @map("end_date")
+  hourlyRate Decimal  @map("hourly_rate") @db.Decimal(15, 2)
+  done       Done     @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
-model Expense {
-  id              Int         @id @default(autoincrement())
-  uuid            String      @unique @default(uuid()) @db.Uuid
-  amount          Decimal     @db.Decimal(15, 2)
-  date            DateTime
-  supplierUuid    String      @map("supplier_uuid") @db.Uuid
-  taskExpenseUuid String      @map("task_expense_uuid") @db.Uuid
-  supplier        Supplier    @relation(fields: [supplierUuid], references: [uuid], onDelete: Restrict)
-  taskExpense     TaskExpense @relation(fields: [taskExpenseUuid], references: [uuid], onDelete: Restrict)
-  done            Done        @relation(fields: [id], references: [id], onDelete: Cascade)
+model DoneExpense {
+  id           Int      @id @default(autoincrement())
+  uuid         String   @unique @default(uuid()) @db.Uuid
+  amount       Decimal  @db.Decimal(15, 2)
+  date         DateTime
+  supplierUuid String   @map("supplier_uuid") @db.Uuid
+  supplier     Supplier @relation(fields: [supplierUuid], references: [uuid], onDelete: Restrict)
+  done         Done     @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model Transaction {
@@ -219,7 +216,7 @@ model Transaction {
   projectUuid String?  @map("project_uuid") @db.Uuid
   user        User     @relation(fields: [userUuid], references: [uuid], onDelete: Restrict)
   project     Project? @relation(fields: [projectUuid], references: [uuid], onDelete: Restrict)
-  bill        Bill?
+  expense     Expense?
   income      Income?
   refund      Refund?
   loan        Loan?
@@ -227,7 +224,7 @@ model Transaction {
   @@unique([id])
 }
 
-model Bill {
+model Expense {
   id           Int         @id @default(autoincrement())
   uuid         String      @unique @default(uuid()) @db.Uuid
   supplierUuid String      @map("supplier_uuid") @db.Uuid
@@ -256,7 +253,8 @@ model Refund {
 model Loan {
   id           Int         @id @default(autoincrement())
   uuid         String      @unique @default(uuid()) @db.Uuid
-  percent      Decimal     @db.Decimal(15, 2)
+  installment  Decimal     @db.Decimal(15, 2)
+  months       Int
   supplierUuid String      @map("supplier_uuid") @db.Uuid
   supplier     Supplier    @relation(fields: [supplierUuid], references: [uuid], onDelete: Restrict)
   transaction  Transaction @relation(fields: [id], references: [id], onDelete: Cascade)

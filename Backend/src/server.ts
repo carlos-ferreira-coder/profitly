@@ -11,7 +11,7 @@ import routerProject from '@routers/routerProject'
 import routerBudget from '@routers/routerBudget'
 import routerTasks from '@routers/routerTasks'
 import routerSupplier from '@routers/routerSupplier'
-import routerBill from '@routers/routerBill'
+import routerExpense from '@routers/routerExpense'
 import routerIncome from '@routers/routerIncome'
 import routerRefund from '@routers/routerRefund'
 import routerLoan from '@routers/routerLoan'
@@ -41,7 +41,7 @@ app.use('/project', auth, routerProject)
 app.use('/budget', auth, routerBudget)
 app.use('/tasks', auth, routerTasks)
 app.use('/supplier', auth, routerSupplier)
-app.use('/bill', auth, routerBill)
+app.use('/expense', auth, routerExpense)
 app.use('/income', auth, routerIncome)
 app.use('/refund', auth, routerRefund)
 app.use('/loan', auth, routerLoan)

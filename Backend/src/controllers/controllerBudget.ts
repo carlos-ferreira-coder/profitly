@@ -16,7 +16,7 @@ type TaskProps = Task & {
 }
 
 type BudgetProps = Budget & {
-  task: TaskProps[]
+  tasks: TaskProps[]
 }
 
 const formatDate = (date: Date) => {
@@ -33,7 +33,7 @@ const responseBudgets = (budgets: BudgetProps[]) => {
   return budgets.map((budget) => {
     return {
       ...budget,
-      task: budget.task.map((task) => {
+      task: budget.tasks.map((task) => {
         return {
           ...task,
           beginDate: formatDate(task.beginDate),
@@ -83,7 +83,7 @@ export const budgetSelect = async (req: Request, res: Response): Promise<void> =
     // server request
     const budgets = await prisma.budget.findMany({
       include: {
-        task: {
+        tasks: {
           include: {
             taskExpense: true,
             taskActivity: true,

@@ -50,10 +50,10 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
       const usr: (UserProps | null)[] = []
       const sts: (StatusProps | null)[] = []
 
-      for (let i = 0; i < budget.task.length; i++) {
+      for (let i = 0; i < budget.tasks.length; i++) {
         rsm.push(false)
-        usr.push(resUser.find((u) => u.uuid === budget.task[i].userUuid) || null)
-        sts.push(resStatus.find((s) => s.uuid === budget.task[i].statusUuid) || null)
+        usr.push(resUser.find((u) => u.uuid === budget.tasks[i].userUuid) || null)
+        sts.push(resStatus.find((s) => s.uuid === budget.tasks[i].statusUuid) || null)
       }
 
       setUser(usr)
@@ -80,7 +80,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
   const defaultValues = {
     uuid: budget.uuid,
     register: budget.register,
-    task: budget.task,
+    tasks: budget.tasks,
   }
 
   // Hookform

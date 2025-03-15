@@ -7,7 +7,7 @@ import {
   faCreditCard,
   faDiagramProject,
   faHouse,
-  faMoneyBills,
+  faMoneyBill,
   faMoneyBillTransfer,
   faParachuteBox,
   faPercent,
@@ -42,8 +42,8 @@ import SupplierSelect from './pages/Supplier/Select/Index'
 import SupplierCreate from './pages/Supplier/Create/Index'
 import SupplierUpdate from './pages/Supplier/Update/Index'
 import SupplierDelete from './pages/Supplier/Delete/Index'
-import BillSelect from './pages/Transaction/Bill/Select/Index'
-import BillCreate from './pages/Transaction/Bill/Create/Index'
+import ExpenseSelect from './pages/Transaction/Expense/Select/Index'
+import ExpenseCreate from './pages/Transaction/Expense/Create/Index'
 import IncomeSelect from './pages/Transaction/Income/Select/Index'
 import IncomeCreate from './pages/Transaction/Income/Create/Index'
 import RefundSelect from './pages/Transaction/Refund/Select/Index'
@@ -224,7 +224,7 @@ export const pages: PageProps[] = [
     route: '/income/select',
     protection: ['logged', 'financial'],
     useIn: ['Navigate'],
-    icon: faMoneyBills,
+    icon: faMoneyBill,
     component: IncomeSelect,
   },
   {
@@ -237,19 +237,19 @@ export const pages: PageProps[] = [
   },
   {
     title: 'Despesa',
-    route: '/bill/select',
+    route: '/expense/select',
     protection: ['logged', 'financial'],
     useIn: ['Navigate'],
     icon: faCreditCard,
-    component: BillSelect,
+    component: ExpenseSelect,
   },
   {
     title: 'Cadastrar Despesa',
-    route: '/bill/create',
+    route: '/expense/create',
     protection: ['logged', 'financial'],
     useIn: [],
     icon: faQuestion,
-    component: BillCreate,
+    component: ExpenseCreate,
   },
   {
     title: 'Empréstimo',

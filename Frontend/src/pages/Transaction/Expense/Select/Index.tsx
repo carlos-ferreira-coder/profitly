@@ -4,25 +4,25 @@ import Filter from './Filter'
 import List from './List'
 import { api as axios, handleAxiosError } from '../../../../services/Axios'
 import { useLocation } from 'react-router-dom'
-import { BillProps } from '../../../../types/Database'
+import { ExpenseProps } from '../../../../types/Database'
 import Alert from '../../../../components/Alert/Index'
 import Loader from '../../../../components/Loader'
 
 const Select = () => {
   const location = useLocation()
-  const [bills, setBills] = useState<BillProps[] | null>(null)
+  const [expenses, setExpenses] = useState<ExpenseProps[] | null>(null)
   const [filtering, setFiltering] = useState<'idle' | 'filter' | 'reset'>('idle')
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
 
-  // Get Bills
+  // Get Expenses
   useEffect(() => {
     ;(async () => {
       try {
-        const { data } = await axios.get(`bill/select/all${location.search}`, {
+        const { data } = await axios.get(`expense/select/all${location.search}`, {
           withCredentials: true,
         })
 
-        setBills(data)
+        setExpenses(data)
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])
       }
@@ -39,7 +39,7 @@ const Select = () => {
         <div className="flex flex-wrap items-center">
           {alertErrors && <Alert type="danger" size="lg" data={alertErrors} />}
 
-          {bills ? (
+          {expenses ? (
             <>
               <div className="block w-full md:w-2/6 lg:w-3/12 md:border-r-2 border-stroke dark:border-strokedark">
                 <div className="p-7">
@@ -49,7 +49,7 @@ const Select = () => {
 
               <div className="block w-full md:w-4/6 lg:w-9/12">
                 <div className="p-7">
-                  <List bills={bills} />
+                  <List expenses={expenses} />
                 </div>
               </div>
             </>

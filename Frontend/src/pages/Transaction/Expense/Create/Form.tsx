@@ -13,7 +13,7 @@ import {
   faSignature,
 } from '@fortawesome/free-solid-svg-icons'
 import { useEffect, useState } from 'react'
-import { billCreateSchema } from '../../../../hooks/useSchema'
+import { expenseCreateSchema } from '../../../../hooks/useSchema'
 import { ProjectProps, SupplierProps } from '../../../../types/Database'
 import ProjectSearch from '../../../../hooks/search/useSearchProject'
 import SupplierSearch from '../../../../hooks/search/useSearchSupplier'
@@ -26,8 +26,8 @@ const Form = () => {
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
   const [alertSuccesses, setAlertSuccesses] = useState<(string | JSX.Element)[] | null>(null)
 
-  // Bill schema
-  const schema = billCreateSchema
+  // Expense schema
+  const schema = expenseCreateSchema
   type SchemaProps = z.infer<typeof schema>
 
   const defaultValues = {
@@ -71,14 +71,14 @@ const Form = () => {
     setValue('supplierUuid', supplier ? supplier.uuid : '')
   }, [supplier, setValue])
 
-  // Create bill in backend
-  const createBill = async (data: SchemaProps) => {
+  // Create expense in backend
+  const createExpense = async (data: SchemaProps) => {
     setStatus('request')
     setAlertErrors(null)
     setAlertSuccesses(null)
 
     try {
-      const response = await axios.post('/bill/create', data, {
+      const response = await axios.post('/expense/create', data, {
         withCredentials: true,
       })
 
@@ -87,7 +87,7 @@ const Form = () => {
         <Button
           type="button"
           color="success"
-          onClick={() => navigate('/bill/select')}
+          onClick={() => navigate('/expense/select')}
           className="h-8 w-35 bg-green-400 dark:text-form-input dark:bg-green-400"
         >
           Listar despesas
@@ -101,7 +101,7 @@ const Form = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit(createBill)}>
+    <form onSubmit={handleSubmit(createExpense)}>
       <div className="mb-6">
         <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="name">
           Nome <span className="text-danger">*</span>

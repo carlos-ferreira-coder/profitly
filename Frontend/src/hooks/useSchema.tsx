@@ -343,7 +343,7 @@ const transactionCreateSchema = {
     .optional(),
 }
 
-export const billCreateSchema = z.object({
+export const expenseCreateSchema = z.object({
   supplierUuid: zodUuid('fornecedor'),
   ...transactionCreateSchema,
 })

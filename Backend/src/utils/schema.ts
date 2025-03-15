@@ -365,7 +365,7 @@ const transactionCreateSchema = {
   projectUuid: zodUuid('cargo/função').optional(),
 }
 
-export const billSelectSchema = z.object({
+export const expenseSelectSchema = z.object({
   supplierUuid: zodRegex(
     'uuid(s) de fornecedor',
     /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
@@ -376,7 +376,7 @@ export const billSelectSchema = z.object({
   ...transactionSelectSchema,
 })
 
-export const billCreateSchema = z.object({
+export const expenseCreateSchema = z.object({
   supplierUuid: zodUuid('cargo/função'),
   ...transactionCreateSchema,
 })

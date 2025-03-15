@@ -8,6 +8,7 @@ import {
   uuidSchema,
 } from '@utils/schema'
 import { authorization } from '@utils/auth'
+import { currencyToNumber, numberToCurrency } from '@utils/currency'
 
 const formatDate = (date: Date) => {
   const year = String(date.getFullYear()).slice(-2)
@@ -42,6 +43,12 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
       return
     }
 
+    const auth = await prisma.auth.findUnique({ where: { uuid: token.authUuid } })
+    if (!auth) {
+      res.status(401).json({ message: 'Autorização não encontrada!' })
+      return
+    }
+
     // server request
     const projects = await prisma.project.findMany({
       include: {
@@ -70,6 +77,31 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
           },
         },
         status: true,
+        budget: {
+          include: {
+            tasks: {
+              include: {
+                taskExpense: true,
+                taskActivity: true,
+              },
+            },
+          },
+        },
+        tasks: {
+          include: {
+            dones: true,
+            taskExpense: true,
+            taskActivity: true,
+          },
+        },
+        transactions: {
+          include: {
+            expense: true,
+            income: true,
+            refund: true,
+            loan: true,
+          },
+        },
       },
       where: {
         uuid: params.data.key === 'all' ? undefined : params.data.key,
@@ -87,22 +119,120 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
     })
 
     const responseProjects = projects.map((project) => {
+      // calculate dates
+      const dates: Date[] = [
+        project.register,
+        project.budget.register,
+        ...project.budget.tasks.flatMap((task) => [task.beginDate, task.endDate]),
+        ...project.tasks.flatMap((task) => [
+          task.beginDate,
+          task.endDate,
+          ...(task.dones?.flatMap((done) => [done.register]) ?? []),
+        ]),
+        ...(project.transactions?.flatMap((transaction) => [transaction.register]) ?? []),
+      ].filter((date): date is Date => date instanceof Date)
+
+      const beginDate =
+        dates.length > 0
+          ? new Date(Math.min(...dates.map((d) => new Date(d).getTime())))
+          : project.register
+      const endDate =
+        dates.length > 0
+          ? new Date(Math.max(...dates.map((d) => new Date(d).getTime())))
+          : project.register
+
+      // calculate budget
+      const budgetCost: number = project.budget.tasks.reduce((sum, task) => {
+        if (task.taskExpense) return sum + task.taskExpense.amount.toNumber()
+
+        if (task.taskActivity) {
+          const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+          return sum + hours * task.taskActivity.hourlyRate.toNumber()
+        }
+
+        return 0
+      }, 0)
+
+      const budgetRevenue: number = project.budget.tasks.reduce((sum, task) => {
+        if (task.taskExpense) return sum + task.revenue.toNumber()
+
+        const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+        return sum + hours * task.revenue.toNumber()
+      }, 0)
+
+      const budgetTotal = budgetCost + budgetRevenue
+
+      // calculate transactions
+      const expense: number = project.transactions
+        .filter((transaction) => transaction.expense)
+        .reduce((sum, { amount }) => sum + amount.toNumber(), 0)
+
+      const income: number = project.transactions
+        .filter((transaction) => transaction.income)
+        .reduce((sum, { amount }) => sum + amount.toNumber(), 0)
+
+      const refund: number = project.transactions
+        .filter((transaction) => transaction.refund)
+        .reduce((sum, { amount }) => sum + amount.toNumber(), 0)
+
+      const loan: { income: number; expense: number } = project.transactions
+        .filter((transaction) => transaction.loan)
+        .reduce(
+          (sum, { amount, loan }) => {
+            if (!loan) return sum
+
+            const income = sum.income + amount.toNumber()
+            const expense = sum.expense + loan.months * loan.installment.toNumber()
+
+            return { income, expense }
+          },
+          { income: 0, expense: 0 },
+        )
+
+      const transactionIncome = income + loan.income - refund
+      const transactionExpense = expense + loan.expense + refund
+      const transactionRevenue = transactionIncome - transactionExpense
+
+      // calculate project
+      const projectCost: number = project.tasks.reduce((sum, task) => {
+        if (task.taskExpense) return sum + task.taskExpense.amount.toNumber()
+
+        if (task.taskActivity) {
+          const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+          return sum + hours * task.taskActivity.hourlyRate.toNumber()
+        }
+
+        return 0
+      }, 0)
+
+      // TODO retificar a logica
+      const projectRevenue: number = project.tasks.reduce((sum, task) => {
+        if (task.taskExpense) return sum + task.revenue.toNumber()
+
+        const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+        return sum + hours * task.revenue.toNumber()
+      }, 0)
+
+      const projectTotal = projectCost + projectRevenue
+
       return {
         ...project,
+
         register: formatDate(project.register),
+        beginDate: formatDate(beginDate),
+        endDate: formatDate(endDate),
 
-        beginDate: formatDate(project.register),
-        endDate: formatDate(project.register),
+        budgetTotal: numberToCurrency(budgetTotal, 'BRL'),
+        budgetCost: numberToCurrency(budgetCost, 'BRL'),
+        budgetRevenue: numberToCurrency(budgetRevenue, 'BRL'),
 
-        prevTotal: 'R$ 0,00',
-        prevCost: 'R$ 0,00',
-        prevRevenue: 'R$ 0,00',
-        total: 'R$ 0,00',
-        cost: 'R$ 0,00',
-        revenue: 'R$ 0,00',
-        currentIncome: 'R$ 0,00',
-        currentExpense: 'R$ 0,00',
-        currentRevenue: 'R$ 0,00',
+        transactionIncome: numberToCurrency(transactionIncome, 'BRL'),
+        transactionExpense: numberToCurrency(transactionExpense, 'BRL'),
+        transactionRevenue: numberToCurrency(transactionRevenue, 'BRL'),
+
+        projectTotal: numberToCurrency(projectTotal, 'BRL'),
+        projectCost: numberToCurrency(projectCost, 'BRL'),
+        projectRevenue: numberToCurrency(projectRevenue, 'BRL'),
       }
     })
 

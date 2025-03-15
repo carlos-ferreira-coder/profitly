@@ -76,7 +76,7 @@ const Filter = ({
 
       reset(defaultValues)
 
-      navigate('/bill/select')
+      navigate('/expense/select')
     }
   }
 
@@ -108,7 +108,7 @@ const Filter = ({
     if (location.search === urlQuery) {
       setFiltering('idle')
     } else {
-      navigate(`/bill/select${urlQuery}`)
+      navigate(`/expense/select${urlQuery}`)
     }
   }
 

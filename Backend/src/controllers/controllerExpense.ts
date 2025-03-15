@@ -1,11 +1,11 @@
 import { Request, Response } from 'express'
 import { prisma } from '@/server'
-import { billCreateSchema, billSelectSchema, keySchema } from '@utils/schema'
+import { expenseCreateSchema, expenseSelectSchema, keySchema } from '@utils/schema'
 import { numberToCurrency } from '@utils/currency'
 import { authorization } from '@utils/auth'
-import { Bill, Transaction } from '@prisma/client'
+import { Expense, Transaction } from '@prisma/client'
 
-type BillProps = Bill & { transaction: Transaction }
+type ExpenseProps = Expense & { transaction: Transaction }
 
 const formatDate = (date: Date) => {
   const year = String(date.getFullYear()).slice(-2)
@@ -17,21 +17,21 @@ const formatDate = (date: Date) => {
   return `${day}/${month}/${year} ${hour}:${minute}`
 }
 
-const responseBills = (bills: BillProps[]) => {
-  return bills.map((bill) => {
+const responseExpenses = (expenses: ExpenseProps[]) => {
+  return expenses.map((expense) => {
     return {
-      ...bill,
+      ...expense,
       transaction: {
-        ...bill.transaction,
-        register: formatDate(bill.transaction.register),
-        date: formatDate(bill.transaction.date),
-        amount: numberToCurrency(bill.transaction.amount.toNumber(), 'BRL'),
+        ...expense.transaction,
+        register: formatDate(expense.transaction.register),
+        date: formatDate(expense.transaction.date),
+        amount: numberToCurrency(expense.transaction.amount.toNumber(), 'BRL'),
       },
     }
   })
 }
 
-export const billSelect = async (req: Request, res: Response): Promise<void> => {
+export const expenseSelect = async (req: Request, res: Response): Promise<void> => {
   try {
     // check params
     const params = keySchema.safeParse(req.params)
@@ -41,7 +41,7 @@ export const billSelect = async (req: Request, res: Response): Promise<void> => 
     }
 
     // check query
-    const query = billSelectSchema.safeParse(req.query)
+    const query = expenseSelectSchema.safeParse(req.query)
     if (!query.success) {
       res.status(401).json({ message: `Query inválido: ${JSON.stringify(query.error.format())}` })
       return
@@ -55,7 +55,7 @@ export const billSelect = async (req: Request, res: Response): Promise<void> => 
     }
 
     // server request
-    const bills = await prisma.bill.findMany({
+    const expenses = await prisma.expense.findMany({
       include: {
         supplier: {
           include: {
@@ -109,7 +109,7 @@ export const billSelect = async (req: Request, res: Response): Promise<void> => 
       },
     })
 
-    res.status(200).json(responseBills(bills))
+    res.status(200).json(responseExpenses(expenses))
     return
   } catch (e) {
     console.log(e)
@@ -118,10 +118,10 @@ export const billSelect = async (req: Request, res: Response): Promise<void> => 
   }
 }
 
-export const billCreate = async (req: Request, res: Response): Promise<void> => {
+export const expenseCreate = async (req: Request, res: Response): Promise<void> => {
   try {
     // check schema
-    const body = billCreateSchema.safeParse(req.body)
+    const body = expenseCreateSchema.safeParse(req.body)
     if (!body.success) {
       res.status(401).json({ message: `Body inválido: ${JSON.stringify(body.error.format())}` })
       return
@@ -168,7 +168,7 @@ export const billCreate = async (req: Request, res: Response): Promise<void> => 
         projectUuid: body.data.projectUuid,
       },
     })
-    await prisma.bill.create({
+    await prisma.expense.create({
       data: {
         id: transaction.id,
         supplierUuid: body.data.supplierUuid,
