@@ -119,7 +119,6 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
     })
 
     const responseProjects = projects.map((project) => {
-      /*
       // calculate dates
       const dates: Date[] = [
         project.register,
@@ -215,12 +214,12 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
       }, 0)
 
       const projectTotal = projectCost + projectRevenue
-      */
+
       return {
         ...project,
 
         register: formatDate(project.register),
-        /*
+
         beginDate: formatDate(beginDate),
         endDate: formatDate(endDate),
 
@@ -235,7 +234,6 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
         projectTotal: numberToCurrency(projectTotal, 'BRL'),
         projectCost: numberToCurrency(projectCost, 'BRL'),
         projectRevenue: numberToCurrency(projectRevenue, 'BRL'),
-        */
       }
     })
 
