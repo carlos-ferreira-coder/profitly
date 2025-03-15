@@ -83,6 +83,7 @@ export const budgetSelect = async (req: Request, res: Response): Promise<void> =
     // server request
     const budgets = await prisma.budget.findMany({
       include: {
+        project: true,
         tasks: {
           include: {
             taskExpense: true,
