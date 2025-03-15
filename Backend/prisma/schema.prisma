@@ -131,7 +131,7 @@ model Budget {
   id       Int       @id @default(autoincrement())
   uuid     String    @unique @default(uuid()) @db.Uuid
   register DateTime?
-  project  Project[]
+  project  Project?
   tasks    Task[]
 }
 
