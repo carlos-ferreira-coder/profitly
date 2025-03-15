@@ -70,7 +70,6 @@ export type ProjectProps = {
   user?: UserProps
   client: ClientProps
   status: StatusProps
-
   // metods
   beginDate: string
   endDate: string

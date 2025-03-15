@@ -106,7 +106,7 @@ CREATE TABLE "Project" (
 CREATE TABLE "Budget" (
     "id" SERIAL NOT NULL,
     "uuid" UUID NOT NULL,
-    "register" TIMESTAMP(3) NOT NULL,
+    "register" TIMESTAMP(3),
 
     CONSTRAINT "Budget_pkey" PRIMARY KEY ("id")
 );
@@ -131,7 +131,7 @@ CREATE TABLE "Task" (
 CREATE TABLE "TaskExpense" (
     "id" SERIAL NOT NULL,
     "uuid" UUID NOT NULL,
-    "cost" DECIMAL(15,2) NOT NULL,
+    "amount" DECIMAL(15,2) NOT NULL,
 
     CONSTRAINT "TaskExpense_pkey" PRIMARY KEY ("id")
 );
@@ -151,33 +151,32 @@ CREATE TABLE "Done" (
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "register" TIMESTAMP(3) NOT NULL,
+    "taskId" INTEGER NOT NULL,
     "user_uuid" UUID NOT NULL,
 
     CONSTRAINT "Done_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Activity" (
+CREATE TABLE "DoneActivity" (
     "id" SERIAL NOT NULL,
     "uuid" UUID NOT NULL,
     "begin_date" TIMESTAMP(3) NOT NULL,
     "end_date" TIMESTAMP(3) NOT NULL,
     "hourly_rate" DECIMAL(15,2) NOT NULL,
-    "task_activity_uuid" UUID NOT NULL,
 
-    CONSTRAINT "Activity_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "DoneActivity_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Expense" (
+CREATE TABLE "DoneExpense" (
     "id" SERIAL NOT NULL,
     "uuid" UUID NOT NULL,
     "amount" DECIMAL(15,2) NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
     "supplier_uuid" UUID NOT NULL,
-    "task_expense_uuid" UUID NOT NULL,
 
-    CONSTRAINT "Expense_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "DoneExpense_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -195,12 +194,12 @@ CREATE TABLE "Transaction" (
 );
 
 -- CreateTable
-CREATE TABLE "Bill" (
+CREATE TABLE "Expense" (
     "id" SERIAL NOT NULL,
     "uuid" UUID NOT NULL,
     "supplier_uuid" UUID NOT NULL,
 
-    CONSTRAINT "Bill_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Expense_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -226,7 +225,8 @@ CREATE TABLE "Refund" (
 CREATE TABLE "Loan" (
     "id" SERIAL NOT NULL,
     "uuid" UUID NOT NULL,
-    "percent" DECIMAL(15,2) NOT NULL,
+    "installment" DECIMAL(15,2) NOT NULL,
+    "months" INTEGER NOT NULL,
     "supplier_uuid" UUID NOT NULL,
 
     CONSTRAINT "Loan_pkey" PRIMARY KEY ("id")
@@ -305,16 +305,16 @@ CREATE UNIQUE INDEX "TaskActivity_uuid_key" ON "TaskActivity"("uuid");
 CREATE UNIQUE INDEX "Done_id_key" ON "Done"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Activity_uuid_key" ON "Activity"("uuid");
+CREATE UNIQUE INDEX "DoneActivity_uuid_key" ON "DoneActivity"("uuid");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Expense_uuid_key" ON "Expense"("uuid");
+CREATE UNIQUE INDEX "DoneExpense_uuid_key" ON "DoneExpense"("uuid");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Transaction_id_key" ON "Transaction"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Bill_uuid_key" ON "Bill"("uuid");
+CREATE UNIQUE INDEX "Expense_uuid_key" ON "Expense"("uuid");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Income_uuid_key" ON "Income"("uuid");
@@ -383,19 +383,16 @@ ALTER TABLE "TaskActivity" ADD CONSTRAINT "TaskActivity_id_fkey" FOREIGN KEY ("i
 ALTER TABLE "Done" ADD CONSTRAINT "Done_user_uuid_fkey" FOREIGN KEY ("user_uuid") REFERENCES "User"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Activity" ADD CONSTRAINT "Activity_task_activity_uuid_fkey" FOREIGN KEY ("task_activity_uuid") REFERENCES "TaskActivity"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Done" ADD CONSTRAINT "Done_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "Task"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Activity" ADD CONSTRAINT "Activity_id_fkey" FOREIGN KEY ("id") REFERENCES "Done"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "DoneActivity" ADD CONSTRAINT "DoneActivity_id_fkey" FOREIGN KEY ("id") REFERENCES "Done"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Expense" ADD CONSTRAINT "Expense_supplier_uuid_fkey" FOREIGN KEY ("supplier_uuid") REFERENCES "Supplier"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "DoneExpense" ADD CONSTRAINT "DoneExpense_supplier_uuid_fkey" FOREIGN KEY ("supplier_uuid") REFERENCES "Supplier"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Expense" ADD CONSTRAINT "Expense_task_expense_uuid_fkey" FOREIGN KEY ("task_expense_uuid") REFERENCES "TaskExpense"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Expense" ADD CONSTRAINT "Expense_id_fkey" FOREIGN KEY ("id") REFERENCES "Done"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "DoneExpense" ADD CONSTRAINT "DoneExpense_id_fkey" FOREIGN KEY ("id") REFERENCES "Done"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_user_uuid_fkey" FOREIGN KEY ("user_uuid") REFERENCES "User"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -404,10 +401,10 @@ ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_user_uuid_fkey" FOREIGN KE
 ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_project_uuid_fkey" FOREIGN KEY ("project_uuid") REFERENCES "Project"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Bill" ADD CONSTRAINT "Bill_supplier_uuid_fkey" FOREIGN KEY ("supplier_uuid") REFERENCES "Supplier"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Expense" ADD CONSTRAINT "Expense_supplier_uuid_fkey" FOREIGN KEY ("supplier_uuid") REFERENCES "Supplier"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Bill" ADD CONSTRAINT "Bill_id_fkey" FOREIGN KEY ("id") REFERENCES "Transaction"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Expense" ADD CONSTRAINT "Expense_id_fkey" FOREIGN KEY ("id") REFERENCES "Transaction"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Income" ADD CONSTRAINT "Income_client_uuid_fkey" FOREIGN KEY ("client_uuid") REFERENCES "Client"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
