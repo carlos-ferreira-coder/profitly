@@ -89,7 +89,7 @@ export type BudgetProps = {
   uuid: string
   register?: string
   project: ProjectProps
-  task: TaskProps[]
+  task: TaskProps[] | undefined
 }
 
 export type TaskProps = {
