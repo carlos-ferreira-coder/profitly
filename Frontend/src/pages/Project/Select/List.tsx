@@ -58,44 +58,44 @@ const ProjectStatsInfo = ({ project }: { project: ProjectProps }) => (
   </>
 )
 
-const ProjectPrevInfo = ({ project }: { project: ProjectProps }) => (
+const ProjectBudgetInfo = ({ project }: { project: ProjectProps }) => (
   <>
     <p>
-      <b>Total previsto: </b> {project.prevTotal}
+      <b>Total previsto: </b> {project.budgetTotal}
     </p>
     <p>
-      <b>Lucro previsto: </b> {project.prevRevenue}
+      <b>Lucro previsto: </b> {project.budgetRevenue}
     </p>
     <p>
-      <b>Custo previsto: </b> {project.prevCost}
+      <b>Custo previsto: </b> {project.budgetCost}
     </p>
   </>
 )
 
-const ProjectActualInfo = ({ project }: { project: ProjectProps }) => (
+const ProjectProjectInfo = ({ project }: { project: ProjectProps }) => (
   <>
     <p>
-      <b>Total atual: </b> {project.total}
+      <b>Total atual: </b> {project.projectTotal}
     </p>
     <p>
-      <b>Lucro atual: </b> {project.revenue}
+      <b>Lucro atual: </b> {project.projectRevenue}
     </p>
     <p>
-      <b>Custo atual: </b> {project.cost}
+      <b>Custo atual: </b> {project.projectCost}
     </p>
   </>
 )
 
-const ProjectCurrentInfo = ({ project }: { project: ProjectProps }) => (
+const ProjectTransactionInfo = ({ project }: { project: ProjectProps }) => (
   <>
     <p>
-      <b>Receita corrente: </b> {project.currentIncome}
+      <b>Receita corrente: </b> {project.transactionIncome}
     </p>
     <p>
-      <b>Lucro corrente: </b> {project.currentRevenue}
+      <b>Lucro corrente: </b> {project.transactionRevenue}
     </p>
     <p>
-      <b>Despesa corrente: </b> {project.currentExpense}
+      <b>Despesa corrente: </b> {project.transactionExpense}
     </p>
   </>
 )
@@ -135,11 +135,11 @@ const List = ({ projects }: { projects: ProjectProps[] }) => {
 
               {auth?.financial && (
                 <>
-                  <ProjectPrevInfo project={project} />
+                  <ProjectBudgetInfo project={project} />
 
-                  <ProjectActualInfo project={project} />
+                  <ProjectProjectInfo project={project} />
 
-                  <ProjectCurrentInfo project={project} />
+                  <ProjectTransactionInfo project={project} />
                 </>
               )}
             </div>
@@ -155,13 +155,13 @@ const List = ({ projects }: { projects: ProjectProps[] }) => {
             {auth?.financial && (
               <>
                 <div className="col-span-2 hidden lg:flex flex-col justify-center space-y-2">
-                  <ProjectPrevInfo project={project} />
+                  <ProjectBudgetInfo project={project} />
                 </div>
                 <div className="col-span-2 hidden lg:flex flex-col justify-center space-y-2">
-                  <ProjectActualInfo project={project} />
+                  <ProjectProjectInfo project={project} />
                 </div>
                 <div className="col-span-2 hidden lg:flex flex-col justify-center space-y-2">
-                  <ProjectCurrentInfo project={project} />
+                  <ProjectTransactionInfo project={project} />
                 </div>
               </>
             )}
@@ -183,7 +183,7 @@ const List = ({ projects }: { projects: ProjectProps[] }) => {
                 <FontAwesomeIcon icon={faFileInvoiceDollar} />
               </Button>
 
-              {currencyToNumber(project.prevTotal, 'BRL') !== 0 && (
+              {currencyToNumber(project.budgetTotal, 'BRL') !== 0 && (
                 <Button
                   color="warning"
                   className="w-8 h-8"
