@@ -422,75 +422,59 @@ export const projectDeleteSchema = z.object({
   statusUuid: zodUuid('status'),
 })
 
-const taskSchema = {
-  name: zodString('nome', true),
-  description: zodString('descrição', true),
-  beginDate: zodRegex(
-    'data inicial',
-    /^(0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/(\d{2}) ([01]\d|2[0-3]):[0-5]\d$/,
-    true
-  ).transform((s) => {
-    const [date, time] = s.split(' ')
-    const [hour, minute] = time.split(':')
-    const [day, month, year] = date.split('/')
-
-    return `20${year}-${month}-${day}T${hour}:${minute}:00`
-  }),
-  endDate: zodRegex(
-    'data final',
-    /^(0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/(\d{2}) ([01]\d|2[0-3]):[0-5]\d$/,
-    true
-  ).transform((s) => {
-    const [date, time] = s.split(' ')
-    const [hour, minute] = time.split(':')
-    const [day, month, year] = date.split('/')
-
-    return `20${year}-${month}-${day}T${hour}:${minute}:00`
-  }),
-  revenue: zodRegex('lucro', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
-  statusUuid: zodUuid('status'),
-  projectUuid: zodUuid('projeto'),
-  userUuid: zodUuid('usuário').optional(),
-  budgetUuid: zodUuid('orçamento').optional(),
-}
-
-const taskExpenseSchema = z
-  .object({
-    uuid: zodUuid('tarefa de despesa'),
-    amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
-    ...taskSchema,
-  })
-  .superRefine(({ beginDate, endDate }, ctx) => {
-    if (beginDate > endDate) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'A data final deve ser posterior a data inicial!',
-        path: ['endDate'],
-      })
-    }
-  })
-
-const taskActivitySchema = z
-  .object({
-    uuid: zodUuid('tarefa de atividade'),
-    hourlyRate: zodRegex('valor da hora', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
-    ...taskSchema,
-  })
-  .superRefine(({ beginDate, endDate }, ctx) => {
-    if (beginDate > endDate) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'A data final deve ser posterior a data inicial!',
-        path: ['endDate'],
-      })
-    }
-  })
-
-export const tasksSchema = z.object({
-  tasks: z
-    .array(z.union([taskExpenseSchema, taskActivitySchema]))
-    .min(1, { message: 'Insira as tarefas para prosseguir!' }),
+const taskExpenseSchema = z.object({
+  uuid: zodUuid('tarefa de despesa'),
+  amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
 })
+
+const taskActivitySchema = z.object({
+  uuid: zodUuid('tarefa de atividade'),
+  hourlyRate: zodRegex('valor da hora', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
+})
+
+const taskSchema = z
+  .object({
+    name: zodString('nome', true),
+    description: zodString('descrição', true),
+    beginDate: zodRegex(
+      'data inicial',
+      /^(0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/(\d{2}) ([01]\d|2[0-3]):[0-5]\d$/,
+      true
+    ).transform((s) => {
+      const [date, time] = s.split(' ')
+      const [hour, minute] = time.split(':')
+      const [day, month, year] = date.split('/')
+
+      return `20${year}-${month}-${day}T${hour}:${minute}:00`
+    }),
+    endDate: zodRegex(
+      'data final',
+      /^(0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/(\d{2}) ([01]\d|2[0-3]):[0-5]\d$/,
+      true
+    ).transform((s) => {
+      const [date, time] = s.split(' ')
+      const [hour, minute] = time.split(':')
+      const [day, month, year] = date.split('/')
+
+      return `20${year}-${month}-${day}T${hour}:${minute}:00`
+    }),
+    revenue: zodRegex('lucro', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
+    statusUuid: zodUuid('status'),
+    projectUuid: zodUuid('projeto'),
+    userUuid: zodUuid('usuário').optional(),
+    budgetUuid: zodUuid('orçamento').optional(),
+    taskExpense: taskExpenseSchema.optional(),
+    taskActivity: taskActivitySchema.optional(),
+  })
+  .superRefine(({ beginDate, endDate }, ctx) => {
+    if (beginDate > endDate) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'A data final deve ser posterior a data inicial!',
+        path: ['endDate'],
+      })
+    }
+  })
 
 export const budgetSchema = z.object({
   uuid: zodUuid('orçamento'),
@@ -508,7 +492,7 @@ export const budgetSchema = z.object({
     })
     .nullable()
     .optional(),
-  tasks: z
-    .array(z.union([taskExpenseSchema, taskActivitySchema]))
-    .min(1, { message: 'Insira as tarefas para prosseguir!' }),
+  tasks: z.array(taskSchema).min(1, {
+    message: 'Insira as tarefas para prosseguir!',
+  }),
 })
