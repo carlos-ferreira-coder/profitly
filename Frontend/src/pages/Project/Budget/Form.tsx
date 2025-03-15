@@ -130,10 +130,11 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
   }
 
   const Total = ({ control }: { control: Control<SchemaProps> }) => {
-    const tasks = useWatch({
-      name: 'tasks',
-      control,
-    })
+    const tasks =
+      useWatch({
+        name: 'tasks',
+        control,
+      }) || []
 
     const revenue = tasks.reduce((acc, task) => {
       if ('amount' in task) return acc + currencyToNumber(task.revenue, 'BRL')
