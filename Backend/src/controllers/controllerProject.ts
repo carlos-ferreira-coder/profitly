@@ -199,42 +199,48 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
       const transactionRevenue = transactionIncome - transactionExpense
 
       // calculate project
-      const projectPrevCost: number = project.tasks.reduce((sum, task) => {
-        if (task.taskExpense) return sum + task.taskExpense.amount.toNumber()
+      const projectPrevCost: number = project.tasks
+        .filter(({ budgetUuid }) => !budgetUuid)
+        .reduce((sum, task) => {
+          if (task.taskExpense) return sum + task.taskExpense.amount.toNumber()
 
-        if (task.taskActivity) {
-          const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
-          return sum + hours * task.taskActivity.hourlyRate.toNumber()
-        }
+          if (task.taskActivity) {
+            const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+            return sum + hours * task.taskActivity.hourlyRate.toNumber()
+          }
 
-        return 0
-      }, 0)
+          return 0
+        }, 0)
 
-      const projectCost: number = project.tasks.reduce(
-        (sum, task) =>
-          sum +
-          task.dones.reduce((sum, done) => {
-            if (done.doneExpense) return sum + done.doneExpense.amount.toNumber()
+      const projectCost: number = project.tasks
+        .filter(({ budgetUuid }) => !budgetUuid)
+        .reduce(
+          (sum, task) =>
+            sum +
+            task.dones.reduce((sum, done) => {
+              if (done.doneExpense) return sum + done.doneExpense.amount.toNumber()
 
-            if (done.doneActivity) {
-              const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
-              return sum + hours * done.doneActivity.hourlyRate.toNumber()
-            }
+              if (done.doneActivity) {
+                const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+                return sum + hours * done.doneActivity.hourlyRate.toNumber()
+              }
 
-            return 0
-          }, 0),
-        0,
-      )
+              return 0
+            }, 0),
+          0,
+        )
 
       const projectCostDiff = projectPrevCost - projectCost
 
       const projectRevenue: number =
-        project.tasks.reduce((sum, task) => {
-          if (task.taskExpense) return sum + task.revenue.toNumber()
+        project.tasks
+          .filter(({ budgetUuid }) => !budgetUuid)
+          .reduce((sum, task) => {
+            if (task.taskExpense) return sum + task.revenue.toNumber()
 
-          const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
-          return sum + hours * task.revenue.toNumber()
-        }, 0) + projectCostDiff
+            const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+            return sum + hours * task.revenue.toNumber()
+          }, 0) + projectCostDiff
 
       const projectTotal = projectCost + projectRevenue
 
