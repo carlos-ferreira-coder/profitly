@@ -170,7 +170,7 @@ const Form = ({ project }: { project: ProjectProps }) => {
             <div className="relative">
               <Input id="user" type="text" hidden disabled {...register('userUuid')} />
 
-              <div className="flex flex-col p-3 shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50">
+              <div className="flex flex-col text-black dark:text-white p-3 shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50">
                 <p>
                   <b>Cargo/Função: </b> {project.user.auth.name}
                 </p>
@@ -196,7 +196,7 @@ const Form = ({ project }: { project: ProjectProps }) => {
         <div className="relative">
           <Input id="client" type="text" hidden disabled {...register('clientUuid')} />
 
-          <div className="flex flex-col p-3 shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50">
+          <div className="flex flex-col text-black dark:text-white p-3 shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50">
             {project.client.enterprise && (
               <>
                 <p>
@@ -234,7 +234,7 @@ const Form = ({ project }: { project: ProjectProps }) => {
         <div className="relative">
           <Input id="status" type="text" hidden disabled {...register('statusUuid')} />
 
-          <div className="flex flex-col p-3 shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50">
+          <div className="flex flex-col text-black dark:text-white p-3 shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50">
             <p>
               <b>Nome: </b> {project.status.name}
             </p>
