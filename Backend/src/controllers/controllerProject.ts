@@ -8,7 +8,7 @@ import {
   uuidSchema,
 } from '@utils/schema'
 import { authorization } from '@utils/auth'
-import { currencyToNumber, numberToCurrency } from '@utils/currency'
+import { numberToCurrency } from '@utils/currency'
 
 const formatDate = (date: Date) => {
   const year = String(date.getFullYear()).slice(-2)
