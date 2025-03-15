@@ -50,12 +50,10 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
       const usr: (UserProps | null)[] = []
       const sts: (StatusProps | null)[] = []
 
-      const tasks = budget.task || []
-
-      for (let i = 0; i < tasks.length; i++) {
+      for (let i = 0; i < budget.task.length; i++) {
         rsm.push(false)
-        usr.push(resUser.find((u) => u.uuid === tasks[i].userUuid) || null)
-        sts.push(resStatus.find((s) => s.uuid === tasks[i].statusUuid) || null)
+        usr.push(resUser.find((u) => u.uuid === budget.task[i].userUuid) || null)
+        sts.push(resStatus.find((s) => s.uuid === budget.task[i].statusUuid) || null)
       }
 
       setUser(usr)
