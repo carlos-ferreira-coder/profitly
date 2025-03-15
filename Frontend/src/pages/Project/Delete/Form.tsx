@@ -1,17 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Input } from '../../../components/Form/Input'
-import {
-  faAlignLeft,
-  faBarsProgress,
-  faBriefcase,
-  faCalendar,
-  faEnvelope,
-  faExclamation,
-  faProjectDiagram,
-  faUser,
-  faUserTie,
-} from '@fortawesome/free-solid-svg-icons'
+import { faAlignLeft, faCalendar, faProjectDiagram } from '@fortawesome/free-solid-svg-icons'
 import { api as axios, handleAxiosError } from '../../../services/Axios'
 import Alert from '../../../components/Alert/Index'
 import Button from '../../../components/Form/Button'
@@ -171,44 +161,33 @@ const Form = ({ project }: { project: ProjectProps }) => {
         )}
       </div>
 
-      <div className="mb-6" style={{ display: project.userUuid ? 'block' : 'none' }}>
-        <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="user">
-          Usuário
-        </label>
-        <div className="relative">
-          <Input id="user" type="text" hidden disabled {...register('userUuid')} />
+      {project.user && (
+        <>
+          <div className="mb-6">
+            <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="user">
+              Usuário
+            </label>
+            <div className="relative">
+              <Input id="user" type="text" hidden disabled {...register('userUuid')} />
 
-          <div className="flex flex-col p-3 shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50">
-            <Input
-              type="text"
-              disabled
-              icon={faUserTie}
-              iconPosition="left"
-              value={project.user?.username}
-              className="bg-slate-200 dark:bg-slate-700"
-            />
-            <Input
-              type="text"
-              disabled
-              icon={faBriefcase}
-              iconPosition="left"
-              value={project.user?.auth.name}
-              className="bg-slate-200 dark:bg-slate-700"
-            />
-            <Input
-              type="text"
-              disabled
-              icon={faEnvelope}
-              iconPosition="left"
-              value={project.user?.person.entity.email}
-              className="bg-slate-200 dark:bg-slate-700"
-            />
+              <div className="flex flex-col p-3 shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50">
+                <p>
+                  <b>Cargo/Função: </b> {project.user.auth.name}
+                </p>
+                <p>
+                  <b>Nome do usuário: </b> {project.user.username}
+                </p>
+                <p>
+                  <b>Email: </b> {project.user.person.entity.email}
+                </p>
+              </div>
+            </div>
+            {errors.userUuid && (
+              <Alert type="danger" size="sm" data={[errors.userUuid.message || '']} />
+            )}
           </div>
-        </div>
-        {errors.userUuid && (
-          <Alert type="danger" size="sm" data={[errors.userUuid.message || '']} />
-        )}
-      </div>
+        </>
+      )}
 
       <div className="mb-6">
         <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="client">
@@ -218,32 +197,29 @@ const Form = ({ project }: { project: ProjectProps }) => {
           <Input id="client" type="text" hidden disabled {...register('clientUuid')} />
 
           <div className="flex flex-col p-3 shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50">
-            <Input
-              type="text"
-              disabled
-              icon={faUser}
-              iconPosition="left"
-              value={project.client.enterprise?.entity.name || project.client.person?.entity.name}
-              className="bg-slate-200 dark:bg-slate-700"
-            />
             {project.client.enterprise && (
-              <Input
-                type="text"
-                disabled
-                icon={faUser}
-                iconPosition="left"
-                value={project.client.enterprise.fantasy}
-                className="bg-slate-200 dark:bg-slate-700"
-              />
+              <>
+                <p>
+                  <b>Nome: </b> {project.client.enterprise.entity.name}
+                </p>
+                <p>
+                  <b>Nome fantasia: </b> {project.client.enterprise.fantasy}
+                </p>
+                <p>
+                  <b>CNPJ: </b> {project.client.enterprise.cnpj}
+                </p>
+              </>
             )}
-            <Input
-              type="text"
-              disabled
-              icon={faBriefcase}
-              iconPosition="left"
-              value={project.client.enterprise?.cnpj || project.client.person?.cpf}
-              className="bg-slate-200 dark:bg-slate-700"
-            />
+            {project.client.person && (
+              <>
+                <p>
+                  <b>Nome: </b> {project.client.person.entity.name}
+                </p>
+                <p>
+                  <b>CPF: </b> {project.client.person.cpf}
+                </p>
+              </>
+            )}
           </div>
         </div>
         {errors.clientUuid && (
@@ -259,36 +235,20 @@ const Form = ({ project }: { project: ProjectProps }) => {
           <Input id="status" type="text" hidden disabled {...register('statusUuid')} />
 
           <div className="flex flex-col p-3 shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50">
-            <Input
-              type="text"
-              disabled
-              icon={faBarsProgress}
-              iconPosition="left"
-              value={project.status.name}
-              className="bg-slate-200 dark:bg-slate-700"
-            />
-            <Input
-              type="text"
-              disabled
-              icon={faAlignLeft}
-              iconPosition="left"
-              value={project.status.description}
-              className="bg-slate-200 dark:bg-slate-700"
-            />
-            <Input
-              type="text"
-              disabled
-              icon={faExclamation}
-              iconPosition="left"
-              value={`${
-                project.status.priority < 4
-                  ? 'Alta'
-                  : project.status.priority < 8
-                  ? 'Média'
-                  : 'Baixa'
-              } prioridade`}
-              className="bg-slate-200 dark:bg-slate-700"
-            />
+            <p>
+              <b>Nome: </b> {project.status.name}
+            </p>
+            <p>
+              <b>Descrição: </b> {project.status.description}
+            </p>
+            <p>
+              <b>Prioridade: </b>
+              {project.status.priority < 4
+                ? 'Alta'
+                : project.status.priority < 8
+                ? 'Média'
+                : 'Baixa'}
+            </p>
           </div>
         </div>
         {errors.statusUuid && (
