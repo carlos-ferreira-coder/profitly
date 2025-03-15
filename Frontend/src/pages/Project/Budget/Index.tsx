@@ -22,9 +22,6 @@ const Budget = () => {
           withCredentials: true,
         })
 
-        console.log(`Response: ${resBudget}`)
-        console.log(`Response stringfy: ${JSON.stringify(resBudget)}`)
-
         setBudget(resBudget)
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])
