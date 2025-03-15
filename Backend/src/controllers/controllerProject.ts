@@ -52,6 +52,7 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
                 entity: true,
               },
             },
+            auth: true,
           },
         },
         client: {
