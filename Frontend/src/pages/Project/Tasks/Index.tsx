@@ -5,11 +5,11 @@ import { useEffect, useState } from 'react'
 import { api as axios, handleAxiosError } from '../../../services/Axios'
 import Alert from '../../../components/Alert/Index'
 import Loader from '../../../components/Loader'
-import { TaskActivityProps, TaskExpenseProps } from '../../../types/Database'
+import { TaskProps } from '../../../types/Database'
 
 const Tasks = () => {
   const { uuid } = useParams()
-  const [tasks, setTasks] = useState<(TaskExpenseProps | TaskActivityProps)[] | null>(null)
+  const [tasks, setTasks] = useState<TaskProps[] | null>(null)
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
 
   // Get tasks
