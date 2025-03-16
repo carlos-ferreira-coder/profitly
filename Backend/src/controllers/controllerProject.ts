@@ -244,6 +244,25 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
 
       const projectTotal = projectCost + projectRevenue
 
+      console.log(`budgetCost: ${budgetCost}`)
+      console.log(`budgetRevenue: ${budgetRevenue}`)
+      console.log(`budgetTotal: ${budgetTotal}`)
+      console.log(`projectPrevCost: ${projectPrevCost}`)
+      console.log(`projectCost: ${projectCost}`)
+      console.log(`projectCostDiff: ${projectCostDiff}`)
+      console.log(
+        `projectRevenue: ${project.tasks
+          .filter(({ budgetUuid }) => !budgetUuid)
+          .reduce((sum, task) => {
+            if (task.taskExpense) return sum + task.revenue.toNumber()
+
+            const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+            return sum + hours * task.revenue.toNumber()
+          }, 0)}`,
+      )
+      console.log(`projectRevenueCostDiff: ${projectRevenue}`)
+      console.log(`projectTotal: ${projectTotal}`)
+
       return {
         ...project,
 
