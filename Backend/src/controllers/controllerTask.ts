@@ -91,6 +91,7 @@ export const tasksExpenseSelect = async (req: Request, res: Response): Promise<v
         task: {
           name: query.data.name ? { contains: query.data.name } : undefined,
           description: query.data.description ? { contains: query.data.description } : undefined,
+          finished: query.data.finished?.length === 1 ? query.data.finished[0] : undefined,
           beginDate: {
             gte: query.data.beginDateMin ? query.data.beginDateMin : undefined,
             lte: query.data.beginDateMax ? query.data.beginDateMax : undefined,
@@ -157,6 +158,7 @@ export const tasksActivitySelect = async (req: Request, res: Response): Promise<
         task: {
           name: query.data.name ? { contains: query.data.name } : undefined,
           description: query.data.description ? { contains: query.data.description } : undefined,
+          finished: query.data.finished?.length === 1 ? query.data.finished[0] : undefined,
           beginDate: {
             gte: query.data.beginDateMin ? query.data.beginDateMin : undefined,
             lte: query.data.beginDateMax ? query.data.beginDateMax : undefined,
@@ -240,6 +242,7 @@ export const tasksExpenseUpdate = async (req: Request, res: Response): Promise<v
         data: {
           name: task.name,
           description: task.description,
+          finished: task.finished,
           beginDate: task.beginDate,
           endDate: task.endDate,
           revenue: task.revenue,
@@ -270,6 +273,7 @@ export const tasksExpenseUpdate = async (req: Request, res: Response): Promise<v
         data: {
           name: task.name,
           description: task.description,
+          finished: task.finished,
           beginDate: task.beginDate,
           endDate: task.endDate,
           revenue: task.revenue,
@@ -356,6 +360,7 @@ export const tasksActivityUpdate = async (req: Request, res: Response): Promise<
         data: {
           name: task.name,
           description: task.description,
+          finished: task.finished,
           beginDate: task.beginDate,
           endDate: task.endDate,
           revenue: task.revenue,
@@ -386,6 +391,7 @@ export const tasksActivityUpdate = async (req: Request, res: Response): Promise<
         data: {
           name: task.name,
           description: task.description,
+          finished: task.finished,
           beginDate: task.beginDate,
           endDate: task.endDate,
           revenue: task.revenue,

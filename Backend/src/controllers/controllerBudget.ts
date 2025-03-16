@@ -183,6 +183,7 @@ export const budgetTasksExpenseUpdate = async (req: Request, res: Response): Pro
         data: {
           name: task.name,
           description: task.description,
+          finished: task.finished,
           beginDate: task.beginDate,
           endDate: task.endDate,
           revenue: task.revenue,
@@ -213,6 +214,7 @@ export const budgetTasksExpenseUpdate = async (req: Request, res: Response): Pro
         data: {
           name: task.name,
           description: task.description,
+          finished: task.finished,
           beginDate: task.beginDate,
           endDate: task.endDate,
           revenue: task.revenue,
@@ -319,6 +321,7 @@ export const budgetTasksActivityUpdate = async (req: Request, res: Response): Pr
         data: {
           name: task.name,
           description: task.description,
+          finished: task.finished,
           beginDate: task.beginDate,
           endDate: task.endDate,
           revenue: task.revenue,
@@ -349,6 +352,7 @@ export const budgetTasksActivityUpdate = async (req: Request, res: Response): Pr
         data: {
           name: task.name,
           description: task.description,
+          finished: task.finished,
           beginDate: task.beginDate,
           endDate: task.endDate,
           revenue: task.revenue,

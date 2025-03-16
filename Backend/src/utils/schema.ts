@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { zodBoolean, zodEmail, zodNumber, zodRegex, zodString, zodUuid } from '@utils/z'
 import { currencyToNumber } from './currency'
+import { finished } from 'stream'
 
 export const keySchema = z.object({
   key: zodRegex(
@@ -509,6 +510,9 @@ export const projectUpdateSchema = z.object({
 const taskSelectSchema = {
   name: zodString('nome', false).optional(),
   description: zodString('descrição', false).optional(),
+  finished: zodRegex('finalizado', /^(false|true)(,(false|true))?$/, false)
+    .transform((s) => s.split(',').map((i) => i === 'true'))
+    .optional(),
   beginDateMin: zodString('data inicial', false).optional(),
   beginDateMax: zodString('data inicial', false).optional(),
   endDateMin: zodString('data final', false).optional(),
@@ -552,6 +556,7 @@ const taskSelectSchema = {
 const taskUpdateSchema = {
   name: zodString('nome', true),
   description: zodString('descrição', true),
+  finished: zodBoolean('finalizado'),
   beginDate: zodRegex('data inicial', /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/, true).transform(
     (s) => new Date(s),
   ),

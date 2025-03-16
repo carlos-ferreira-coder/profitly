@@ -139,6 +139,7 @@ model Task {
   id           Int           @id @default(autoincrement())
   name         String
   description  String
+  finished     Boolean       @default(false)
   beginDate    DateTime      @map("begin_date")
   endDate      DateTime      @map("end_date")
   revenue      Decimal       @db.Decimal(15, 2)

@@ -51,7 +51,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
       const sts: (StatusProps | null)[] = []
 
       for (let i = 0; i < tasks.length; i++) {
-        rsm.push(false)
+        rsm.push(true)
         usr.push(resUser.find((u) => u.uuid === tasks[i].userUuid) || null)
         sts.push(resStatus.find((s) => s.uuid === tasks[i].statusUuid) || null)
       }
