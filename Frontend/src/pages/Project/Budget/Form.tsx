@@ -137,39 +137,23 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
       }) || []
 
     const revenue = tasks.reduce((sum, task) => {
-      if (!task.revenue || (task.taskActivity && !(task.beginDate || task.endDate))) return sum
+      if (task.taskExpense?.amount) return sum + currencyToNumber(task.revenue, 'BRL')
 
-      if (task.taskExpense) return sum + currencyToNumber(task.revenue, 'BRL')
+      if (task.taskActivity?.hourlyRate) {
+        const beginDate = parse(task.beginDate, 'dd/MM/yy HH:mm', new Date())
+        const endDate = parse(task.endDate, 'dd/MM/yy HH:mm', new Date())
+        const hours = differenceInHours(endDate, beginDate)
 
-      const beginDate = parse(task.beginDate, 'dd/MM/yy HH:mm', new Date())
-      const endDate = parse(task.endDate, 'dd/MM/yy HH:mm', new Date())
-      const hours = differenceInHours(endDate, beginDate)
+        return sum + hours * currencyToNumber(task.revenue, 'BRL')
+      }
 
-      return sum + hours * currencyToNumber(task.revenue, 'BRL')
+      return 0
     }, 0)
 
     const cost = tasks.reduce((sum, task) => {
-      if (
-        (task.taskExpense && !task.taskExpense.amount) ||
-        (task.taskActivity && !(task.taskActivity.hourlyRate || task.beginDate || task.endDate))
-      ) {
-        console.log(`task uuid: ${task.taskActivity?.uuid}${task.taskExpense?.uuid}`)
-        if (task.taskExpense)
-          console.log(`task expense: {
-            task.taskExpense.amount: ${task.taskExpense.amount},
-          }`)
-        if (task.taskActivity)
-          console.log(`task activity: {
-            task.beginDate: ${task.beginDate}, 
-            task.endDate: ${task.endDate},
-            task.taskActivity.hourlyRate: ${task.taskActivity.hourlyRate},
-        }`)
-        return sum
-      }
+      if (task.taskExpense?.amount) return sum + currencyToNumber(task.taskExpense.amount, 'BRL')
 
-      if (task.taskExpense) return sum + currencyToNumber(task.taskExpense.amount, 'BRL')
-
-      if (task.taskActivity) {
+      if (task.taskActivity?.hourlyRate) {
         const beginDate = parse(task.beginDate, 'dd/MM/yy HH:mm', new Date())
         const endDate = parse(task.endDate, 'dd/MM/yy HH:mm', new Date())
         const hours = differenceInHours(endDate, beginDate)
@@ -338,13 +322,13 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                     </p>
                     <p>
                       <b>Valor: </b>
-                      {field.taskExpense
+                      {field.taskExpense?.amount
                         ? numberToCurrency(
                             currencyToNumber(field.revenue, 'BRL') +
                               currencyToNumber(field.taskExpense.amount, 'BRL'),
                             'BRL'
                           )
-                        : field.taskActivity
+                        : field.taskActivity?.hourlyRate
                         ? numberToCurrency(
                             (currencyToNumber(field.revenue, 'BRL') +
                               currencyToNumber(field.taskActivity.hourlyRate, 'BRL')) *
@@ -371,34 +355,41 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                   </div>
 
                   <div className={resume[index] ? 'hidden' : 'block'}>
-                    <Input
-                      id={`tasks.${index}.taskExpense.uuid`}
-                      type="text"
-                      hidden
-                      disabled
-                      {...register(`tasks.${index}.taskExpense.uuid`)}
-                    />
-                    {errors.tasks?.[index]?.taskExpense?.uuid && (
-                      <Alert
-                        type="danger"
-                        size="sm"
-                        data={[errors.tasks?.[index].taskExpense.uuid.message || '']}
-                      />
+                    {field.taskExpense?.amount && (
+                      <>
+                        <Input
+                          id={`tasks.${index}.taskExpense.uuid`}
+                          type="text"
+                          hidden
+                          disabled
+                          {...register(`tasks.${index}.taskExpense.uuid`)}
+                        />
+                        {errors.tasks?.[index]?.taskExpense?.uuid && (
+                          <Alert
+                            type="danger"
+                            size="sm"
+                            data={[errors.tasks?.[index].taskExpense.uuid.message || '']}
+                          />
+                        )}
+                      </>
                     )}
-
-                    <Input
-                      id={`tasks.${index}.taskActivity.uuid`}
-                      type="text"
-                      hidden
-                      disabled
-                      {...register(`tasks.${index}.taskActivity.uuid`)}
-                    />
-                    {errors.tasks?.[index]?.taskActivity?.uuid && (
-                      <Alert
-                        type="danger"
-                        size="sm"
-                        data={[errors.tasks?.[index].taskActivity.uuid.message || '']}
-                      />
+                    {field.taskActivity?.hourlyRate && (
+                      <>
+                        <Input
+                          id={`tasks.${index}.taskActivity.uuid`}
+                          type="text"
+                          hidden
+                          disabled
+                          {...register(`tasks.${index}.taskActivity.uuid`)}
+                        />
+                        {errors.tasks?.[index]?.taskActivity?.uuid && (
+                          <Alert
+                            type="danger"
+                            size="sm"
+                            data={[errors.tasks?.[index].taskActivity.uuid.message || '']}
+                          />
+                        )}
+                      </>
                     )}
 
                     <Input
@@ -535,7 +526,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                       )}
                     </div>
 
-                    {field.taskExpense && (
+                    {field.taskExpense?.amount && (
                       <div className="mb-6">
                         <label
                           className="mb-2.5 block font-medium text-black dark:text-white"
@@ -574,7 +565,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                       </div>
                     )}
 
-                    {field.taskActivity && (
+                    {field.taskActivity?.hourlyRate && (
                       <div className="mb-6">
                         <label
                           className="mb-2.5 block font-medium text-black dark:text-white"
