@@ -154,12 +154,15 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
         (task.taskActivity && !(task.taskActivity.hourlyRate || task.beginDate || task.endDate))
       ) {
         console.log(`task uuid: ${task.taskActivity?.uuid}${task.taskExpense?.uuid}`)
-        if (task.taskExpense) console.log(`task expense`)
+        if (task.taskExpense)
+          console.log(`task expense: {
+            task.taskExpense.amount: ${task.taskExpense.amount},
+          }`)
         if (task.taskActivity)
           console.log(`task activity: {
-          {task.beginDate: ${task.beginDate}, 
-          {task.endDate: ${task.endDate},
-          {task.taskActivity.hourlyRate: ${task.taskActivity.hourlyRate},
+            task.beginDate: ${task.beginDate}, 
+            task.endDate: ${task.endDate},
+            task.taskActivity.hourlyRate: ${task.taskActivity.hourlyRate},
         }`)
         return sum
       }
@@ -310,8 +313,6 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
 
           {resume && user && status ? (
             fields.map((field, index) => {
-              console.log(JSON.stringify(field))
-
               return (
                 <div
                   key={field.id}
