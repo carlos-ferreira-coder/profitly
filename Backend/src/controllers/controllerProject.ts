@@ -344,7 +344,10 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
         ),
         projectCost: numberToCurrency(projectCost.finished + projectCost.notFinished, 'BRL'),
         projectRevenue: numberToCurrency(
-          projectPrevCost.finished + projectRevenue.finished - projectCost.finished,
+          projectPrevCost.finished +
+            projectRevenue.finished -
+            projectCost.finished +
+            projectRevenue.notFinished,
           'BRL',
         ),
       }
