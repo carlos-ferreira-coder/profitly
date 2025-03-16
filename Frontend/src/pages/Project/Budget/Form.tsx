@@ -152,8 +152,17 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
       if (
         (task.taskExpense && !task.taskExpense.amount) ||
         (task.taskActivity && !(task.taskActivity.hourlyRate || task.beginDate || task.endDate))
-      )
+      ) {
+        console.log(`task uuid: ${task.taskActivity?.uuid}${task.taskExpense?.uuid}`)
+        if (task.taskExpense) console.log(`task expense`)
+        if (task.taskActivity)
+          console.log(`task activity: {
+          {task.beginDate: ${task.beginDate}, 
+          {task.endDate: ${task.endDate},
+          {task.taskActivity.hourlyRate: ${task.taskActivity.hourlyRate},
+        }`)
         return sum
+      }
 
       if (task.taskExpense) return sum + currencyToNumber(task.taskExpense.amount, 'BRL')
 
