@@ -314,26 +314,20 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
 
                   <div className={resume[index] ? 'block' : 'hidden'}>
                     <p>
-                      <b>Descrição: </b>
-                      {watch(`tasks.${index}.description`)}
+                      <b>Descrição: </b> {field.description}
                     </p>
                     <p>
                       <b>Valor: </b>
-                      {watch(`tasks.${index}.taskExpense`) &&
-                        numberToCurrency(
-                          currencyToNumber(watch(`tasks.${index}.taskExpense.amount`), 'BRL') +
-                            currencyToNumber(watch(`tasks.${index}.revenue`), 'BRL'),
-                          'BRL'
-                        )}
-
-                      {watch(`tasks.${index}.taskActivity`) &&
-                        numberToCurrency(
-                          currencyToNumber(watch(`tasks.${index}.taskActivity.hourlyRate`), 'BRL') *
-                            differenceInHours(
-                              parse(watch(`tasks.${index}.endDate`), 'dd/MM/yy HH:mm', new Date()),
-                              parse(watch(`tasks.${index}.beginDate`), 'dd/MM/yy HH:mm', new Date())
-                            ) +
-                            currencyToNumber(watch(`tasks.${index}.revenue`), 'BRL') *
+                      {field.taskExpense
+                        ? numberToCurrency(
+                            currencyToNumber(field.revenue, 'BRL') +
+                              currencyToNumber(field.taskExpense.amount, 'BRL'),
+                            'BRL'
+                          )
+                        : field.taskActivity
+                        ? numberToCurrency(
+                            (currencyToNumber(field.revenue, 'BRL') +
+                              currencyToNumber(field.taskActivity.hourlyRate, 'BRL')) *
                               differenceInHours(
                                 parse(
                                   watch(`tasks.${index}.endDate`),
@@ -346,8 +340,9 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                                   new Date()
                                 )
                               ),
-                          'BRL'
-                        )}
+                            'BRL'
+                          )
+                        : null}
                     </p>
                     <p>
                       <b>Status: </b>
@@ -520,7 +515,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                       )}
                     </div>
 
-                    {watch(`tasks.${index}.taskExpense`) && (
+                    {field.taskExpense && (
                       <div className="mb-6">
                         <label
                           className="mb-2.5 block font-medium text-black dark:text-white"
@@ -559,7 +554,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                       </div>
                     )}
 
-                    {watch(`tasks.${index}.taskActivity`) && (
+                    {field.taskActivity && (
                       <div className="mb-6">
                         <label
                           className="mb-2.5 block font-medium text-black dark:text-white"
