@@ -136,6 +136,8 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
         control,
       }) || []
 
+    console.log(JSON.stringify(tasks))
+
     const revenue = tasks.reduce((acc, task) => {
       if (task.taskExpense) return acc + currencyToNumber(task.revenue, 'BRL')
 
@@ -293,6 +295,8 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
 
           {resume && user && status ? (
             fields.map((field, index) => {
+              console.log(JSON.stringify(field))
+
               return (
                 <div
                   key={field.id}
