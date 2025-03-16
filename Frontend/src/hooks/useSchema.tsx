@@ -436,6 +436,7 @@ const taskSchema = z
   .object({
     name: zodString('nome', true),
     description: zodString('descrição', true),
+    finished: zodBoolean('finalizado'),
     beginDate: zodRegex(
       'data inicial',
       /^(0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/(\d{2}) ([01]\d|2[0-3]):[0-5]\d$/,

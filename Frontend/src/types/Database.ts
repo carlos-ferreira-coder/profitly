@@ -94,6 +94,7 @@ export type BudgetProps = {
 export type TaskProps = {
   name: string
   description: string
+  finished: boolean
   beginDate: string
   endDate: string
   revenue: string

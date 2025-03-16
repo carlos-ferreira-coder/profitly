@@ -147,23 +147,23 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
           : project.register
 
       // calculate budget
-      const budgetCost: number = project.budget.tasks.reduce((sum, task) => {
-        if (task.taskExpense?.amount) return sum + task.taskExpense.amount.toNumber()
-
-        if (task.taskActivity?.hourlyRate) {
-          const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
-          return sum + hours * task.taskActivity.hourlyRate.toNumber()
-        }
-
-        return 0
-      }, 0)
-
       const budgetRevenue: number = project.budget.tasks.reduce((sum, task) => {
         if (task.taskExpense?.amount) return sum + task.revenue.toNumber()
 
         if (task.taskActivity?.hourlyRate) {
           const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
           return sum + hours * task.revenue.toNumber()
+        }
+
+        return 0
+      }, 0)
+
+      const budgetCost: number = project.budget.tasks.reduce((sum, task) => {
+        if (task.taskExpense?.amount) return sum + task.taskExpense.amount.toNumber()
+
+        if (task.taskActivity?.hourlyRate) {
+          const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+          return sum + hours * task.taskActivity.hourlyRate.toNumber()
         }
 
         return 0
@@ -203,69 +203,119 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
       const transactionRevenue = transactionIncome - transactionExpense
 
       // calculate project
-      const projectRevenueCostDiff: number =
-        project.tasks
-          .filter(({ budgetUuid, finished }) => !budgetUuid && finished)
-          .reduce((sum, task) => {
-            if (task.taskExpense?.amount) return sum + task.taskExpense.amount.toNumber()
+      const projectRevenue: { finished: number; notFinished: number } = project.tasks
+        .filter(({ budgetUuid }) => !budgetUuid)
+        .reduce(
+          (sum, task) => {
+            if (task.taskExpense?.amount) {
+              if (task.finished)
+                return {
+                  finished: sum.finished + task.revenue.toNumber(),
+                  notFinished: sum.notFinished,
+                }
+
+              return {
+                finished: sum.finished,
+                notFinished: sum.notFinished + task.revenue.toNumber(),
+              }
+            }
 
             if (task.taskActivity?.hourlyRate) {
               const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
-              return sum + hours * task.taskActivity.hourlyRate.toNumber()
-            }
 
-            return 0
-          }, 0) -
-        project.tasks
-          .filter(({ budgetUuid, finished }) => !budgetUuid && finished)
-          .reduce(
-            (sum, task) =>
-              sum +
-              task.dones.reduce((sum, done) => {
-                if (done.doneExpense?.amount) return sum + done.doneExpense.amount.toNumber()
-
-                if (done.doneActivity?.hourlyRate) {
-                  const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
-                  return sum + hours * done.doneActivity.hourlyRate.toNumber()
+              if (task.finished)
+                return {
+                  finished: sum.finished + hours * task.revenue.toNumber(),
+                  notFinished: sum.notFinished,
                 }
 
-                return 0
-              }, 0),
-            0,
-          )
-
-      const projectCost: number = project.tasks
-        .filter(({ budgetUuid }) => !budgetUuid)
-        .reduce(
-          (sum, task) =>
-            sum +
-            task.dones.reduce((sum, done) => {
-              if (done.doneExpense?.amount) return sum + done.doneExpense.amount.toNumber()
-
-              if (done.doneActivity?.hourlyRate) {
-                const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
-                return sum + hours * done.doneActivity.hourlyRate.toNumber()
+              return {
+                finished: sum.finished,
+                notFinished: sum.notFinished + hours * task.revenue.toNumber(),
               }
+            }
 
-              return 0
-            }, 0),
-          0,
+            return {
+              finished: sum.finished,
+              notFinished: sum.notFinished,
+            }
+          },
+          { finished: 0, notFinished: 0 },
         )
 
-      const projectRevenue: number = project.tasks
+      const projectCost = project.tasks
         .filter(({ budgetUuid }) => !budgetUuid)
-        .reduce((sum, task) => {
-          if (task.taskExpense?.amount) return sum + task.revenue.toNumber()
+        .reduce(
+          (acc, task) => {
+            const taskCost = task.dones.reduce(
+              (sum, done) => {
+                let cost = 0
 
-          if (task.taskActivity?.hourlyRate) {
-            const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
-            return sum + hours * task.revenue.toNumber()
-          }
+                if (done.doneExpense?.amount) {
+                  cost = done.doneExpense.amount.toNumber()
+                } else if (done.doneActivity?.hourlyRate) {
+                  const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+                  cost = hours * done.doneActivity.hourlyRate.toNumber()
+                }
 
-          return 0
-        }, 0)
+                if (task.finished) {
+                  sum.finished += cost
+                } else {
+                  sum.notFinished += cost
+                }
 
-      const projectTotal = projectCost + projectRevenue
+                return sum
+              },
+              { finished: 0, notFinished: 0 },
+            )
+
+            return {
+              finished: acc.finished + taskCost.finished,
+              notFinished: acc.notFinished + taskCost.notFinished,
+            }
+          },
+          { finished: 0, notFinished: 0 },
+        )
+
+      const projectPrevCost: { finished: number; notFinished: number } = project.tasks
+        .filter(({ budgetUuid }) => !budgetUuid)
+        .reduce(
+          (sum, task) => {
+            if (task.taskExpense?.amount) {
+              if (task.finished)
+                return {
+                  finished: sum.finished + task.taskExpense.amount.toNumber(),
+                  notFinished: sum.notFinished,
+                }
+
+              return {
+                finished: sum.finished,
+                notFinished: sum.notFinished + task.taskExpense.amount.toNumber(),
+              }
+            }
+
+            if (task.taskActivity?.hourlyRate) {
+              const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+
+              if (task.finished)
+                return {
+                  finished: sum.finished + hours * task.taskActivity.hourlyRate.toNumber(),
+                  notFinished: sum.notFinished,
+                }
+
+              return {
+                finished: sum.finished,
+                notFinished: sum.notFinished + hours * task.taskActivity.hourlyRate.toNumber(),
+              }
+            }
+
+            return {
+              finished: sum.finished,
+              notFinished: sum.notFinished,
+            }
+          },
+          { finished: 0, notFinished: 0 },
+        )
 
       return {
         ...project,
@@ -283,9 +333,20 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
         transactionExpense: numberToCurrency(transactionExpense, 'BRL'),
         transactionRevenue: numberToCurrency(transactionRevenue, 'BRL'),
 
-        projectTotal: numberToCurrency(projectTotal, 'BRL'),
-        projectCost: numberToCurrency(projectCost, 'BRL'),
-        projectRevenue: numberToCurrency(projectRevenue + projectRevenueCostDiff, 'BRL'),
+        projectTotal: numberToCurrency(
+          projectPrevCost.finished +
+            projectRevenue.finished -
+            projectCost.finished +
+            projectPrevCost.notFinished +
+            projectRevenue.notFinished -
+            projectCost.notFinished,
+          'BRL',
+        ),
+        projectCost: numberToCurrency(projectCost.finished + projectCost.notFinished, 'BRL'),
+        projectRevenue: numberToCurrency(
+          projectPrevCost.finished + projectRevenue.finished - projectCost.finished,
+          'BRL',
+        ),
       }
     })
 

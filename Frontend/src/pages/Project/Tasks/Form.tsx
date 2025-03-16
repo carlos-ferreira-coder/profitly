@@ -24,6 +24,7 @@ import { StatusProps, TaskProps, UserProps } from '../../../types/Database'
 import { tasksSchema } from '../../../hooks/useSchema'
 import StatusSearch from '../../../hooks/search/useSearchStatus'
 import UserSearch from '../../../hooks/search/useSearchUser'
+import Switcher from '../../../components/Form/Switcher'
 
 const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string }) => {
   const navigate = useNavigate()
@@ -180,6 +181,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
     const task = {
       name: '',
       description: '',
+      finished: false,
       beginDate: '',
       endDate: '',
       revenue: '',
@@ -378,30 +380,51 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                       />
                     )}
 
-                    <div className="mb-6">
-                      <label
-                        className="mb-2.5 block font-medium text-black dark:text-white"
-                        htmlFor="name"
-                      >
-                        Nome: <span className="text-danger">*</span>
-                      </label>
-                      <div className="relative">
-                        <Input
-                          id={`tasks.${index}.name`}
-                          type="text"
-                          icon={faThumbTack}
-                          iconPosition="left"
-                          {...register(`tasks.${index}.name`)}
-                          placeholder="Digite o nome"
-                        />
+                    <div className="flex justify-between gap-5 mb-6">
+                      <div className="w-full">
+                        <label
+                          className="mb-2.5 block font-medium text-black dark:text-white"
+                          htmlFor="name"
+                        >
+                          Nome: <span className="text-danger">*</span>
+                        </label>
+                        <div className="relative">
+                          <Input
+                            id="`tasks.${index}.name`"
+                            type="text"
+                            icon={faThumbTack}
+                            iconPosition="left"
+                            {...register(`tasks.${index}.name`)}
+                            placeholder="Digite o nome"
+                          />
+                        </div>
+                        {errors.tasks?.[index]?.name && (
+                          <Alert
+                            type="danger"
+                            size="sm"
+                            data={[errors.tasks?.[index].name.message || '']}
+                          />
+                        )}
                       </div>
-                      {errors.tasks?.[index]?.name && (
-                        <Alert
-                          type="danger"
-                          size="sm"
-                          data={[errors.tasks?.[index].name.message || '']}
-                        />
-                      )}
+
+                      <div className="relative">
+                        <div className="flex justify-center">
+                          <label
+                            className="mb-2.5 block font-medium text-black dark:text-white text-center"
+                            htmlFor={`tasks.${index}.name`}
+                          >
+                            Ativo
+                          </label>
+                        </div>
+
+                        <div className="flex items-center h-13">
+                          <Controller
+                            name={`tasks.${index}.finished`}
+                            control={control}
+                            render={({ field }) => <Switcher {...field} />}
+                          />
+                        </div>
+                      </div>
                     </div>
 
                     <div className="mb-6">
