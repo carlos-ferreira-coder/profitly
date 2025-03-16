@@ -136,27 +136,33 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
         control,
       }) || []
 
-    console.log(JSON.stringify(tasks))
+    const revenue = tasks.reduce((sum, task) => {
+      if (!task.revenue || (task.taskActivity && !(task.beginDate || task.endDate))) return sum
 
-    const revenue = tasks.reduce((acc, task) => {
-      if (task.taskExpense) return acc + currencyToNumber(task.revenue, 'BRL')
+      if (task.taskExpense) return sum + currencyToNumber(task.revenue, 'BRL')
 
       const beginDate = parse(task.beginDate, 'dd/MM/yy HH:mm', new Date())
       const endDate = parse(task.endDate, 'dd/MM/yy HH:mm', new Date())
       const hours = differenceInHours(endDate, beginDate)
 
-      return acc + hours * currencyToNumber(task.revenue, 'BRL')
+      return sum + hours * currencyToNumber(task.revenue, 'BRL')
     }, 0)
 
-    const cost = tasks.reduce((acc, task) => {
-      if (task.taskExpense) return acc + currencyToNumber(task.taskExpense.amount, 'BRL')
+    const cost = tasks.reduce((sum, task) => {
+      if (
+        (task.taskExpense && !task.taskExpense.amount) ||
+        (task.taskActivity && !(task.taskActivity.hourlyRate || task.beginDate || task.endDate))
+      )
+        return sum
+
+      if (task.taskExpense) return sum + currencyToNumber(task.taskExpense.amount, 'BRL')
 
       if (task.taskActivity) {
         const beginDate = parse(task.beginDate, 'dd/MM/yy HH:mm', new Date())
         const endDate = parse(task.endDate, 'dd/MM/yy HH:mm', new Date())
         const hours = differenceInHours(endDate, beginDate)
 
-        return acc + hours * currencyToNumber(task.taskActivity.hourlyRate, 'BRL')
+        return sum + hours * currencyToNumber(task.taskActivity.hourlyRate, 'BRL')
       }
 
       return 0
