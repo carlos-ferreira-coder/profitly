@@ -204,7 +204,7 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
 
       // calculate project
       const projectRevenue: { finished: number; notFinished: number } = project.tasks
-        .filter(({ budgetUuid }) => !budgetUuid)
+        .filter(({ budgetUuid, originalTaskId }) => !budgetUuid && originalTaskId)
         .reduce(
           (sum, task) => {
             if (task.taskExpense?.amount) {

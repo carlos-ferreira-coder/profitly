@@ -136,24 +136,27 @@ model Budget {
 }
 
 model Task {
-  id           Int           @id @default(autoincrement())
-  name         String
-  description  String
-  finished     Boolean       @default(false)
-  beginDate    DateTime      @map("begin_date")
-  endDate      DateTime      @map("end_date")
-  revenue      Decimal       @db.Decimal(15, 2)
-  statusUuid   String        @map("status_uuid") @db.Uuid
-  projectUuid  String        @map("project_uuid") @db.Uuid
-  userUuid     String?       @map("user_uuid") @db.Uuid
-  budgetUuid   String?       @map("budget_uuid") @db.Uuid
-  status       Status        @relation(fields: [statusUuid], references: [uuid], onDelete: Restrict)
-  project      Project       @relation(fields: [projectUuid], references: [uuid], onDelete: Restrict)
-  user         User?         @relation(fields: [userUuid], references: [uuid], onDelete: SetNull)
-  budget       Budget?       @relation(fields: [budgetUuid], references: [uuid], onDelete: Cascade)
-  dones        Done[]
-  taskExpense  TaskExpense?
-  taskActivity TaskActivity?
+  id              Int           @id @default(autoincrement())
+  name            String
+  description     String
+  finished        Boolean       @default(false)
+  beginDate       DateTime      @map("begin_date")
+  endDate         DateTime      @map("end_date")
+  revenue         Decimal       @db.Decimal(15, 2)
+  statusUuid      String        @map("status_uuid") @db.Uuid
+  projectUuid     String        @map("project_uuid") @db.Uuid
+  userUuid        String?       @map("user_uuid") @db.Uuid
+  budgetUuid      String?       @map("budget_uuid") @db.Uuid
+  originalTaskId  Int?          @map("original_task_id")
+  status          Status        @relation(fields: [statusUuid], references: [uuid], onDelete: Restrict)
+  project         Project       @relation(fields: [projectUuid], references: [uuid], onDelete: Restrict)
+  user            User?         @relation(fields: [userUuid], references: [uuid], onDelete: SetNull)
+  budget          Budget?       @relation(fields: [budgetUuid], references: [uuid], onDelete: Cascade)
+  originalTask    Task?         @relation("TaskDuplication", fields: [originalTaskId], references: [id])
+  duplicatedTasks Task[]        @relation("TaskDuplication")
+  dones           Done[]
+  taskExpense     TaskExpense?
+  taskActivity    TaskActivity?
 
   @@unique([id])
 }
