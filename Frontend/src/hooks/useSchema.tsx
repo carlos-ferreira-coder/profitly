@@ -355,8 +355,22 @@ export const incomeCreateSchema = z.object({
 
 export const refundCreateSchema = z
   .object({
-    clientUuid: zodUuid('cliente').optional(),
-    supplierUuid: zodUuid('fornecedor').optional(),
+    clientUuid: zodRegex(
+      'uuid de cliente',
+      /^$|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+      false
+    )
+      .transform((s) => (s === '' ? undefined : s))
+      .nullable()
+      .optional(),
+    supplierUuid: zodRegex(
+      'uuid de fornecedor',
+      /^$|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+      false
+    )
+      .transform((s) => (s === '' ? undefined : s))
+      .nullable()
+      .optional(),
     ...transactionCreateSchema,
   })
   .superRefine(({ clientUuid, supplierUuid }, ctx) => {
