@@ -237,8 +237,8 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
     setAlertSuccesses(null)
 
     try {
-      const tasksExpense = data.tasks.filter((task) => 'amount' in task)
-      const tasksActivity = data.tasks.filter((task) => 'hourlyRate' in task)
+      const tasksExpense = data.tasks.filter(({ taskExpense }) => taskExpense)
+      const tasksActivity = data.tasks.filter(({ taskActivity }) => taskActivity)
 
       const budgetTaskExpense = {
         ...data,
