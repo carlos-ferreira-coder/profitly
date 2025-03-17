@@ -140,17 +140,26 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
     const budget = tasks.reduce(
       (acc, task) => {
         if (task.taskExpense) {
-          acc.revenue += currencyToNumber(task.revenue, 'BRL')
-          acc.cost += currencyToNumber(task.taskExpense.amount, 'BRL')
+          if (task.revenue !== '' && task.taskExpense.amount !== '') {
+            acc.revenue += currencyToNumber(task.revenue, 'BRL')
+            acc.cost += currencyToNumber(task.taskExpense.amount, 'BRL')
+          }
         }
 
         if (task.taskActivity) {
-          const beginDate = parse(task.beginDate, 'dd/MM/yy HH:mm', new Date())
-          const endDate = parse(task.endDate, 'dd/MM/yy HH:mm', new Date())
-          const hours = differenceInHours(endDate, beginDate)
+          if (
+            task.beginDate !== '' &&
+            task.endDate !== '' &&
+            task.revenue !== '' &&
+            task.taskActivity.hourlyRate !== ''
+          ) {
+            const beginDate = parse(task.beginDate, 'dd/MM/yy HH:mm', new Date())
+            const endDate = parse(task.endDate, 'dd/MM/yy HH:mm', new Date())
+            const hours = differenceInHours(endDate, beginDate)
 
-          acc.revenue += hours * currencyToNumber(task.revenue, 'BRL')
-          acc.cost += hours * currencyToNumber(task.taskActivity.hourlyRate, 'BRL')
+            acc.revenue += hours * currencyToNumber(task.revenue, 'BRL')
+            acc.cost += hours * currencyToNumber(task.taskActivity.hourlyRate, 'BRL')
+          }
         }
 
         return acc
