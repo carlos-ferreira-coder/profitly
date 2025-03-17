@@ -148,25 +148,18 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
 
       const budget: { cost: number; revenue: number } = project.budget.tasks.reduce(
         (sum, task) => {
-          if (task.taskExpense)
-            return {
-              cost: sum.cost + task.taskExpense.amount.toNumber(),
-              revenue: sum.revenue + task.revenue.toNumber(),
-            }
+          if (task.taskExpense) {
+            sum.cost += task.taskExpense.amount.toNumber()
+            sum.revenue += +task.revenue.toNumber()
+          }
 
           if (task.taskActivity) {
             const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
-
-            return {
-              cost: sum.cost + hours * task.taskActivity.hourlyRate.toNumber(),
-              revenue: sum.revenue + hours * task.revenue.toNumber(),
-            }
+            sum.cost += hours * task.taskActivity.hourlyRate.toNumber()
+            sum.revenue += hours * task.revenue.toNumber()
           }
 
-          return {
-            cost: sum.cost,
-            revenue: sum.revenue,
-          }
+          return sum
         },
         { cost: 0, revenue: 0 },
       )
@@ -178,17 +171,15 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
         loan: { income: number; expense: number }
       } = project.transactions.reduce(
         (sum, { amount, expense, income, refund, loan }) => {
-          return {
-            expense: expense ? sum.expense + amount.toNumber() : sum.expense,
-            income: income ? sum.income + amount.toNumber() : sum.income,
-            refund: refund ? sum.refund + amount.toNumber() : sum.refund,
-            loan: {
-              income: loan ? sum.loan.income + amount.toNumber() : sum.loan.income,
-              expense: loan
-                ? sum.loan.expense + loan.months * loan.installment.toNumber()
-                : sum.loan.expense,
-            },
+          if (expense) sum.expense += amount.toNumber()
+          if (income) sum.income += amount.toNumber()
+          if (refund) sum.refund += amount.toNumber()
+          if (loan) {
+            sum.loan.income += amount.toNumber()
+            sum.loan.expense += loan.months * loan.installment.toNumber()
           }
+
+          return sum
         },
         { expense: 0, income: 0, refund: 0, loan: { income: 0, expense: 0 } },
       )
