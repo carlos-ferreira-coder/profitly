@@ -158,36 +158,6 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
       { cost: 0, revenue: 0 }
     )
 
-    /*
-    const revenue = tasks.reduce((sum, task) => {
-      if (task.taskExpense?.amount) return sum + currencyToNumber(task.revenue, 'BRL')
-
-      if (task.taskActivity?.hourlyRate) {
-        const beginDate = parse(task.beginDate, 'dd/MM/yy HH:mm', new Date())
-        const endDate = parse(task.endDate, 'dd/MM/yy HH:mm', new Date())
-        const hours = differenceInHours(endDate, beginDate)
-
-        return sum + hours * currencyToNumber(task.revenue, 'BRL')
-      }
-
-      return 0
-    }, 0)
-
-    const cost = tasks.reduce((sum, task) => {
-      if (task.taskExpense?.amount) return sum + currencyToNumber(task.taskExpense.amount, 'BRL')
-
-      if (task.taskActivity?.hourlyRate) {
-        const beginDate = parse(task.beginDate, 'dd/MM/yy HH:mm', new Date())
-        const endDate = parse(task.endDate, 'dd/MM/yy HH:mm', new Date())
-        const hours = differenceInHours(endDate, beginDate)
-
-        return sum + hours * currencyToNumber(task.taskActivity.hourlyRate, 'BRL')
-      }
-
-      return 0
-    }, 0)
-    */
-
     return (
       <>
         <p>
@@ -465,7 +435,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                             className="mb-2.5 block font-medium text-black dark:text-white text-center"
                             htmlFor={`tasks.${index}.name`}
                           >
-                            Ativo
+                            Finalizado
                           </label>
                         </div>
 
@@ -571,7 +541,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                       )}
                     </div>
 
-                    {field.taskExpense?.amount && (
+                    {field.taskExpense && (
                       <div className="mb-6">
                         <label
                           className="mb-2.5 block font-medium text-black dark:text-white"
@@ -610,7 +580,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                       </div>
                     )}
 
-                    {field.taskActivity?.hourlyRate && (
+                    {field.taskActivity && (
                       <div className="mb-6">
                         <label
                           className="mb-2.5 block font-medium text-black dark:text-white"

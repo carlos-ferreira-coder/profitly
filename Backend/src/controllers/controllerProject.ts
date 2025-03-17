@@ -205,13 +205,14 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
                 acc.expected.prev += task.taskExpense.amount.toNumber()
                 acc.expected.revn += task.revenue.toNumber()
                 acc.expected.cost += task.dones.reduce((sum, done) => {
-                  if (done.doneExpense) return sum + done.doneExpense.amount.toNumber()
+                  if (done.doneExpense) sum += done.doneExpense.amount.toNumber()
                   return sum
                 }, 0)
               }
 
               if (task.taskActivity) {
                 const taskHours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+
                 acc.expected.prev += taskHours * task.taskActivity.hourlyRate.toNumber()
                 acc.expected.revn += taskHours * task.revenue.toNumber()
                 acc.expected.cost += task.dones.reduce((sum, done) => {
@@ -220,37 +221,40 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
                       (done.doneActivity.endDate.getTime() -
                         done.doneActivity.beginDate.getTime()) /
                       3600000
-                    return sum + doneHours * done.doneActivity.hourlyRate.toNumber()
+
+                    sum += doneHours * done.doneActivity.hourlyRate.toNumber()
                   }
                   return sum
                 }, 0)
               }
-
-              return acc
             }
 
-            if (task.taskExpense) {
-              acc.unexpected.prev += task.taskExpense.amount.toNumber()
-              acc.unexpected.revn += task.revenue.toNumber()
-              acc.unexpected.cost += task.dones.reduce((sum, done) => {
-                if (done.doneExpense) return sum + done.doneExpense.amount.toNumber()
-                return sum
-              }, 0)
-            }
+            if (!task.originalTaskId) {
+              if (task.taskExpense) {
+                acc.unexpected.prev += task.taskExpense.amount.toNumber()
+                acc.unexpected.revn += task.revenue.toNumber()
+                acc.unexpected.cost += task.dones.reduce((sum, done) => {
+                  if (done.doneExpense) sum += done.doneExpense.amount.toNumber()
+                  return sum
+                }, 0)
+              }
 
-            if (task.taskActivity) {
-              const taskHours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
-              acc.unexpected.prev += taskHours * task.taskActivity.hourlyRate.toNumber()
-              acc.unexpected.revn += taskHours * task.revenue.toNumber()
-              acc.unexpected.cost += task.dones.reduce((sum, done) => {
-                if (done.doneActivity) {
-                  const doneHours =
-                    (done.doneActivity.endDate.getTime() - done.doneActivity.beginDate.getTime()) /
-                    3600000
-                  return sum + doneHours * done.doneActivity.hourlyRate.toNumber()
-                }
-                return sum
-              }, 0)
+              if (task.taskActivity) {
+                const taskHours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+                acc.unexpected.prev += taskHours * task.taskActivity.hourlyRate.toNumber()
+                acc.unexpected.revn += taskHours * task.revenue.toNumber()
+                acc.unexpected.cost += task.dones.reduce((sum, done) => {
+                  if (done.doneActivity) {
+                    const doneHours =
+                      (done.doneActivity.endDate.getTime() -
+                        done.doneActivity.beginDate.getTime()) /
+                      3600000
+
+                    sum += doneHours * done.doneActivity.hourlyRate.toNumber()
+                  }
+                  return sum
+                }, 0)
+              }
             }
 
             return acc

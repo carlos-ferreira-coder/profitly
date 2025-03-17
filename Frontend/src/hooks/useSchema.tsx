@@ -495,8 +495,8 @@ const taskSchema = z
       .transform((s) => (s === '' ? undefined : s))
       .nullable()
       .optional(),
-    taskExpense: taskExpenseSchema.optional(),
-    taskActivity: taskActivitySchema.optional(),
+    taskExpense: taskExpenseSchema.nullable().optional(),
+    taskActivity: taskActivitySchema.nullable().optional(),
   })
   .superRefine(({ beginDate, endDate }, ctx) => {
     if (beginDate > endDate) {
