@@ -563,9 +563,6 @@ const taskUpdateSchema = z.object({
 
 export const budgetTasksUpdateSchema = z.object({
   uuid: zodUuid('orçamento'),
-  register: zodRegex('registro', /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/, true)
-    .transform((s) => new Date(s))
-    .optional(),
   tasks: z.array(taskUpdateSchema),
 })
 
