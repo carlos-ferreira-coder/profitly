@@ -165,17 +165,21 @@ export const refundCreate = async (req: Request, res: Response): Promise<void> =
     }
 
     // check if client has registered
-    const client = await prisma.client.findUnique({ where: { uuid: body.data.clientUuid } })
-    if (!client) {
-      res.status(401).json({ message: 'Cliente não econtrado!' })
-      return
+    if (body.data.clientUuid) {
+      const client = await prisma.client.findUnique({ where: { uuid: body.data.clientUuid } })
+      if (!client) {
+        res.status(401).json({ message: 'Cliente não econtrado!' })
+        return
+      }
     }
 
     // check if supplier has registered
-    const supplier = await prisma.supplier.findUnique({ where: { uuid: body.data.supplierUuid } })
-    if (!supplier) {
-      res.status(401).json({ message: 'Fornecedor não econtrado!' })
-      return
+    if (body.data.supplierUuid) {
+      const supplier = await prisma.supplier.findUnique({ where: { uuid: body.data.supplierUuid } })
+      if (!supplier) {
+        res.status(401).json({ message: 'Fornecedor não econtrado!' })
+        return
+      }
     }
 
     // create resource
