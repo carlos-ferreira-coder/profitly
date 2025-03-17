@@ -21,12 +21,12 @@ const responseLoans = (loans: LoanProps[]) => {
   return loans.map((loan) => {
     return {
       ...loan,
+      installment: numberToCurrency(loan.installment.toNumber(), 'BRL'),
       transaction: {
         ...loan.transaction,
         register: formatDate(loan.transaction.register),
         date: formatDate(loan.transaction.date),
         amount: numberToCurrency(loan.transaction.amount.toNumber(), 'BRL'),
-        percent: `% ${loan.percent.toNumber().toString().replace(/[.]/g, ',')}`,
       },
     }
   })
@@ -88,9 +88,13 @@ export const loanSelect = async (req: Request, res: Response): Promise<void> => 
       },
       where: {
         uuid: params.data.key === 'all' ? undefined : params.data.key,
-        percent: {
-          gte: query.data.percentMin ? query.data.percentMin : undefined,
-          lte: query.data.percentMax ? query.data.percentMax : undefined,
+        installment: {
+          gte: query.data.installmentMin ? query.data.installmentMin : undefined,
+          lte: query.data.installmentMax ? query.data.installmentMax : undefined,
+        },
+        months: {
+          gte: query.data.monthsMin ? query.data.monthsMin : undefined,
+          lte: query.data.monthsMax ? query.data.monthsMax : undefined,
         },
         supplierUuid: query.data.supplierUuid?.length ? { in: query.data.supplierUuid } : undefined,
         transaction: {
@@ -176,7 +180,8 @@ export const loanCreate = async (req: Request, res: Response): Promise<void> => 
     await prisma.loan.create({
       data: {
         id: transaction.id,
-        percent: body.data.percent,
+        installment: body.data.installment,
+        months: body.data.months,
         supplierUuid: body.data.supplierUuid,
       },
     })

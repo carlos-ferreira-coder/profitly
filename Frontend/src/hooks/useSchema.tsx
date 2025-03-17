@@ -384,7 +384,8 @@ export const refundCreateSchema = z
   })
 
 export const loanCreateSchema = z.object({
-  percent: zodRegex('valor', /^%\s\d{1,3}(,\d{1,2})?$/, true),
+  installment: zodRegex('parcela', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
+  months: zodRegex('nº de meses', /^\d+$/, true),
   supplierUuid: zodUuid('fornecedor'),
   ...transactionCreateSchema,
 })

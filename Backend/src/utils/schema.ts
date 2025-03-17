@@ -440,20 +440,27 @@ export const loanSelectSchema = z.object({
   )
     .transform((s) => s.split(','))
     .optional(),
-  percentMin: zodString('percentual', false)
-    .transform((s) => parseFloat(s.replace(/[%\s]/g, '').replace(',', '.')))
+  installmentMin: zodString('parcela', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
     .optional(),
-  percentMax: zodString('percentual', false)
-    .transform((s) => parseFloat(s.replace(/[%\s]/g, '').replace(',', '.')))
+  installmentMax: zodString('parcela', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
+    .optional(),
+  monthsMin: zodString('meses', false)
+    .transform((s) => parseInt(s))
+    .optional(),
+  monthsMax: zodString('meses', false)
+    .transform((s) => parseInt(s))
     .optional(),
   ...transactionSelectSchema,
 })
 
 export const loanCreateSchema = z.object({
   supplierUuid: zodUuid('cargo/função'),
-  percent: zodRegex('quantia', /^%\s\d{1,3}(,\d{1,2})?$/, true).transform((s) =>
-    parseFloat(s.replace(/[%\s]/g, '').replace(',', '.')),
+  installment: zodRegex('parcela', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true).transform((s) =>
+    currencyToNumber(s, 'BRL'),
   ),
+  months: zodRegex('meses', /^\d+$/, true).transform((s) => parseInt(s)),
   ...transactionCreateSchema,
 })
 

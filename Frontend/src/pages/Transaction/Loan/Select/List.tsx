@@ -42,7 +42,10 @@ const LoanMoneyInfo = ({ loan }: { loan: LoanProps }) => (
       <b>Quantia: </b> {loan.transaction.amount}
     </p>
     <p>
-      <b>Percentual: </b> {loan.percent}
+      <b>Parcela: </b> {loan.installment}
+    </p>
+    <p>
+      <b>Nº de meses: </b> {loan.months}
     </p>
     <p>
       <b>Fornecedor: </b>

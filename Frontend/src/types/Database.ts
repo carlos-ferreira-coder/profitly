@@ -196,7 +196,8 @@ export type RefundProps = {
 
 export type LoanProps = {
   uuid: string
-  percent: string
+  installment: number
+  months: number
   supplierUuid: string
   supplier: SupplierProps
   transaction: TransactionProps

@@ -10,7 +10,6 @@ import {
   faAlignLeft,
   faCalendar,
   faDollarSign,
-  faPercent,
   faSignature,
 } from '@fortawesome/free-solid-svg-icons'
 import { useEffect, useState } from 'react'
@@ -38,7 +37,8 @@ const Form = () => {
     amount: '',
     projectUuid: '',
     supplierUuid: undefined,
-    percent: '',
+    installment: '',
+    months: '',
   }
 
   // Hookform
@@ -196,30 +196,60 @@ const Form = () => {
       </div>
 
       <div className="mb-6">
-        <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="percent">
-          Percentual <span className="text-danger">*</span>
+        <label
+          className="mb-2.5 block font-medium text-black dark:text-white"
+          htmlFor="installment"
+        >
+          Parcela <span className="text-danger">*</span>
         </label>
         <div className="relative">
           <Controller
-            name="percent"
+            name="installment"
             control={control}
             render={({ field }) => (
               <InputNumeric
                 {...field}
-                id="percent"
-                icon={faPercent}
+                id="installment"
+                icon={faDollarSign}
                 iconPosition="left"
-                prefix={'% '}
+                prefix={'R$ '}
                 fixedDecimalScale
                 decimalScale={2}
                 allowNegative={false}
                 decimalSeparator=","
-                placeholder="Digite o percentual"
+                thousandSeparator="."
+                placeholder="Digite o valor da parcela"
               />
             )}
           />
         </div>
-        {errors.percent && <Alert type="danger" size="sm" data={[errors.percent.message || '']} />}
+        {errors.installment && (
+          <Alert type="danger" size="sm" data={[errors.installment.message || '']} />
+        )}
+      </div>
+
+      <div className="mb-6">
+        <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="months">
+          Nº de meses <span className="text-danger">*</span>
+        </label>
+        <div className="relative">
+          <Controller
+            name="months"
+            control={control}
+            render={({ field }) => (
+              <InputPattern
+                {...field}
+                id="months"
+                mask="_"
+                icon={faCalendar}
+                iconPosition="left"
+                format="##"
+                placeholder="Digite a qunatidade de meses"
+              />
+            )}
+          />
+        </div>
+        {errors.months && <Alert type="danger" size="sm" data={[errors.months.message || '']} />}
       </div>
 
       <div className="mb-6">

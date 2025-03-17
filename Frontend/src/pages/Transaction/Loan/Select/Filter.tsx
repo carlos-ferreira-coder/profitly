@@ -34,8 +34,10 @@ const Filter = ({
     userUuid: string
     projectUuid: string
     supplierUuid: string
-    percentMin: string
-    percentMax: string
+    installmentMin: string
+    installmentMax: string
+    monthsMin: string
+    monthsMax: string
   }
 
   const defaultValues = {
@@ -47,8 +49,10 @@ const Filter = ({
     dateMax: '',
     amountMin: '',
     amountMax: '',
-    percentMin: '',
-    percentMax: '',
+    installmentMin: '',
+    installmentMax: '',
+    monthsMin: '',
+    monthsMax: '',
     userUuid: '',
     projectUuid: '',
     supplierUuid: '',
@@ -252,34 +256,68 @@ const Filter = ({
 
         <div className="mb-5.5">
           <label
-            htmlFor="percentMin"
+            htmlFor="installmentMin"
             className="mb-3 block text-sm font-medium text-black dark:text-white"
           >
-            Percentual minimo
+            Parcela minima
           </label>
           <div className="relative">
             <Input
-              id="percentMin"
+              id="installmentMin"
               type="text"
-              {...register('percentMin')}
-              placeholder="Percentual minimo"
+              {...register('installmentMin')}
+              placeholder="Parcela minima"
             />
           </div>
         </div>
 
         <div className="mb-5.5">
           <label
-            htmlFor="percentMax"
+            htmlFor="installmentMax"
             className="mb-3 block text-sm font-medium text-black dark:text-white"
           >
-            Percentual máximo
+            Parcela máxima
           </label>
           <div className="relative">
             <Input
-              id="percentMax"
+              id="installmentMax"
               type="text"
-              {...register('percentMax')}
-              placeholder="Percentual máximo"
+              {...register('installmentMax')}
+              placeholder="Parcela máxima"
+            />
+          </div>
+        </div>
+
+        <div className="mb-5.5">
+          <label
+            htmlFor="monthsMin"
+            className="mb-3 block text-sm font-medium text-black dark:text-white"
+          >
+            Nº de meses minimo
+          </label>
+          <div className="relative">
+            <Input
+              id="monthsMin"
+              type="text"
+              {...register('monthsMin')}
+              placeholder="Quantidade de meses minimo"
+            />
+          </div>
+        </div>
+
+        <div className="mb-5.5">
+          <label
+            htmlFor="monthsMax"
+            className="mb-3 block text-sm font-medium text-black dark:text-white"
+          >
+            Nº de meses máximo
+          </label>
+          <div className="relative">
+            <Input
+              id="monthsMax"
+              type="text"
+              {...register('monthsMax')}
+              placeholder="Quantidade de meses máximo"
             />
           </div>
         </div>
