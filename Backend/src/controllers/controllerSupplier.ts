@@ -279,11 +279,13 @@ export const supplierDelete = async (req: Request, res: Response): Promise<void>
     }
 
     // check pending issues
+    const doneExpense = await prisma.doneExpense.findMany({
+      where: { supplierUuid: params.data.uuid },
+    })
     const expense = await prisma.expense.findMany({ where: { supplierUuid: params.data.uuid } })
-    const bill = await prisma.bill.findMany({ where: { supplierUuid: params.data.uuid } })
     const refund = await prisma.refund.findMany({ where: { supplierUuid: params.data.uuid } })
     const loan = await prisma.loan.findMany({ where: { supplierUuid: params.data.uuid } })
-    if (expense.length || bill.length || refund.length || loan.length) {
+    if (doneExpense.length || expense.length || refund.length || loan.length) {
       res.status(401).json({ message: 'O fornecedor contém pendências!' })
       return
     }

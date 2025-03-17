@@ -72,7 +72,7 @@ const Form = ({ client }: { client: ClientProps }) => {
           onClick={() => navigate('/client/select')}
           className="h-8 w-35 bg-green-400 dark:text-form-input dark:bg-green-400"
         >
-          Listar usuários
+          Listar clientes
         </Button>,
       ])
 
