@@ -443,11 +443,8 @@ const taskExpenseSchema = z.object({
   uuid: zodRegex(
     'uuid de tarefa de despesa',
     /^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
-    false
-  )
-    .transform((s) => (s === '' ? undefined : s))
-    .nullable()
-    .optional(),
+    true
+  ).transform((s) => (s === '' ? undefined : s)),
   amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
 })
 
@@ -455,11 +452,8 @@ const taskActivitySchema = z.object({
   uuid: zodRegex(
     'uuid de tarefa de atividade',
     /^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
-    false
-  )
-    .transform((s) => (s === '' ? undefined : s))
-    .nullable()
-    .optional(),
+    true
+  ).transform((s) => (s === '' ? undefined : s)),
   hourlyRate: zodRegex('valor da hora', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
 })
 
