@@ -119,6 +119,8 @@ export const budgetTasksExpenseUpdate = async (req: Request, res: Response): Pro
     }
     const tasks = body.data.tasks
 
+    console.log(tasks)
+
     // check if has token
     const token = req.user
     if (!token) {
