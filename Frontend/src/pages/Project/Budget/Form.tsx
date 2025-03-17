@@ -237,16 +237,16 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
     setAlertSuccesses(null)
 
     try {
-      const taskExpense = data.tasks.filter((task) => 'amount' in task)
-      const taskActivity = data.tasks.filter((task) => 'hourlyRate' in task)
+      const tasksExpense = data.tasks.filter((task) => 'amount' in task)
+      const tasksActivity = data.tasks.filter((task) => 'hourlyRate' in task)
 
       const budgetTaskExpense = {
         ...data,
-        tasks: taskExpense,
+        tasks: tasksExpense,
       }
       const budgetTaskActivity = {
         ...data,
-        tasks: taskActivity,
+        tasks: tasksActivity,
       }
 
       const [{ data: resBudgetTaskExpenses }, { data: resBudgetTaskActivity }] = await Promise.all([

@@ -648,7 +648,7 @@ export const budgetTasksExpenseUpdateSchema = z.object({
     .transform((s) => new Date(s))
     .nullable()
     .optional(),
-  tasks: z.array(taskExpenseUpdateSchema).min(1, { message: 'Insira as tarefas para prosseguir!' }),
+  tasks: z.array(taskExpenseUpdateSchema),
 })
 
 export const budgetTasksActivityUpdateSchema = z.object({
@@ -657,7 +657,5 @@ export const budgetTasksActivityUpdateSchema = z.object({
     .transform((s) => new Date(s))
     .nullable()
     .optional(),
-  tasks: z
-    .array(taskActivityUpdateSchema)
-    .min(1, { message: 'Insira as tarefas para prosseguir!' }),
+  tasks: z.array(taskActivityUpdateSchema),
 })
