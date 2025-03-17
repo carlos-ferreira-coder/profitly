@@ -242,15 +242,11 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
 
       const budgetTaskExpense = {
         ...data,
-        tasks: {
-          ...taskExpense,
-        },
+        tasks: taskExpense,
       }
       const budgetTaskActivity = {
         ...data,
-        tasks: {
-          ...taskActivity,
-        },
+        tasks: taskActivity,
       }
 
       const [{ data: resBudgetTaskExpenses }, { data: resBudgetTaskActivity }] = await Promise.all([

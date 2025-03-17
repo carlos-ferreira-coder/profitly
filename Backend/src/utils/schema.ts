@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { zodBoolean, zodEmail, zodNumber, zodRegex, zodString, zodUuid } from '@utils/z'
 import { currencyToNumber } from './currency'
-import { finished } from 'stream'
 
 export const keySchema = z.object({
   key: zodRegex(
@@ -590,17 +589,6 @@ export const taskExpenseSelectSchema = z.object({
   ...taskSelectSchema,
 })
 
-export const taskActivitySelectSchema = z.object({
-  uuid: zodUuid('tarefa de atividade'),
-  hourlyRateMin: zodString('quantia', false)
-    .transform((s) => currencyToNumber(s, 'BRL'))
-    .optional(),
-  hourlyRateMax: zodString('quantia', false)
-    .transform((s) => currencyToNumber(s, 'BRL'))
-    .optional(),
-  ...taskSelectSchema,
-})
-
 export const taskExpenseUpdateSchema = z
   .object({
     uuid: zodUuid('taskExpense'),
@@ -619,8 +607,15 @@ export const taskExpenseUpdateSchema = z
     }
   })
 
-export const tasksExpenseUpdateSchema = z.object({
-  tasks: z.array(taskExpenseUpdateSchema).min(1, { message: 'Insira as tarefas para prosseguir!' }),
+export const taskActivitySelectSchema = z.object({
+  uuid: zodUuid('tarefa de atividade'),
+  hourlyRateMin: zodString('quantia', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
+    .optional(),
+  hourlyRateMax: zodString('quantia', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
+    .optional(),
+  ...taskSelectSchema,
 })
 
 export const taskActivityUpdateSchema = z
@@ -640,12 +635,6 @@ export const taskActivityUpdateSchema = z
       })
     }
   })
-
-export const tasksActivityUpdateSchema = z.object({
-  tasks: z
-    .array(taskActivityUpdateSchema)
-    .min(1, { message: 'Insira as tarefas para prosseguir!' }),
-})
 
 export const budgetSelectSchema = z.object({
   uuid: zodUuid('orçamento').optional(),
