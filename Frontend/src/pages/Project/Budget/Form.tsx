@@ -346,41 +346,53 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                   </div>
 
                   <div className={resume[index] ? 'hidden' : 'block'}>
-                    {field.taskExpense && (
-                      <>
-                        <Input
-                          id={`tasks.${index}.taskExpense.uuid`}
-                          type="text"
-                          hidden
-                          disabled
-                          {...register(`tasks.${index}.taskExpense.uuid`)}
-                        />
-                        {errors.tasks?.[index]?.taskExpense?.uuid && (
-                          <Alert
-                            type="danger"
-                            size="sm"
-                            data={[errors.tasks?.[index].taskExpense.uuid.message || '']}
-                          />
-                        )}
-                      </>
+                    {errors.tasks?.[index]?.taskExpense?.uuid && (
+                      <Alert
+                        type="danger"
+                        size="sm"
+                        data={[errors.tasks?.[index].taskExpense.uuid.message || '']}
+                      />
                     )}
+                    {errors.tasks?.[index]?.taskActivity?.uuid && (
+                      <Alert
+                        type="danger"
+                        size="sm"
+                        data={[errors.tasks?.[index].taskActivity.uuid.message || '']}
+                      />
+                    )}
+                    {errors.tasks?.[index]?.projectUuid && (
+                      <Alert
+                        type="danger"
+                        size="sm"
+                        data={[errors.tasks?.[index].projectUuid.message || '']}
+                      />
+                    )}
+                    {errors.tasks?.[index]?.budgetUuid && (
+                      <Alert
+                        type="danger"
+                        size="sm"
+                        data={[errors.tasks?.[index].budgetUuid.message || '']}
+                      />
+                    )}
+
+                    {field.taskExpense && (
+                      <Input
+                        id={`tasks.${index}.taskExpense.uuid`}
+                        type="text"
+                        hidden
+                        disabled
+                        {...register(`tasks.${index}.taskExpense.uuid`)}
+                      />
+                    )}
+
                     {field.taskActivity && (
-                      <>
-                        <Input
-                          id={`tasks.${index}.taskActivity.uuid`}
-                          type="text"
-                          hidden
-                          disabled
-                          {...register(`tasks.${index}.taskActivity.uuid`)}
-                        />
-                        {errors.tasks?.[index]?.taskActivity?.uuid && (
-                          <Alert
-                            type="danger"
-                            size="sm"
-                            data={[errors.tasks?.[index].taskActivity.uuid.message || '']}
-                          />
-                        )}
-                      </>
+                      <Input
+                        id={`tasks.${index}.taskActivity.uuid`}
+                        type="text"
+                        hidden
+                        disabled
+                        {...register(`tasks.${index}.taskActivity.uuid`)}
+                      />
                     )}
 
                     <Input

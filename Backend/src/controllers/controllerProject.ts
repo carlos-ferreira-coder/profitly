@@ -529,7 +529,7 @@ export const projectDelete = async (req: Request, res: Response): Promise<void> 
       where: { projectUuid: params.data.uuid },
     })
     if (task.length || transaction.length) {
-      res.status(401).json({ message: 'O status contém pendências!' })
+      res.status(401).json({ message: 'O projeto contém pendências!' })
       return
     }
 
