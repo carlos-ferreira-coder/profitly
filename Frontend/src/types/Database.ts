@@ -71,17 +71,25 @@ export type ProjectProps = {
   client: ClientProps
   status: StatusProps
   // metods
-  beginDate: string
-  endDate: string
-  budgetTotal: string
-  budgetCost: string
-  budgetRevenue: string
-  projectTotal: string
-  projectCost: string
-  projectRevenue: string
-  transactionIncome: string
-  transactionExpense: string
-  transactionRevenue: string
+  dates: {
+    beginDate: string
+    endDate: string
+  }
+  budget: BudgetProps & {
+    total: string
+    cost: string
+    revenue: string
+  }
+  tx: {
+    income: string
+    expense: string
+    revenue: string
+  }
+  proj: {
+    total: string
+    cost: string
+    revenue: string
+  }
 }
 
 export type BudgetProps = {

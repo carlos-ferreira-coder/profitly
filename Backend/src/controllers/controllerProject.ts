@@ -146,65 +146,181 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
           ? new Date(Math.max(...dates.map((d) => new Date(d).getTime())))
           : project.register
 
-      // calculate budget
-      const budgetRevenue: number = project.budget.tasks.reduce((sum, task) => {
-        if (task.taskExpense?.amount) return sum + task.revenue.toNumber()
+      const budget: { cost: number; revenue: number } = project.budget.tasks.reduce(
+        (sum, task) => {
+          if (task.taskExpense)
+            return {
+              cost: sum.cost + task.taskExpense.amount.toNumber(),
+              revenue: sum.revenue + task.revenue.toNumber(),
+            }
 
-        if (task.taskActivity?.hourlyRate) {
-          const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
-          return sum + hours * task.revenue.toNumber()
-        }
+          if (task.taskActivity) {
+            const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
 
-        return 0
-      }, 0)
+            return {
+              cost: sum.cost + hours * task.taskActivity.hourlyRate.toNumber(),
+              revenue: sum.revenue + hours * task.revenue.toNumber(),
+            }
+          }
 
-      const budgetCost: number = project.budget.tasks.reduce((sum, task) => {
-        if (task.taskExpense?.amount) return sum + task.taskExpense.amount.toNumber()
+          return {
+            cost: sum.cost,
+            revenue: sum.revenue,
+          }
+        },
+        { cost: 0, revenue: 0 },
+      )
 
-        if (task.taskActivity?.hourlyRate) {
-          const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
-          return sum + hours * task.taskActivity.hourlyRate.toNumber()
-        }
-
-        return 0
-      }, 0)
-
-      const budgetTotal = budgetCost + budgetRevenue
-
-      // calculate transactions
-      const expense: number = project.transactions
-        .filter((transaction) => transaction.expense)
-        .reduce((sum, { amount }) => sum + amount.toNumber(), 0)
-
-      const income: number = project.transactions
-        .filter((transaction) => transaction.income)
-        .reduce((sum, { amount }) => sum + amount.toNumber(), 0)
-
-      const refund: number = project.transactions
-        .filter((transaction) => transaction.refund)
-        .reduce((sum, { amount }) => sum + amount.toNumber(), 0)
-
-      const loan: { income: number; expense: number } = project.transactions
-        .filter((transaction) => transaction.loan)
-        .reduce(
-          (sum, { amount, loan }) => {
-            if (!loan) return sum
-
-            const income = sum.income + amount.toNumber()
-            const expense = sum.expense + loan.months * loan.installment.toNumber()
-
-            return { income, expense }
-          },
-          { income: 0, expense: 0 },
-        )
-
-      const transactionIncome = income + loan.income - refund
-      const transactionExpense = expense + loan.expense + refund
-      const transactionRevenue = transactionIncome - transactionExpense
+      const txs: {
+        expense: number
+        income: number
+        refund: number
+        loan: { income: number; expense: number }
+      } = project.transactions.reduce(
+        (sum, { amount, expense, income, refund, loan }) => {
+          return {
+            expense: expense ? sum.expense + amount.toNumber() : sum.expense,
+            income: income ? sum.income + amount.toNumber() : sum.income,
+            refund: refund ? sum.refund + amount.toNumber() : sum.refund,
+            loan: {
+              income: loan ? sum.loan.income + amount.toNumber() : sum.loan.income,
+              expense: loan
+                ? sum.loan.expense + loan.months * loan.installment.toNumber()
+                : sum.loan.expense,
+            },
+          }
+        },
+        { expense: 0, income: 0, refund: 0, loan: { income: 0, expense: 0 } },
+      )
 
       // calculate project
+      const prj: {
+        expected: {
+          prev: number
+          cost: number
+          revn: number
+        }
+        unexpected: {
+          prev: number
+          cost: number
+          revn: number
+        }
+      } = project.tasks
+        .filter(({ budgetUuid }) => !budgetUuid)
+        .reduce(
+          (acc, task) => {
+            if (task.originalTaskId) {
+              if (task.taskExpense) {
+                acc.expected.prev += task.taskExpense.amount.toNumber()
+                acc.expected.revn += task.revenue.toNumber()
+                acc.expected.cost += task.dones.reduce((sum, done) => {
+                  if (done.doneExpense) return sum + done.doneExpense.amount.toNumber()
+                  return sum
+                }, 0)
+              }
+
+              if (task.taskActivity) {
+                const taskHours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+                acc.expected.prev += taskHours * task.taskActivity.hourlyRate.toNumber()
+                acc.expected.revn += taskHours * task.revenue.toNumber()
+                acc.expected.cost += task.dones.reduce((sum, done) => {
+                  if (done.doneActivity) {
+                    const doneHours =
+                      (done.doneActivity.endDate.getTime() -
+                        done.doneActivity.beginDate.getTime()) /
+                      3600000
+                    return sum + doneHours * done.doneActivity.hourlyRate.toNumber()
+                  }
+                  return sum
+                }, 0)
+              }
+
+              return acc
+            }
+
+            if (task.taskExpense) {
+              acc.unexpected.prev += task.taskExpense.amount.toNumber()
+              acc.unexpected.revn += task.revenue.toNumber()
+              acc.unexpected.cost += task.dones.reduce((sum, done) => {
+                if (done.doneExpense) return sum + done.doneExpense.amount.toNumber()
+                return sum
+              }, 0)
+            }
+
+            if (task.taskActivity) {
+              const taskHours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+              acc.unexpected.prev += taskHours * task.taskActivity.hourlyRate.toNumber()
+              acc.unexpected.revn += taskHours * task.revenue.toNumber()
+              acc.unexpected.cost += task.dones.reduce((sum, done) => {
+                if (done.doneActivity) {
+                  const doneHours =
+                    (done.doneActivity.endDate.getTime() - done.doneActivity.beginDate.getTime()) /
+                    3600000
+                  return sum + doneHours * done.doneActivity.hourlyRate.toNumber()
+                }
+                return sum
+              }, 0)
+            }
+
+            return acc
+          },
+          {
+            expected: {
+              prev: 0,
+              cost: 0,
+              revn: 0,
+            },
+            unexpected: {
+              prev: 0,
+              cost: 0,
+              revn: 0,
+            },
+          },
+        )
+
+      /*
       const projectRevenue: { finished: number; notFinished: number } = project.tasks
         .filter(({ budgetUuid, originalTaskId }) => !budgetUuid && originalTaskId)
+        .reduce(
+          (sum, task) => {
+            if (task.taskExpense?.amount) {
+              if (task.finished)
+                return {
+                  finished: sum.finished + task.revenue.toNumber(),
+                  notFinished: sum.notFinished,
+                }
+
+              return {
+                finished: sum.finished,
+                notFinished: sum.notFinished + task.revenue.toNumber(),
+              }
+            }
+
+            if (task.taskActivity?.hourlyRate) {
+              const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+
+              if (task.finished)
+                return {
+                  finished: sum.finished + hours * task.revenue.toNumber(),
+                  notFinished: sum.notFinished,
+                }
+
+              return {
+                finished: sum.finished,
+                notFinished: sum.notFinished + hours * task.revenue.toNumber(),
+              }
+            }
+
+            return {
+              finished: sum.finished,
+              notFinished: sum.notFinished,
+            }
+          },
+          { finished: 0, notFinished: 0 },
+        )
+
+      const unforeseen: { finished: number; notFinished: number } = project.tasks
+        .filter(({ budgetUuid, originalTaskId }) => !budgetUuid && !originalTaskId)
         .reduce(
           (sum, task) => {
             if (task.taskExpense?.amount) {
@@ -316,40 +432,42 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
           },
           { finished: 0, notFinished: 0 },
         )
+          */
+
+      const tx = {
+        income: txs.income + txs.loan.income - txs.refund,
+        expense: txs.expense + txs.loan.expense + txs.refund,
+      }
+
+      const proj = {
+        total: prj.expected.prev + prj.expected.revn,
+        cost: prj.expected.cost + prj.unexpected.cost,
+        revenue: prj.expected.revn - prj.unexpected.cost + prj.expected.prev - prj.expected.cost,
+      }
 
       return {
         ...project,
-
         register: formatDate(project.register),
-
-        beginDate: formatDate(beginDate),
-        endDate: formatDate(endDate),
-
-        budgetTotal: numberToCurrency(budgetTotal, 'BRL'),
-        budgetCost: numberToCurrency(budgetCost, 'BRL'),
-        budgetRevenue: numberToCurrency(budgetRevenue, 'BRL'),
-
-        transactionIncome: numberToCurrency(transactionIncome, 'BRL'),
-        transactionExpense: numberToCurrency(transactionExpense, 'BRL'),
-        transactionRevenue: numberToCurrency(transactionRevenue, 'BRL'),
-
-        projectTotal: numberToCurrency(
-          projectPrevCost.finished +
-            projectRevenue.finished -
-            projectCost.finished +
-            projectPrevCost.notFinished +
-            projectRevenue.notFinished -
-            projectCost.notFinished,
-          'BRL',
-        ),
-        projectCost: numberToCurrency(projectCost.finished + projectCost.notFinished, 'BRL'),
-        projectRevenue: numberToCurrency(
-          projectPrevCost.finished +
-            projectRevenue.finished -
-            projectCost.finished +
-            projectRevenue.notFinished,
-          'BRL',
-        ),
+        dates: {
+          beginDate: formatDate(beginDate),
+          endDate: formatDate(endDate),
+        },
+        budget: {
+          ...project.budget,
+          total: numberToCurrency(budget.revenue - budget.cost, 'BRL'),
+          cost: numberToCurrency(budget.cost, 'BRL'),
+          revenue: numberToCurrency(budget.revenue, 'BRL'),
+        },
+        tx: {
+          income: numberToCurrency(tx.income, 'BRL'),
+          expense: numberToCurrency(tx.expense, 'BRL'),
+          revenue: numberToCurrency(tx.income - tx.expense, 'BRL'),
+        },
+        proj: {
+          total: numberToCurrency(proj.total, 'BRL'),
+          cost: numberToCurrency(proj.cost, 'BRL'),
+          revenue: numberToCurrency(proj.revenue, 'BRL'),
+        },
       }
     })
 

@@ -534,6 +534,7 @@ const seed = async () => {
         projectUuid: '767c9836-62b2-49f3-8d7b-fb183fcc2791',
         userUuid: '47d56b1b-a557-47a9-81c5-2b5ee179912d',
         budgetUuid: 'c874d6c7-f452-46dd-b0e0-2d173bef1bb5',
+        originalTaskId: null,
       },
       {
         id: 2,
@@ -546,6 +547,7 @@ const seed = async () => {
         projectUuid: '767c9836-62b2-49f3-8d7b-fb183fcc2791',
         userUuid: null,
         budgetUuid: 'c874d6c7-f452-46dd-b0e0-2d173bef1bb5',
+        originalTaskId: null,
       },
       {
         id: 3,
@@ -559,6 +561,7 @@ const seed = async () => {
         projectUuid: '767c9836-62b2-49f3-8d7b-fb183fcc2791',
         userUuid: '2dec250c-3d0b-41b4-9385-853d9d20d9e8',
         budgetUuid: 'c874d6c7-f452-46dd-b0e0-2d173bef1bb5',
+        originalTaskId: null,
       },
       {
         id: 4,
@@ -572,6 +575,7 @@ const seed = async () => {
         projectUuid: '767c9836-62b2-49f3-8d7b-fb183fcc2791',
         userUuid: '2dec250c-3d0b-41b4-9385-853d9d20d9e8',
         budgetUuid: 'c874d6c7-f452-46dd-b0e0-2d173bef1bb5',
+        originalTaskId: null,
       },
       {
         id: 5,
@@ -584,6 +588,7 @@ const seed = async () => {
         projectUuid: '767c9836-62b2-49f3-8d7b-fb183fcc2791',
         userUuid: '47d56b1b-a557-47a9-81c5-2b5ee179912d',
         budgetUuid: 'c874d6c7-f452-46dd-b0e0-2d173bef1bb5',
+        originalTaskId: null,
       },
       {
         id: 6,
@@ -596,6 +601,7 @@ const seed = async () => {
         projectUuid: '767c9836-62b2-49f3-8d7b-fb183fcc2791',
         userUuid: 'a01c243b-a5d5-40af-b571-1342b272943e',
         budgetUuid: 'c874d6c7-f452-46dd-b0e0-2d173bef1bb5',
+        originalTaskId: null,
       },
       {
         id: 7,
@@ -609,6 +615,7 @@ const seed = async () => {
         projectUuid: '767c9836-62b2-49f3-8d7b-fb183fcc2791',
         userUuid: null,
         budgetUuid: 'c874d6c7-f452-46dd-b0e0-2d173bef1bb5',
+        originalTaskId: null,
       },
       {
         id: 8,
@@ -622,6 +629,7 @@ const seed = async () => {
         projectUuid: '767c9836-62b2-49f3-8d7b-fb183fcc2791',
         userUuid: '47d56b1b-a557-47a9-81c5-2b5ee179912d',
         budgetUuid: 'c874d6c7-f452-46dd-b0e0-2d173bef1bb5',
+        originalTaskId: null,
       },
       {
         id: 9,
@@ -634,6 +642,7 @@ const seed = async () => {
         projectUuid: '767c9836-62b2-49f3-8d7b-fb183fcc2791',
         userUuid: '3b116097-581d-4af2-b0d6-5f085adf26e1',
         budgetUuid: null,
+        originalTaskId: null,
       },
       {
         id: 10,
@@ -646,6 +655,7 @@ const seed = async () => {
         projectUuid: '767c9836-62b2-49f3-8d7b-fb183fcc2791',
         userUuid: '47d56b1b-a557-47a9-81c5-2b5ee179912d',
         budgetUuid: null,
+        originalTaskId: 1,
       },
       {
         id: 11,
@@ -658,6 +668,7 @@ const seed = async () => {
         projectUuid: '767c9836-62b2-49f3-8d7b-fb183fcc2791',
         userUuid: null,
         budgetUuid: null,
+        originalTaskId: 2,
       },
       {
         id: 12,
@@ -671,6 +682,7 @@ const seed = async () => {
         projectUuid: '767c9836-62b2-49f3-8d7b-fb183fcc2791',
         userUuid: '2dec250c-3d0b-41b4-9385-853d9d20d9e8',
         budgetUuid: null,
+        originalTaskId: 3,
       },
       {
         id: 13,
@@ -684,6 +696,7 @@ const seed = async () => {
         projectUuid: '767c9836-62b2-49f3-8d7b-fb183fcc2791',
         userUuid: '2dec250c-3d0b-41b4-9385-853d9d20d9e8',
         budgetUuid: null,
+        originalTaskId: 4,
       },
       {
         id: 14,
@@ -696,6 +709,7 @@ const seed = async () => {
         projectUuid: '767c9836-62b2-49f3-8d7b-fb183fcc2791',
         userUuid: '47d56b1b-a557-47a9-81c5-2b5ee179912d',
         budgetUuid: null,
+        originalTaskId: 5,
       },
       {
         id: 15,
@@ -708,6 +722,7 @@ const seed = async () => {
         projectUuid: '767c9836-62b2-49f3-8d7b-fb183fcc2791',
         userUuid: 'a01c243b-a5d5-40af-b571-1342b272943e',
         budgetUuid: null,
+        originalTaskId: 6,
       },
       {
         id: 16,
@@ -721,6 +736,7 @@ const seed = async () => {
         projectUuid: '767c9836-62b2-49f3-8d7b-fb183fcc2791',
         userUuid: null,
         budgetUuid: null,
+        originalTaskId: 7,
       },
       {
         id: 17,
@@ -734,6 +750,7 @@ const seed = async () => {
         projectUuid: '767c9836-62b2-49f3-8d7b-fb183fcc2791',
         userUuid: '47d56b1b-a557-47a9-81c5-2b5ee179912d',
         budgetUuid: null,
+        originalTaskId: 8,
       },
     ],
     skipDuplicates: true,
