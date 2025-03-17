@@ -163,9 +163,11 @@ export const userCreateSchema = z
     password: zodPassword('senha'),
     passwordCheck: zodRegex('senha', /^(?=.*\d)(?=.*\W)[a-zA-Z\d\W]{8,}$/, true),
     active: zodBoolean('ativo'),
-    hourlyRate: zodRegex('valor da hora', /^$|R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, false).transform(
-      (s) => (s === '' ? undefined : s)
-    ),
+    hourlyRate: zodRegex(
+      'valor da hora',
+      /^$|^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/,
+      false
+    ).transform((s) => (s === '' ? undefined : s)),
     authUuid: zodUuid('cargo/função'),
     ...personCreateSchema(false),
   })
@@ -183,7 +185,7 @@ export const userUpdateSchema = z.object({
   uuid: zodUuid('usuário'),
   username: zodString('nome de usuário', true),
   active: zodBoolean('ativo'),
-  hourlyRate: zodRegex('valor da hora', /^$|R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, false)
+  hourlyRate: zodRegex('valor da hora', /^$|^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, false)
     .transform((s) => (s === '' ? undefined : s))
     .nullable(),
   authUuid: zodUuid('cargo/função'),
@@ -335,7 +337,7 @@ const transactionCreateSchema = {
   amount: zodRegex('valor', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
   projectUuid: zodRegex(
     'uuid de projeto',
-    /^$|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+    /^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
     false
   )
     .transform((s) => (s === '' ? undefined : s))
@@ -357,7 +359,7 @@ export const refundCreateSchema = z
   .object({
     clientUuid: zodRegex(
       'uuid de cliente',
-      /^$|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+      /^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
       false
     )
       .transform((s) => (s === '' ? undefined : s))
@@ -365,7 +367,7 @@ export const refundCreateSchema = z
       .optional(),
     supplierUuid: zodRegex(
       'uuid de fornecedor',
-      /^$|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+      /^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
       false
     )
       .transform((s) => (s === '' ? undefined : s))
@@ -477,8 +479,22 @@ const taskSchema = z
     revenue: zodRegex('lucro', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
     statusUuid: zodUuid('status'),
     projectUuid: zodUuid('projeto'),
-    userUuid: zodUuid('usuário').optional(),
-    budgetUuid: zodUuid('orçamento').optional(),
+    userUuid: zodRegex(
+      'uuid de usuário',
+      /^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+      false
+    )
+      .transform((s) => (s === '' ? undefined : s))
+      .nullable()
+      .optional(),
+    budgetUuid: zodRegex(
+      'uuid de orçamento',
+      /^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+      false
+    )
+      .transform((s) => (s === '' ? undefined : s))
+      .nullable()
+      .optional(),
     taskExpense: taskExpenseSchema.optional(),
     taskActivity: taskActivitySchema.optional(),
   })

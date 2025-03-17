@@ -149,7 +149,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
           const endDate = parse(task.endDate, 'dd/MM/yy HH:mm', new Date())
           const hours = differenceInHours(endDate, beginDate)
 
-          acc.revenue += currencyToNumber(task.revenue, 'BRL')
+          acc.revenue += hours * currencyToNumber(task.revenue, 'BRL')
           acc.cost += hours * currencyToNumber(task.revenue, 'BRL')
         }
 
