@@ -86,7 +86,6 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
 
   // Hookform
   const {
-    watch,
     reset,
     control,
     register,
@@ -147,9 +146,11 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
         }
 
         if (task.taskActivity) {
+          const regex = /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{2} ([01]\d|2[0-3]):[0-5]\d$/
+
           if (
-            task.beginDate !== '' &&
-            task.endDate !== '' &&
+            regex.test(task.beginDate) &&
+            regex.test(task.endDate) &&
             task.revenue !== '' &&
             task.taskActivity.hourlyRate !== ''
           ) {
@@ -306,23 +307,32 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
               let total = numberToCurrency(0, 'BRL')
 
               if (field.taskExpense) {
-                total = numberToCurrency(
-                  currencyToNumber(field.revenue, 'BRL') +
-                    currencyToNumber(field.taskExpense.amount, 'BRL'),
-                  'BRL'
-                )
+                if (field.revenue !== '' && field.taskExpense.amount !== '')
+                  total = numberToCurrency(
+                    currencyToNumber(field.revenue, 'BRL') +
+                      currencyToNumber(field.taskExpense.amount, 'BRL'),
+                    'BRL'
+                  )
               }
 
               if (field.taskActivity) {
-                total = numberToCurrency(
-                  (currencyToNumber(field.revenue, 'BRL') +
-                    currencyToNumber(field.taskActivity.hourlyRate, 'BRL')) *
-                    differenceInHours(
-                      parse(watch(`tasks.${index}.endDate`), 'dd/MM/yy HH:mm', new Date()),
-                      parse(watch(`tasks.${index}.beginDate`), 'dd/MM/yy HH:mm', new Date())
-                    ),
-                  'BRL'
+                const regex = /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{2} ([01]\d|2[0-3]):[0-5]\d$/
+
+                if (
+                  field.revenue !== '' &&
+                  field.taskActivity.hourlyRate !== '' &&
+                  regex.test(field.beginDate) &&
+                  regex.test(field.endDate)
                 )
+                  total = numberToCurrency(
+                    (currencyToNumber(field.revenue, 'BRL') +
+                      currencyToNumber(field.taskActivity.hourlyRate, 'BRL')) *
+                      differenceInHours(
+                        parse(field.endDate, 'dd/MM/yy HH:mm', new Date()),
+                        parse(field.beginDate, 'dd/MM/yy HH:mm', new Date())
+                      ),
+                    'BRL'
+                  )
               }
 
               return (
