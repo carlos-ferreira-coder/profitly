@@ -250,6 +250,9 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
         ),
       }
 
+      console.log(budgetTaskExpense)
+      console.log(budgetTaskActivity)
+
       const [{ data: resBudgetTaskExpenses }, { data: resBudgetTaskActivity }] = await Promise.all([
         await axios.put('/budget/task/expense/update', budgetTaskExpense, {
           withCredentials: true,
