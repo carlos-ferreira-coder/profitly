@@ -38,10 +38,10 @@ const ProjectDescInfo = ({ project }: { project: ProjectProps }) => (
 const ProjectStatsInfo = ({ project }: { project: ProjectProps }) => (
   <>
     <p>
-      <b>Data inicial: </b> {project.beginDate}
+      <b>Data inicial: </b> {project.dates.beginDate}
     </p>
     <p>
-      <b>Data final: </b> {project.endDate}
+      <b>Data final: </b> {project.dates.endDate}
     </p>
     {project.user && (
       <p>
@@ -61,13 +61,13 @@ const ProjectStatsInfo = ({ project }: { project: ProjectProps }) => (
 const ProjectBudgetInfo = ({ project }: { project: ProjectProps }) => (
   <>
     <p>
-      <b>Total previsto: </b> {project.budgetTotal}
+      <b>Total previsto: </b> {project.budget.total}
     </p>
     <p>
-      <b>Lucro previsto: </b> {project.budgetRevenue}
+      <b>Lucro previsto: </b> {project.budget.revenue}
     </p>
     <p>
-      <b>Custo previsto: </b> {project.budgetCost}
+      <b>Custo previsto: </b> {project.budget.cost}
     </p>
   </>
 )
@@ -75,13 +75,13 @@ const ProjectBudgetInfo = ({ project }: { project: ProjectProps }) => (
 const ProjectProjectInfo = ({ project }: { project: ProjectProps }) => (
   <>
     <p>
-      <b>Total atual: </b> {project.projectTotal}
+      <b>Total atual: </b> {project.proj.total}
     </p>
     <p>
-      <b>Lucro atual: </b> {project.projectRevenue}
+      <b>Lucro atual: </b> {project.proj.revenue}
     </p>
     <p>
-      <b>Custo atual: </b> {project.projectCost}
+      <b>Custo atual: </b> {project.proj.cost}
     </p>
   </>
 )
@@ -89,13 +89,13 @@ const ProjectProjectInfo = ({ project }: { project: ProjectProps }) => (
 const ProjectTransactionInfo = ({ project }: { project: ProjectProps }) => (
   <>
     <p>
-      <b>Receita corrente: </b> {project.transactionIncome}
+      <b>Receita corrente: </b> {project.tx.income}
     </p>
     <p>
-      <b>Lucro corrente: </b> {project.transactionRevenue}
+      <b>Lucro corrente: </b> {project.tx.revenue}
     </p>
     <p>
-      <b>Despesa corrente: </b> {project.transactionExpense}
+      <b>Despesa corrente: </b> {project.tx.expense}
     </p>
   </>
 )
@@ -183,7 +183,7 @@ const List = ({ projects }: { projects: ProjectProps[] }) => {
                 <FontAwesomeIcon icon={faFileInvoiceDollar} />
               </Button>
 
-              {currencyToNumber(project.budgetTotal, 'BRL') !== 0 && (
+              {currencyToNumber(project.budget.total, 'BRL') !== 0 && (
                 <Button
                   color="warning"
                   className="w-8 h-8"
