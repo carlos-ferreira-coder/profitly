@@ -579,7 +579,6 @@ const taskUpdateSchema = {
 }
 
 export const taskExpenseSelectSchema = z.object({
-  uuid: zodUuid('tarefa de despesa'),
   amountMin: zodString('quantia', false)
     .transform((s) => currencyToNumber(s, 'BRL'))
     .optional(),
@@ -591,7 +590,11 @@ export const taskExpenseSelectSchema = z.object({
 
 export const taskExpenseUpdateSchema = z
   .object({
-    uuid: zodUuid('taskExpense'),
+    uuid: zodRegex(
+      'uuid de tarefa de despesa',
+      /^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+      true,
+    ),
     amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true).transform((s) =>
       currencyToNumber(s, 'BRL'),
     ),
@@ -608,7 +611,6 @@ export const taskExpenseUpdateSchema = z
   })
 
 export const taskActivitySelectSchema = z.object({
-  uuid: zodUuid('tarefa de atividade'),
   hourlyRateMin: zodString('quantia', false)
     .transform((s) => currencyToNumber(s, 'BRL'))
     .optional(),
@@ -620,7 +622,11 @@ export const taskActivitySelectSchema = z.object({
 
 export const taskActivityUpdateSchema = z
   .object({
-    uuid: zodUuid('taskExpense'),
+    uuid: zodRegex(
+      'uuid de tarefa de atividade',
+      /^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+      true,
+    ),
     hourlyRate: zodRegex('valor da hora', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true).transform(
       (s) => currencyToNumber(s, 'BRL'),
     ),
@@ -637,7 +643,6 @@ export const taskActivityUpdateSchema = z
   })
 
 export const budgetSelectSchema = z.object({
-  uuid: zodUuid('orçamento').optional(),
   registerMin: zodString('registro', false).optional(),
   registerMax: zodString('registro', false).optional(),
 })
