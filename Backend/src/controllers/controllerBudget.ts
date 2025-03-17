@@ -1,11 +1,6 @@
 import { Request, Response } from 'express'
 import { prisma } from '@/server'
-import {
-  budgetSelectSchema,
-  budgetTasksActivityUpdateSchema,
-  budgetTasksExpenseUpdateSchema,
-  keySchema,
-} from '@utils/schema'
+import { budgetSelectSchema, budgetTasksUpdateSchema, keySchema } from '@utils/schema'
 import { authorization } from '@utils/auth'
 import { TaskExpense, TaskActivity, Task, Budget } from '@prisma/client'
 import { numberToCurrency } from '@utils/currency'
@@ -109,17 +104,14 @@ export const budgetSelect = async (req: Request, res: Response): Promise<void> =
   }
 }
 
-export const budgetTasksExpenseUpdate = async (req: Request, res: Response): Promise<void> => {
+export const budgetTasksUpdate = async (req: Request, res: Response): Promise<void> => {
   try {
     // check schema
-    const body = budgetTasksExpenseUpdateSchema.safeParse(req.body)
+    const body = budgetTasksUpdateSchema.safeParse(req.body)
     if (!body.success) {
       res.status(401).json({ message: `Body inválido: ${JSON.stringify(body.error.format())}` })
       return
     }
-    const tasks = body.data.tasks
-
-    console.log(tasks)
 
     // check if has token
     const token = req.user
@@ -140,37 +132,118 @@ export const budgetTasksExpenseUpdate = async (req: Request, res: Response): Pro
       return
     }
 
-    const projectUuids = new Set(tasks.map(({ projectUuid }) => projectUuid))
+    const projectUuids = new Set(body.data.tasks.map(({ projectUuid }) => projectUuid))
     if (projectUuids.size !== 1) {
       res.status(401).json({ message: 'As tarefas devem ser de um único projeto!' })
       return
     }
     const projectUuid = [...projectUuids][0]
 
-    const budgetUuids = new Set(tasks.map(({ budgetUuid }) => budgetUuid))
+    const budgetUuids = new Set(body.data.tasks.map(({ budgetUuid }) => budgetUuid))
     if (budgetUuids.size !== 1) {
       res.status(401).json({ message: 'As tarefas devem ser de um único projeto!' })
       return
     }
     const budgetUuid = [...budgetUuids][0]
 
-    const tasksExpenseToCreate = tasks
-      .filter(({ uuid }) => uuid === '')
-      .map(({ uuid, ...task }) => task)
+    type TE = {
+      name: string
+      description: string
+      finished: boolean
+      beginDate: Date
+      endDate: Date
+      revenue: number
+      statusUuid: string
+      projectUuid: string
+      userUuid?: string
+      budgetUuid?: string
+      taskExpense: {
+        uuid: string
+        amount: number
+      }
+    }
 
-    const tasksExpenseToUpdate = tasks.filter(({ uuid }) => uuid !== '')
+    type TA = {
+      name: string
+      description: string
+      finished: boolean
+      beginDate: Date
+      endDate: Date
+      revenue: number
+      statusUuid: string
+      projectUuid: string
+      userUuid?: string
+      budgetUuid?: string
+      taskActivity: {
+        uuid: string
+        hourlyRate: number
+      }
+    }
 
-    const tasksExpenseToDelete = await prisma.taskExpense.findMany({
-      where: {
-        uuid: {
-          notIn: tasksExpenseToUpdate.map(({ uuid }) => uuid),
-        },
-        task: {
-          budgetUuid: budgetUuid,
-          projectUuid: projectUuid,
+    let tasks: {
+      create: { expense: TE[]; activity: TA[] }
+      update: { expense: TE[]; activity: TA[] }
+      delete: {
+        expense: { id: number; uuid: string }[]
+        activity: { id: number; uuid: string }[]
+      }
+    } = body.data.tasks.reduce(
+      (acc, task) => {
+        if (task.taskExpense) {
+          const formattedTask = {
+            ...task,
+            taskExpense: { ...task.taskExpense },
+          }
+
+          if (task.taskExpense.uuid === '') acc.create.expense.push(formattedTask)
+          else acc.update.expense.push(formattedTask)
+        }
+
+        if (task.taskActivity) {
+          const formattedTask = {
+            ...task,
+            taskActivity: { ...task.taskActivity },
+          }
+
+          if (task.taskActivity.uuid === '') acc.create.activity.push(formattedTask)
+          else acc.update.activity.push(formattedTask)
+        }
+
+        return acc
+      },
+      {
+        create: { expense: [] as TE[], activity: [] as TA[] },
+        update: { expense: [] as TE[], activity: [] as TA[] },
+        delete: {
+          expense: [] as { id: number; uuid: string }[],
+          activity: [] as { id: number; uuid: string }[],
         },
       },
-    })
+    )
+
+    const [expenseTasks, activityTasks] = await Promise.all([
+      prisma.taskExpense.findMany({
+        where: {
+          uuid: { notIn: tasks.update.expense.map(({ taskExpense }) => taskExpense.uuid) },
+          task: {
+            budgetUuid: budgetUuid,
+            projectUuid: projectUuid,
+          },
+        },
+      }),
+      prisma.taskActivity.findMany({
+        where: {
+          uuid: { notIn: tasks.update.activity.map(({ taskActivity }) => taskActivity.uuid) },
+          task: {
+            budgetUuid: budgetUuid,
+            projectUuid: projectUuid,
+          },
+        },
+      }),
+    ])
+
+    tasks.delete.expense = expenseTasks.map((task) => ({ id: task.id, uuid: task.uuid }))
+    tasks.delete.activity = activityTasks.map((task) => ({ id: task.id, uuid: task.uuid }))
 
     // create resource
     if (!budget.register) {
@@ -179,85 +252,30 @@ export const budgetTasksExpenseUpdate = async (req: Request, res: Response): Pro
         where: { uuid: budget.uuid },
       })
     }
-
-    tasksExpenseToCreate.map(async (task) => {
-      const budgetTaskCreated = await prisma.task.create({
-        data: {
-          name: task.name,
-          description: task.description,
-          finished: task.finished,
-          beginDate: task.beginDate,
-          endDate: task.endDate,
-          revenue: task.revenue,
-          statusUuid: task.statusUuid,
-          projectUuid: projectUuid,
-          userUuid: task.userUuid,
-          budgetUuid: budgetUuid,
-          originalTaskId: null,
-        },
-      })
-      await prisma.taskExpense.create({
-        data: {
-          id: budgetTaskCreated.id,
-          amount: task.amount,
-        },
-      })
-      const taskCreated = await prisma.task.create({
-        data: {
-          name: task.name,
-          description: task.description,
-          finished: task.finished,
-          beginDate: task.beginDate,
-          endDate: task.endDate,
-          revenue: task.revenue,
-          statusUuid: task.statusUuid,
-          projectUuid: projectUuid,
-          userUuid: task.userUuid,
-          budgetUuid: null,
-          originalTaskId: budgetTaskCreated.id,
-        },
-      })
-      await prisma.taskExpense.create({
-        data: {
-          id: taskCreated.id,
-          amount: task.amount,
-        },
-      })
-    })
-
-    tasksExpenseToUpdate.map(async (task) => {
-      const budgetTaskExpenseUpdated = await prisma.taskExpense.update({
-        data: {
-          amount: task.amount,
-        },
-        where: {
-          uuid: task.uuid,
-        },
-      })
-      await prisma.task.update({
-        data: {
-          name: task.name,
-          description: task.description,
-          finished: task.finished,
-          beginDate: task.beginDate,
-          endDate: task.endDate,
-          revenue: task.revenue,
-          statusUuid: task.statusUuid,
-          projectUuid: projectUuid,
-          userUuid: task.userUuid,
-          budgetUuid: budgetUuid,
-          originalTaskId: null,
-        },
-        where: {
-          id: budgetTaskExpenseUpdated.id,
-        },
-      })
-      const taskToUpdate = await prisma.task.findFirst({
-        include: { taskExpense: true },
-        where: { originalTaskId: budgetTaskExpenseUpdated.id },
-      })
-      if (taskToUpdate) {
-        await prisma.task.update({
+    await Promise.all([
+      ...tasks.create.expense.map(async (task) => {
+        const budgetTaskCreated = await prisma.task.create({
+          data: {
+            name: task.name,
+            description: task.description,
+            finished: task.finished,
+            beginDate: task.beginDate,
+            endDate: task.endDate,
+            revenue: task.revenue,
+            statusUuid: task.statusUuid,
+            projectUuid: projectUuid,
+            userUuid: task.userUuid,
+            budgetUuid: budgetUuid,
+            originalTaskId: null,
+          },
+        })
+        await prisma.taskExpense.create({
+          data: {
+            id: budgetTaskCreated.id,
+            amount: task.taskExpense.amount,
+          },
+        })
+        const taskCreated = await prisma.task.create({
           data: {
             name: task.name,
             description: task.description,
@@ -269,210 +287,39 @@ export const budgetTasksExpenseUpdate = async (req: Request, res: Response): Pro
             projectUuid: projectUuid,
             userUuid: task.userUuid,
             budgetUuid: null,
-            originalTaskId: budgetTaskExpenseUpdated.id,
-          },
-          where: {
-            id: taskToUpdate.id,
+            originalTaskId: budgetTaskCreated.id,
           },
         })
-        if (taskToUpdate.taskExpense)
-          await prisma.taskExpense.update({
-            data: {
-              amount: task.amount,
-            },
-            where: {
-              uuid: taskToUpdate.taskExpense.uuid,
-            },
-          })
-      }
-    })
-
-    tasksExpenseToDelete.map(async (task) => {
-      const budgetTaskExpenseDeleted = await prisma.taskExpense.delete({
-        where: { uuid: task.uuid },
-      })
-      await prisma.task.delete({
-        where: { id: budgetTaskExpenseDeleted.id },
-      })
-      const taskToDelete = await prisma.task.findFirst({
-        include: { taskExpense: true },
-        where: { originalTaskId: budgetTaskExpenseDeleted.id },
-      })
-      if (taskToDelete) {
-        await prisma.task.delete({
-          where: { id: taskToDelete.id },
+        await prisma.taskExpense.create({
+          data: {
+            id: taskCreated.id,
+            amount: task.taskExpense.amount,
+          },
         })
-        if (taskToDelete.taskExpense)
-          await prisma.taskExpense.delete({
-            where: { uuid: taskToDelete.taskExpense.uuid },
-          })
-      }
-    })
-
-    res.status(201).json({ message: 'As tarefas de despesa do orçamento foram atualizadas.' })
-    return
-  } catch (e) {
-    console.log(e)
-    res.status(500).json({ message: 'Erro no servidor!' })
-    return
-  }
-}
-
-export const budgetTasksActivityUpdate = async (req: Request, res: Response): Promise<void> => {
-  try {
-    // check schema
-    const body = budgetTasksActivityUpdateSchema.safeParse(req.body)
-    if (!body.success) {
-      res.status(401).json({ message: `Body inválido: ${JSON.stringify(body.error.format())}` })
-      return
-    }
-    const tasks = body.data.tasks
-
-    // check if has token
-    const token = req.user
-    if (!token) {
-      res.status(401).json({ message: 'Token não encontrado!' })
-      return
-    }
-
-    // check if user has authorization
-    if (!(await authorization('project', token.authUuid))) {
-      res.status(401).json({ message: 'Usuário sem autorização para editar esses dados!' })
-      return
-    }
-
-    const budget = await prisma.budget.findUnique({ where: { uuid: body.data.uuid } })
-    if (!budget) {
-      res.status(401).json({ message: 'Orçamento não encontrado!' })
-      return
-    }
-
-    const projectUuids = new Set(tasks.map(({ projectUuid }) => projectUuid))
-    if (projectUuids.size !== 1) {
-      res.status(401).json({ message: 'As tarefas devem ser de um único projeto!' })
-      return
-    }
-    const projectUuid = [...projectUuids][0]
-
-    const budgetUuids = new Set(tasks.map(({ budgetUuid }) => budgetUuid))
-    if (budgetUuids.size !== 1) {
-      res.status(401).json({ message: 'As tarefas devem ser de um único projeto!' })
-      return
-    }
-    const budgetUuid = [...budgetUuids][0]
-
-    const tasksActivityToCreate = tasks
-      .filter(({ uuid }) => uuid === '')
-      .map(({ uuid, ...task }) => task)
-
-    const tasksActivityToUpdate = tasks.filter(({ uuid }) => uuid !== '')
-
-    const tasksActivityToDelete = await prisma.taskExpense.findMany({
-      where: {
-        uuid: {
-          notIn: tasksActivityToUpdate.map(({ uuid }) => uuid),
-        },
-        task: {
-          budgetUuid: budgetUuid,
-          projectUuid: projectUuid,
-        },
-      },
-    })
-
-    // create resource
-    if (!budget.register) {
-      await prisma.budget.update({
-        data: { register: new Date() },
-        where: { uuid: budget.uuid },
-      })
-    }
-
-    // create resource
-    if (!budget.register) {
-      await prisma.budget.update({
-        data: { register: new Date() },
-        where: { uuid: budget.uuid },
-      })
-    }
-
-    tasksActivityToCreate.map(async (task) => {
-      const budgetTaskCreated = await prisma.task.create({
-        data: {
-          name: task.name,
-          description: task.description,
-          finished: task.finished,
-          beginDate: task.beginDate,
-          endDate: task.endDate,
-          revenue: task.revenue,
-          statusUuid: task.statusUuid,
-          projectUuid: projectUuid,
-          userUuid: task.userUuid,
-          budgetUuid: budgetUuid,
-          originalTaskId: null,
-        },
-      })
-      await prisma.taskActivity.create({
-        data: {
-          id: budgetTaskCreated.id,
-          hourlyRate: task.hourlyRate,
-        },
-      })
-      const taskCreated = await prisma.task.create({
-        data: {
-          name: task.name,
-          description: task.description,
-          finished: task.finished,
-          beginDate: task.beginDate,
-          endDate: task.endDate,
-          revenue: task.revenue,
-          statusUuid: task.statusUuid,
-          projectUuid: projectUuid,
-          userUuid: task.userUuid,
-          budgetUuid: null,
-          originalTaskId: budgetTaskCreated.id,
-        },
-      })
-      await prisma.taskActivity.create({
-        data: {
-          id: taskCreated.id,
-          hourlyRate: task.hourlyRate,
-        },
-      })
-    })
-
-    tasksActivityToUpdate.map(async (task) => {
-      const budgetTaskActivityUpdated = await prisma.taskActivity.update({
-        data: {
-          hourlyRate: task.hourlyRate,
-        },
-        where: {
-          uuid: task.uuid,
-        },
-      })
-      await prisma.task.update({
-        data: {
-          name: task.name,
-          description: task.description,
-          finished: task.finished,
-          beginDate: task.beginDate,
-          endDate: task.endDate,
-          revenue: task.revenue,
-          statusUuid: task.statusUuid,
-          projectUuid: projectUuid,
-          userUuid: task.userUuid,
-          budgetUuid: budgetUuid,
-          originalTaskId: null,
-        },
-        where: {
-          id: budgetTaskActivityUpdated.id,
-        },
-      })
-      const taskToUpdate = await prisma.task.findFirst({
-        include: { taskActivity: true },
-        where: { originalTaskId: budgetTaskActivityUpdated.id },
-      })
-      if (taskToUpdate) {
-        await prisma.task.update({
+      }),
+      ...tasks.create.activity.map(async (task) => {
+        const budgetTaskCreated = await prisma.task.create({
+          data: {
+            name: task.name,
+            description: task.description,
+            finished: task.finished,
+            beginDate: task.beginDate,
+            endDate: task.endDate,
+            revenue: task.revenue,
+            statusUuid: task.statusUuid,
+            projectUuid: projectUuid,
+            userUuid: task.userUuid,
+            budgetUuid: budgetUuid,
+            originalTaskId: null,
+          },
+        })
+        await prisma.taskActivity.create({
+          data: {
+            id: budgetTaskCreated.id,
+            hourlyRate: task.taskActivity.hourlyRate,
+          },
+        })
+        const taskCreated = await prisma.task.create({
           data: {
             name: task.name,
             description: task.description,
@@ -484,47 +331,189 @@ export const budgetTasksActivityUpdate = async (req: Request, res: Response): Pr
             projectUuid: projectUuid,
             userUuid: task.userUuid,
             budgetUuid: null,
-            originalTaskId: budgetTaskActivityUpdated.id,
+            originalTaskId: budgetTaskCreated.id,
+          },
+        })
+        await prisma.taskActivity.create({
+          data: {
+            id: taskCreated.id,
+            hourlyRate: task.taskActivity.hourlyRate,
+          },
+        })
+      }),
+    ])
+
+    await Promise.all([
+      ...tasks.update.expense.map(async (task) => {
+        const budgetTaskUpdated = await prisma.taskExpense.update({
+          data: {
+            amount: task.taskExpense.amount,
           },
           where: {
-            id: taskToUpdate.id,
+            uuid: task.taskExpense.uuid,
           },
         })
-        if (taskToUpdate.taskActivity)
-          await prisma.taskActivity.update({
+        await prisma.task.update({
+          data: {
+            name: task.name,
+            description: task.description,
+            finished: task.finished,
+            beginDate: task.beginDate,
+            endDate: task.endDate,
+            revenue: task.revenue,
+            statusUuid: task.statusUuid,
+            projectUuid: projectUuid,
+            userUuid: task.userUuid,
+            budgetUuid: budgetUuid,
+            originalTaskId: null,
+          },
+          where: {
+            id: budgetTaskUpdated.id,
+          },
+        })
+        const taskToUpdate = await prisma.task.findFirst({
+          include: { taskExpense: true },
+          where: { originalTaskId: budgetTaskUpdated.id },
+        })
+        if (taskToUpdate) {
+          await prisma.task.update({
             data: {
-              hourlyRate: task.hourlyRate,
+              name: task.name,
+              description: task.description,
+              finished: task.finished,
+              beginDate: task.beginDate,
+              endDate: task.endDate,
+              revenue: task.revenue,
+              statusUuid: task.statusUuid,
+              projectUuid: projectUuid,
+              userUuid: task.userUuid,
+              budgetUuid: null,
+              originalTaskId: budgetTaskUpdated.id,
             },
             where: {
-              uuid: taskToUpdate.taskActivity.uuid,
+              id: taskToUpdate.id,
             },
           })
-      }
-    })
-
-    tasksActivityToDelete.map(async (task) => {
-      const budgetTaskActivityDeleted = await prisma.taskActivity.delete({
-        where: { uuid: task.uuid },
-      })
-      await prisma.task.delete({
-        where: { id: budgetTaskActivityDeleted.id },
-      })
-      const taskToDelete = await prisma.task.findFirst({
-        include: { taskActivity: true },
-        where: { originalTaskId: budgetTaskActivityDeleted.id },
-      })
-      if (taskToDelete) {
-        await prisma.task.delete({
-          where: { id: taskToDelete.id },
+          if (taskToUpdate.taskExpense)
+            await prisma.taskExpense.update({
+              data: {
+                amount: task.taskExpense.amount,
+              },
+              where: {
+                uuid: taskToUpdate.taskExpense.uuid,
+              },
+            })
+        }
+      }),
+      ...tasks.update.activity.map(async (task) => {
+        const budgetTaskUpdated = await prisma.taskActivity.update({
+          data: {
+            hourlyRate: task.taskActivity.hourlyRate,
+          },
+          where: {
+            uuid: task.taskActivity.uuid,
+          },
         })
-        if (taskToDelete.taskActivity)
-          await prisma.taskActivity.delete({
-            where: { uuid: taskToDelete.taskActivity.uuid },
+        await prisma.task.update({
+          data: {
+            name: task.name,
+            description: task.description,
+            finished: task.finished,
+            beginDate: task.beginDate,
+            endDate: task.endDate,
+            revenue: task.revenue,
+            statusUuid: task.statusUuid,
+            projectUuid: projectUuid,
+            userUuid: task.userUuid,
+            budgetUuid: budgetUuid,
+            originalTaskId: null,
+          },
+          where: {
+            id: budgetTaskUpdated.id,
+          },
+        })
+        const taskToUpdate = await prisma.task.findFirst({
+          include: { taskActivity: true },
+          where: { originalTaskId: budgetTaskUpdated.id },
+        })
+        if (taskToUpdate) {
+          await prisma.task.update({
+            data: {
+              name: task.name,
+              description: task.description,
+              finished: task.finished,
+              beginDate: task.beginDate,
+              endDate: task.endDate,
+              revenue: task.revenue,
+              statusUuid: task.statusUuid,
+              projectUuid: projectUuid,
+              userUuid: task.userUuid,
+              budgetUuid: null,
+              originalTaskId: budgetTaskUpdated.id,
+            },
+            where: {
+              id: taskToUpdate.id,
+            },
           })
-      }
-    })
+          if (taskToUpdate.taskActivity)
+            await prisma.taskActivity.update({
+              data: {
+                hourlyRate: task.taskActivity.hourlyRate,
+              },
+              where: {
+                uuid: taskToUpdate.taskActivity.uuid,
+              },
+            })
+        }
+      }),
+    ])
 
-    res.status(201).json({ message: 'As tarefas de atividade do projeto foram atualizadas.' })
+    await Promise.all([
+      ...tasks.delete.expense.map(async (task) => {
+        const budgetTaskDeleted = await prisma.taskExpense.delete({
+          where: { uuid: task.uuid },
+        })
+        await prisma.task.delete({
+          where: { id: budgetTaskDeleted.id },
+        })
+        const taskToDelete = await prisma.task.findFirst({
+          include: { taskExpense: true },
+          where: { originalTaskId: budgetTaskDeleted.id },
+        })
+        if (taskToDelete) {
+          await prisma.task.delete({
+            where: { id: taskToDelete.id },
+          })
+          if (taskToDelete.taskExpense)
+            await prisma.taskExpense.delete({
+              where: { uuid: taskToDelete.taskExpense.uuid },
+            })
+        }
+      }),
+      ...tasks.delete.activity.map(async (task) => {
+        const budgetTaskDeleted = await prisma.taskActivity.delete({
+          where: { uuid: task.uuid },
+        })
+        await prisma.task.delete({
+          where: { id: budgetTaskDeleted.id },
+        })
+        const taskToDelete = await prisma.task.findFirst({
+          include: { taskActivity: true },
+          where: { originalTaskId: budgetTaskDeleted.id },
+        })
+        if (taskToDelete) {
+          await prisma.task.delete({
+            where: { id: taskToDelete.id },
+          })
+          if (taskToDelete.taskActivity)
+            await prisma.taskActivity.delete({
+              where: { uuid: taskToDelete.taskActivity.uuid },
+            })
+        }
+      }),
+    ])
+
+    res.status(201).json({ message: 'As tarefas do orçamento foram atualizadas.' })
     return
   } catch (e) {
     console.log(e)

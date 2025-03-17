@@ -237,34 +237,12 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
     setAlertSuccesses(null)
 
     try {
-      const budgetTaskExpense = {
-        ...data,
-        tasks: data.tasks.filter(
-          ({ taskExpense }) => taskExpense !== null && taskExpense !== undefined
-        ),
-      }
-      const budgetTaskActivity = {
-        ...data,
-        tasks: data.tasks.filter(
-          ({ taskActivity }) => taskActivity !== null && taskActivity !== undefined
-        ),
-      }
-
-      console.log(budgetTaskExpense)
-      console.log(budgetTaskActivity)
-
-      const [{ data: resBudgetTaskExpenses }, { data: resBudgetTaskActivity }] = await Promise.all([
-        await axios.put('/budget/task/expense/update', budgetTaskExpense, {
-          withCredentials: true,
-        }),
-        await axios.put('/budget/task/activity/update', budgetTaskActivity, {
-          withCredentials: true,
-        }),
-      ])
+      const response = await axios.put('/budget/task/update', data, {
+        withCredentials: true,
+      })
 
       setAlertSuccesses([
-        resBudgetTaskExpenses.message,
-        resBudgetTaskActivity.message,
+        response.data.message,
         <Button
           type="button"
           color="success"

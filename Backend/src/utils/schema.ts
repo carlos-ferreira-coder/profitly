@@ -513,6 +513,64 @@ export const projectUpdateSchema = z.object({
   statusUuid: zodUuid('status'),
 })
 
+export const budgetSelectSchema = z.object({
+  registerMin: zodString('registro', false).optional(),
+  registerMax: zodString('registro', false).optional(),
+})
+
+const taskUpdateSchema = z.object({
+  name: zodString('nome', true),
+  description: zodString('descrição', true),
+  finished: zodBoolean('finalizado'),
+  beginDate: zodRegex('data inicial', /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/, true).transform(
+    (s) => new Date(s),
+  ),
+  endDate: zodRegex('data inicial', /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/, true).transform(
+    (s) => new Date(s),
+  ),
+  revenue: zodRegex('lucro', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, false).transform((s) =>
+    currencyToNumber(s, 'BRL'),
+  ),
+  statusUuid: zodUuid('status'),
+  projectUuid: zodUuid('projeto'),
+  userUuid: zodUuid('usuário').optional(),
+  budgetUuid: zodUuid('orçamento').optional(),
+  taskExpense: z
+    .object({
+      uuid: zodRegex(
+        'uuid de tarefa de despesa',
+        /^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+        false,
+      ),
+      amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true).transform((s) =>
+        currencyToNumber(s, 'BRL'),
+      ),
+    })
+    .optional(),
+  taskActivity: z
+    .object({
+      uuid: zodRegex(
+        'uuid de tarefa de despesa',
+        /^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+        false,
+      ),
+      hourlyRate: zodRegex('valor da hora', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true).transform(
+        (s) => currencyToNumber(s, 'BRL'),
+      ),
+    })
+    .optional(),
+})
+
+export const budgetTasksUpdateSchema = z.object({
+  uuid: zodUuid('orçamento'),
+  register: zodRegex('registro', /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/, true)
+    .transform((s) => new Date(s))
+    .optional(),
+  tasks: z.array(taskUpdateSchema),
+})
+
+/*
+
 const taskSelectSchema = {
   name: zodString('nome', false).optional(),
   description: zodString('descrição', false).optional(),
@@ -557,25 +615,6 @@ const taskSelectSchema = {
   )
     .transform((s) => s.split(','))
     .optional(),
-}
-
-const taskUpdateSchema = {
-  name: zodString('nome', true),
-  description: zodString('descrição', true),
-  finished: zodBoolean('finalizado'),
-  beginDate: zodRegex('data inicial', /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/, true).transform(
-    (s) => new Date(s),
-  ),
-  endDate: zodRegex('data inicial', /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/, true).transform(
-    (s) => new Date(s),
-  ),
-  revenue: zodRegex('lucro', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, false).transform((s) =>
-    currencyToNumber(s, 'BRL'),
-  ),
-  statusUuid: zodUuid('status'),
-  projectUuid: zodUuid('projeto'),
-  userUuid: zodUuid('usuário').nullable().optional(),
-  budgetUuid: zodUuid('orçamento').nullable().optional(),
 }
 
 export const taskExpenseSelectSchema = z.object({
@@ -642,10 +681,7 @@ export const taskActivityUpdateSchema = z
     }
   })
 
-export const budgetSelectSchema = z.object({
-  registerMin: zodString('registro', false).optional(),
-  registerMax: zodString('registro', false).optional(),
-})
+
 
 export const budgetTasksExpenseUpdateSchema = z.object({
   uuid: zodUuid('orçamento'),
@@ -664,3 +700,4 @@ export const budgetTasksActivityUpdateSchema = z.object({
     .optional(),
   tasks: z.array(taskActivityUpdateSchema),
 })
+*/
