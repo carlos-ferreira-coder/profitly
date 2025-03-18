@@ -128,6 +128,7 @@ const Form = ({ user, authOptions }: { user: UserProps; authOptions: Options[] }
                   iconPosition="left"
                   format="###.###.###-##"
                   placeholder="Digite o cpf"
+                  className="bg-slate-200 dark:bg-slate-700"
                 />
               )}
             />
@@ -150,6 +151,7 @@ const Form = ({ user, authOptions }: { user: UserProps; authOptions: Options[] }
           <div className="flex items-center h-13">
             <Controller
               name="active"
+              disabled
               control={control}
               render={({ field }) => <Switcher {...field} />}
             />
@@ -168,10 +170,12 @@ const Form = ({ user, authOptions }: { user: UserProps; authOptions: Options[] }
           <Input
             id="username"
             type="text"
+            disabled
             icon={faUserTie}
             iconPosition="left"
             {...register('username')}
             placeholder="Digite o nome do usuário"
+            className="bg-slate-200 dark:bg-slate-700"
           />
         </div>
         {errors.username && (
@@ -187,10 +191,12 @@ const Form = ({ user, authOptions }: { user: UserProps; authOptions: Options[] }
           <Input
             id="name"
             type="text"
+            disabled
             icon={faUser}
             iconPosition="left"
             {...register('person.entity.name')}
             placeholder="Digite o nome completo"
+            className="bg-slate-200 dark:bg-slate-700"
           />
         </div>
         {errors.person?.entity?.name && (
@@ -209,11 +215,13 @@ const Form = ({ user, authOptions }: { user: UserProps; authOptions: Options[] }
           <Input
             id="email"
             type="text"
+            disabled
             icon={faEnvelope}
             iconPosition="left"
             autoComplete="email"
             {...register('person.entity.email')}
             placeholder="Digite o email"
+            className="bg-slate-200 dark:bg-slate-700"
           />
         </div>
         {errors.person?.entity?.email && (
@@ -236,11 +244,13 @@ const Form = ({ user, authOptions }: { user: UserProps; authOptions: Options[] }
               render={({ field }) => (
                 <Select
                   {...field}
+                  disabled
                   id="authUuid"
                   icon={faBriefcase}
                   iconPosition="left"
                   isSelected={true}
                   options={authOptions || []}
+                  className="bg-slate-200 dark:bg-slate-700"
                 />
               )}
             />
@@ -265,6 +275,7 @@ const Form = ({ user, authOptions }: { user: UserProps; authOptions: Options[] }
                 <InputNumeric
                   {...field}
                   id="hourlyRate"
+                  disabled
                   icon={faDollarSign}
                   iconPosition="left"
                   prefix={'R$ '}
@@ -274,6 +285,7 @@ const Form = ({ user, authOptions }: { user: UserProps; authOptions: Options[] }
                   decimalSeparator=","
                   thousandSeparator="."
                   placeholder="Digite o valor da hora"
+                  className="bg-slate-200 dark:bg-slate-700"
                 />
               )}
             />
@@ -300,11 +312,13 @@ const Form = ({ user, authOptions }: { user: UserProps; authOptions: Options[] }
                 {...field}
                 id="phone"
                 mask="_"
+                disabled
                 icon={faPhone}
                 iconPosition="left"
                 format="(##) # ####-####"
                 autoComplete="phone"
                 placeholder="Digite o telefone"
+                className="bg-slate-200 dark:bg-slate-700"
               />
             )}
           />
@@ -325,10 +339,12 @@ const Form = ({ user, authOptions }: { user: UserProps; authOptions: Options[] }
           <Input
             id="address"
             type="text"
+            disabled
             icon={faLocationDot}
             iconPosition="left"
             {...register('person.entity.address')}
             placeholder="Digite o endereço"
+            className="bg-slate-200 dark:bg-slate-700"
           />
         </div>
         {errors.person?.entity?.address && (
