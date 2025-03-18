@@ -117,7 +117,7 @@ const entityUpdateSchema = z.object({
 
 const personSelectSchema = z.object({
   cpf: zodString('cpf', true),
-  entity: entitySelectSchema,
+  entity: entitySelectSchema.optional(),
 })
 
 const personCreateSchema = z.object({
@@ -132,7 +132,7 @@ const personUpdateSchema = z.object({
 const enterpriseSelectSchema = z.object({
   cnpj: zodString('cnpj', true).optional(),
   fantasy: zodString('nome fantasia', true).optional(),
-  entity: entitySelectSchema,
+  entity: entitySelectSchema.optional(),
 })
 
 const enterpriseCreateSchema = z.object({
@@ -164,7 +164,7 @@ export const userSelectSchema = z.object({
   )
     .transform((s) => s.split(','))
     .optional(),
-  person: personSelectSchema,
+  person: personSelectSchema.optional(),
 })
 
 export const userCreateSchema = z
@@ -370,7 +370,7 @@ export const expenseSelectSchema = z.object({
   )
     .transform((s) => s.split(','))
     .optional(),
-  transaction: transactionSelectSchema,
+  transaction: transactionSelectSchema.optional(),
 })
 
 export const expenseCreateSchema = z.object({
@@ -386,7 +386,7 @@ export const incomeSelectSchema = z.object({
   )
     .transform((s) => s.split(','))
     .optional(),
-  transaction: transactionSelectSchema,
+  transaction: transactionSelectSchema.optional(),
 })
 
 export const incomeCreateSchema = z.object({
@@ -409,7 +409,7 @@ export const refundSelectSchema = z.object({
   )
     .transform((s) => s.split(','))
     .optional(),
-  transaction: transactionSelectSchema,
+  transaction: transactionSelectSchema.optional(),
 })
 
 export const refundCreateSchema = z
@@ -448,7 +448,7 @@ export const loanSelectSchema = z.object({
   monthsMax: zodRegex('meses', /^\d+$/, true)
     .transform((s) => parseInt(s))
     .optional(),
-  transaction: transactionSelectSchema,
+  transaction: transactionSelectSchema.optional(),
 })
 
 export const loanCreateSchema = z.object({
