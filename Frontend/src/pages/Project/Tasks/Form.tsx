@@ -82,8 +82,6 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
     tasks: tasks,
   }
 
-  console.log(defaultValues)
-
   // Hookform
   const {
     reset,
