@@ -29,6 +29,8 @@ const Form = ({ client }: { client: ClientProps }) => {
   const schema = clientSchema
   type SchemaProps = z.infer<typeof schema>
 
+  console.log(client)
+
   const defaultValues = { ...client }
 
   // Hookform
