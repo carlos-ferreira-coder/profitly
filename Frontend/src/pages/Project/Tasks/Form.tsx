@@ -23,8 +23,8 @@ import Loader from '../../../components/Loader'
 import { StatusProps, TaskProps, UserProps } from '../../../types/Database'
 import { tasksSchema } from '../../../hooks/useSchema'
 import StatusSearch from '../../../hooks/search/useSearchStatus'
-import UserSearch from '../../../hooks/search/useSearchUser'
 import Switcher from '../../../components/Form/Switcher'
+import SearchUser from '../../../hooks/search/useSearchUser'
 
 const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string }) => {
   const navigate = useNavigate()
@@ -84,7 +84,6 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
 
   // Hookform
   const {
-    watch,
     reset,
     control,
     register,
@@ -134,40 +133,48 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
       control,
     })
 
-    const revenue = tasks.reduce((acc, task) => {
-      if (task.taskExpense) return acc + currencyToNumber(task.revenue, 'BRL')
+    const total = tasks.reduce(
+      (acc, task) => {
+        if (task.taskExpense) {
+          if (task.revenue !== '' && task.taskExpense.amount !== '') {
+            acc.revenue += currencyToNumber(task.revenue, 'BRL')
+            acc.cost += currencyToNumber(task.taskExpense.amount, 'BRL')
+          }
+        }
 
-      const beginDate = parse(task.beginDate, 'dd/MM/yy HH:mm', new Date())
-      const endDate = parse(task.endDate, 'dd/MM/yy HH:mm', new Date())
-      const hours = differenceInHours(endDate, beginDate)
+        if (task.taskActivity) {
+          const regex = /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{2} ([01]\d|2[0-3]):[0-5]\d$/
 
-      return acc + hours * currencyToNumber(task.revenue, 'BRL')
-    }, 0)
+          if (
+            regex.test(task.beginDate) &&
+            regex.test(task.endDate) &&
+            task.revenue !== '' &&
+            task.taskActivity.hourlyRate !== ''
+          ) {
+            const beginDate = parse(task.beginDate, 'dd/MM/yy HH:mm', new Date())
+            const endDate = parse(task.endDate, 'dd/MM/yy HH:mm', new Date())
+            const hours = differenceInHours(endDate, beginDate)
 
-    const cost = tasks.reduce((acc, task) => {
-      if (task.taskExpense) return acc + currencyToNumber(task.taskExpense.amount, 'BRL')
+            acc.revenue += hours * currencyToNumber(task.revenue, 'BRL')
+            acc.cost += hours * currencyToNumber(task.taskActivity.hourlyRate, 'BRL')
+          }
+        }
 
-      if (task.taskActivity) {
-        const beginDate = parse(task.beginDate, 'dd/MM/yy HH:mm', new Date())
-        const endDate = parse(task.endDate, 'dd/MM/yy HH:mm', new Date())
-        const hours = differenceInHours(endDate, beginDate)
-
-        return acc + hours * currencyToNumber(task.taskActivity.hourlyRate, 'BRL')
-      }
-
-      return 0
-    }, 0)
+        return acc
+      },
+      { cost: 0, revenue: 0 }
+    )
 
     return (
       <>
         <p>
-          <b>Valor Total: </b> {numberToCurrency(cost + revenue, 'BRL')}
+          <b>Valor Total: </b> {numberToCurrency(total.cost + total.revenue, 'BRL')}
         </p>
         <p>
-          <b>Custo Total: </b> {numberToCurrency(cost, 'BRL')}
+          <b>Custo Total: </b> {numberToCurrency(total.cost, 'BRL')}
         </p>
         <p>
-          <b>Lucro Total: </b> {numberToCurrency(revenue, 'BRL')}
+          <b>Lucro Total: </b> {numberToCurrency(total.revenue, 'BRL')}
         </p>
       </>
     )
@@ -189,6 +196,8 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
       projectUuid: projectUuid,
       userUuid: undefined,
       budgetUuid: undefined,
+      taskExpense: undefined,
+      taskActivity: undefined,
     }
 
     if (type === 'expense')
@@ -225,17 +234,10 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
     setAlertSuccesses(null)
 
     try {
-      const taskExpense = data.tasks.filter((task) => 'amount' in task)
-      const taskActivity = data.tasks.filter((task) => 'hourlyRate' in task)
-
-      const [{ data: resTaskExpenses }, { data: resTaskActivity }] = await Promise.all([
-        await axios.put('/task/expense/update', taskExpense, { withCredentials: true }),
-        await axios.put('/task/activity/update', taskActivity, { withCredentials: true }),
-      ])
+      const response = await axios.put('/task/expense/update', data, { withCredentials: true })
 
       setAlertSuccesses([
-        resTaskExpenses.message,
-        resTaskActivity.message,
+        response.data.message,
         <Button
           type="button"
           color="success"
@@ -272,6 +274,37 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
 
           {resume && user && status ? (
             fields.map((field, index) => {
+              let total = numberToCurrency(0, 'BRL')
+
+              if (field.taskExpense) {
+                if (field.revenue !== '' && field.taskExpense.amount !== '')
+                  total = numberToCurrency(
+                    currencyToNumber(field.revenue, 'BRL') +
+                      currencyToNumber(field.taskExpense.amount, 'BRL'),
+                    'BRL'
+                  )
+              }
+
+              if (field.taskActivity) {
+                const regex = /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{2} ([01]\d|2[0-3]):[0-5]\d$/
+
+                if (
+                  field.revenue !== '' &&
+                  field.taskActivity.hourlyRate !== '' &&
+                  regex.test(field.beginDate) &&
+                  regex.test(field.endDate)
+                )
+                  total = numberToCurrency(
+                    (currencyToNumber(field.revenue, 'BRL') +
+                      currencyToNumber(field.taskActivity.hourlyRate, 'BRL')) *
+                      differenceInHours(
+                        parse(field.endDate, 'dd/MM/yy HH:mm', new Date()),
+                        parse(field.beginDate, 'dd/MM/yy HH:mm', new Date())
+                      ),
+                    'BRL'
+                  )
+              }
+
               return (
                 <div
                   key={field.id}
@@ -293,40 +326,10 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
 
                   <div className={resume[index] ? 'block' : 'hidden'}>
                     <p>
-                      <b>Descrição: </b>
-                      {watch(`tasks.${index}.description`)}
+                      <b>Nome: </b> {field.name}
                     </p>
                     <p>
-                      <b>Valor: </b>
-                      {watch(`tasks.${index}.taskExpense`) &&
-                        numberToCurrency(
-                          currencyToNumber(watch(`tasks.${index}.taskExpense.amount`), 'BRL') +
-                            currencyToNumber(watch(`tasks.${index}.revenue`), 'BRL'),
-                          'BRL'
-                        )}
-
-                      {watch(`tasks.${index}.taskActivity`) &&
-                        numberToCurrency(
-                          currencyToNumber(watch(`tasks.${index}.taskActivity.hourlyRate`), 'BRL') *
-                            differenceInHours(
-                              parse(watch(`tasks.${index}.endDate`), 'dd/MM/yy HH:mm', new Date()),
-                              parse(watch(`tasks.${index}.beginDate`), 'dd/MM/yy HH:mm', new Date())
-                            ) +
-                            currencyToNumber(watch(`tasks.${index}.revenue`), 'BRL') *
-                              differenceInHours(
-                                parse(
-                                  watch(`tasks.${index}.endDate`),
-                                  'dd/MM/yy HH:mm',
-                                  new Date()
-                                ),
-                                parse(
-                                  watch(`tasks.${index}.beginDate`),
-                                  'dd/MM/yy HH:mm',
-                                  new Date()
-                                )
-                              ),
-                          'BRL'
-                        )}
+                      <b>Total: </b> {total}
                     </p>
                     <p>
                       <b>Status: </b>
@@ -335,13 +338,6 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                   </div>
 
                   <div className={resume[index] ? 'hidden' : 'block'}>
-                    <Input
-                      id={`tasks.${index}.taskExpense.uuid`}
-                      type="text"
-                      hidden
-                      disabled
-                      {...register(`tasks.${index}.taskExpense.uuid`)}
-                    />
                     {errors.tasks?.[index]?.taskExpense?.uuid && (
                       <Alert
                         type="danger"
@@ -349,19 +345,45 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                         data={[errors.tasks?.[index].taskExpense.uuid.message || '']}
                       />
                     )}
-
-                    <Input
-                      id={`tasks.${index}.taskActivity.uuid`}
-                      type="text"
-                      hidden
-                      disabled
-                      {...register(`tasks.${index}.taskActivity.uuid`)}
-                    />
                     {errors.tasks?.[index]?.taskActivity?.uuid && (
                       <Alert
                         type="danger"
                         size="sm"
                         data={[errors.tasks?.[index].taskActivity.uuid.message || '']}
+                      />
+                    )}
+                    {errors.tasks?.[index]?.projectUuid && (
+                      <Alert
+                        type="danger"
+                        size="sm"
+                        data={[errors.tasks?.[index].projectUuid.message || '']}
+                      />
+                    )}
+                    {errors.tasks?.[index]?.budgetUuid && (
+                      <Alert
+                        type="danger"
+                        size="sm"
+                        data={[errors.tasks?.[index].budgetUuid.message || '']}
+                      />
+                    )}
+
+                    {field.taskExpense && (
+                      <Input
+                        id={`tasks.${index}.taskExpense.uuid`}
+                        type="text"
+                        hidden
+                        disabled
+                        {...register(`tasks.${index}.taskExpense.uuid`)}
+                      />
+                    )}
+
+                    {field.taskActivity && (
+                      <Input
+                        id={`tasks.${index}.taskActivity.uuid`}
+                        type="text"
+                        hidden
+                        disabled
+                        {...register(`tasks.${index}.taskActivity.uuid`)}
                       />
                     )}
 
@@ -372,13 +394,14 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                       disabled
                       {...register(`tasks.${index}.projectUuid`)}
                     />
-                    {errors.tasks?.[index]?.projectUuid && (
-                      <Alert
-                        type="danger"
-                        size="sm"
-                        data={[errors.tasks?.[index].projectUuid.message || '']}
-                      />
-                    )}
+
+                    <Input
+                      id={`tasks.${index}.budgetUuid`}
+                      type="text"
+                      hidden
+                      disabled
+                      {...register(`tasks.${index}.budgetUuid`)}
+                    />
 
                     <div className="flex justify-between gap-5 mb-6">
                       <div className="w-full">
@@ -413,7 +436,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                             className="mb-2.5 block font-medium text-black dark:text-white text-center"
                             htmlFor={`tasks.${index}.name`}
                           >
-                            Ativo
+                            Finalizado
                           </label>
                         </div>
 
@@ -519,7 +542,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                       )}
                     </div>
 
-                    {watch(`tasks.${index}.taskExpense`) && (
+                    {field.taskExpense && (
                       <div className="mb-6">
                         <label
                           className="mb-2.5 block font-medium text-black dark:text-white"
@@ -558,7 +581,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                       </div>
                     )}
 
-                    {watch(`tasks.${index}.taskActivity`) && (
+                    {field.taskActivity && (
                       <div className="mb-6">
                         <label
                           className="mb-2.5 block font-medium text-black dark:text-white"
@@ -686,7 +709,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                           {...register(`tasks.${index}.userUuid`)}
                         />
 
-                        <UserSearch
+                        <SearchUser
                           user={user[index]}
                           setUser={(newUser) => {
                             setUser(

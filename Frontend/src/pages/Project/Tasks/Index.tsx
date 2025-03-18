@@ -16,12 +16,11 @@ const Tasks = () => {
   useEffect(() => {
     ;(async () => {
       try {
-        const [{ data: resTaskExpenses }, { data: resTaskActivity }] = await Promise.all([
-          axios.get(`task/expense/select/all?projectUuid=${uuid}`, { withCredentials: true }),
-          axios.get(`task/activity/select/all?projectUuid=${uuid}`, { withCredentials: true }),
-        ])
+        const { data: resTasks } = await axios.get(`task/select/all?projectUuid=${uuid}`, {
+          withCredentials: true,
+        })
 
-        setTasks([...resTaskExpenses, ...resTaskActivity])
+        setTasks(resTasks)
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])
       }

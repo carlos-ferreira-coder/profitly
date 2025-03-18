@@ -136,7 +136,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
         control,
       }) || []
 
-    const budget = tasks.reduce(
+    const total = tasks.reduce(
       (acc, task) => {
         if (task.taskExpense) {
           if (task.revenue !== '' && task.taskExpense.amount !== '') {
@@ -171,13 +171,13 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
     return (
       <>
         <p>
-          <b>Valor Total: </b> {numberToCurrency(budget.cost + budget.revenue, 'BRL')}
+          <b>Valor Total: </b> {numberToCurrency(total.cost + total.revenue, 'BRL')}
         </p>
         <p>
-          <b>Custo Total: </b> {numberToCurrency(budget.cost, 'BRL')}
+          <b>Custo Total: </b> {numberToCurrency(total.cost, 'BRL')}
         </p>
         <p>
-          <b>Lucro Total: </b> {numberToCurrency(budget.revenue, 'BRL')}
+          <b>Lucro Total: </b> {numberToCurrency(total.revenue, 'BRL')}
         </p>
       </>
     )
@@ -334,7 +334,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
 
                   <div className={resume[index] ? 'block' : 'hidden'}>
                     <p>
-                      <b>Descrição: </b> {field.description}
+                      <b>Nome: </b> {field.name}
                     </p>
                     <p>
                       <b>Total: </b> {total}
