@@ -470,15 +470,9 @@ export const budgetTasksUpdate = async (req: Request, res: Response): Promise<vo
 
     await Promise.all([
       ...tasks.delete.expense.map(async (task) => {
-        const budgetTaskDeleted = await prisma.taskExpense.delete({
-          where: { uuid: task.uuid },
-        })
-        await prisma.task.delete({
-          where: { id: budgetTaskDeleted.id },
-        })
         const taskToDelete = await prisma.task.findFirst({
           include: { taskExpense: true },
-          where: { originalTaskId: budgetTaskDeleted.id },
+          where: { originalTaskId: task.id },
         })
         if (taskToDelete) {
           await prisma.task.delete({
@@ -489,17 +483,17 @@ export const budgetTasksUpdate = async (req: Request, res: Response): Promise<vo
               where: { uuid: taskToDelete.taskExpense.uuid },
             })
         }
-      }),
-      ...tasks.delete.activity.map(async (task) => {
-        const budgetTaskDeleted = await prisma.taskActivity.delete({
+        await prisma.taskExpense.delete({
           where: { uuid: task.uuid },
         })
         await prisma.task.delete({
-          where: { id: budgetTaskDeleted.id },
+          where: { id: task.id },
         })
+      }),
+      ...tasks.delete.activity.map(async (task) => {
         const taskToDelete = await prisma.task.findFirst({
           include: { taskActivity: true },
-          where: { originalTaskId: budgetTaskDeleted.id },
+          where: { originalTaskId: task.id },
         })
         if (taskToDelete) {
           await prisma.task.delete({
@@ -510,6 +504,12 @@ export const budgetTasksUpdate = async (req: Request, res: Response): Promise<vo
               where: { uuid: taskToDelete.taskActivity.uuid },
             })
         }
+        await prisma.taskActivity.delete({
+          where: { uuid: task.uuid },
+        })
+        await prisma.task.delete({
+          where: { id: task.id },
+        })
       }),
     ])
 
