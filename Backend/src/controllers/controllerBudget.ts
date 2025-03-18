@@ -39,13 +39,13 @@ const responseBudgets = (budgets: BudgetProps[]) => {
                 ...task.taskExpense,
                 amount: numberToCurrency(task.taskExpense.amount.toNumber(), 'BRL'),
               }
-            : null,
+            : undefined,
           taskActivity: task.taskActivity
             ? {
                 ...task.taskActivity,
                 hourlyRate: numberToCurrency(task.taskActivity.hourlyRate.toNumber(), 'BRL'),
               }
-            : null,
+            : undefined,
         }
       }),
     }
