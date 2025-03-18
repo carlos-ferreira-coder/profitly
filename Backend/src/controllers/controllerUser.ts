@@ -99,21 +99,27 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
           lte: filter.hourlyRateMax ? filter.hourlyRateMax : undefined,
         },
         authUuid: filter.authUuid?.length ? { in: filter.authUuid } : undefined,
-        person: {
-          cpf: filter.person.cpf ? { contains: filter.person.cpf } : undefined,
-          entity: {
-            name: filter.person.entity.name ? { contains: filter.person.entity.name } : undefined,
-            email: filter.person.entity.email
-              ? { contains: filter.person.entity.email }
-              : undefined,
-            phone: filter.person.entity.phone
-              ? { contains: filter.person.entity.phone }
-              : undefined,
-            address: filter.person.entity.address
-              ? { contains: filter.person.entity.address }
-              : undefined,
-          },
-        },
+        person: filter.person
+          ? {
+              cpf: filter.person.cpf ? { contains: filter.person.cpf } : undefined,
+              entity: filter.person.entity
+                ? {
+                    name: filter.person.entity.name
+                      ? { contains: filter.person.entity.name }
+                      : undefined,
+                    email: filter.person.entity.email
+                      ? { contains: filter.person.entity.email }
+                      : undefined,
+                    phone: filter.person.entity.phone
+                      ? { contains: filter.person.entity.phone }
+                      : undefined,
+                    address: filter.person.entity.address
+                      ? { contains: filter.person.entity.address }
+                      : undefined,
+                  }
+                : undefined,
+            }
+          : undefined,
       },
     })
 

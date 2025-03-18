@@ -73,40 +73,44 @@ export const supplierSelect = async (req: Request, res: Response): Promise<void>
         person: filter.person
           ? {
               cpf: filter.person.cpf,
-              entity: {
-                name: filter.person.entity.name
-                  ? { contains: filter.person.entity.name }
-                  : undefined,
-                email: filter.person.entity.email
-                  ? { contains: filter.person.entity.email }
-                  : undefined,
-                phone: filter.person.entity.phone
-                  ? { contains: filter.person.entity.phone }
-                  : undefined,
-                address: filter.person.entity.address
-                  ? { contains: filter.person.entity.address }
-                  : undefined,
-              },
+              entity: filter.person.entity
+                ? {
+                    name: filter.person.entity.name
+                      ? { contains: filter.person.entity.name }
+                      : undefined,
+                    email: filter.person.entity.email
+                      ? { contains: filter.person.entity.email }
+                      : undefined,
+                    phone: filter.person.entity.phone
+                      ? { contains: filter.person.entity.phone }
+                      : undefined,
+                    address: filter.person.entity.address
+                      ? { contains: filter.person.entity.address }
+                      : undefined,
+                  }
+                : undefined,
             }
           : undefined,
         enterprise: filter.enterprise
           ? {
               cnpj: filter.enterprise.cnpj,
               fantasy: filter.enterprise.fantasy,
-              entity: {
-                name: filter.enterprise.entity.name
-                  ? { contains: filter.enterprise.entity.name }
-                  : undefined,
-                email: filter.enterprise.entity.email
-                  ? { contains: filter.enterprise.entity.email }
-                  : undefined,
-                phone: filter.enterprise.entity.phone
-                  ? { contains: filter.enterprise.entity.phone }
-                  : undefined,
-                address: filter.enterprise.entity.address
-                  ? { contains: filter.enterprise.entity.address }
-                  : undefined,
-              },
+              entity: filter.enterprise.entity
+                ? {
+                    name: filter.enterprise.entity.name
+                      ? { contains: filter.enterprise.entity.name }
+                      : undefined,
+                    email: filter.enterprise.entity.email
+                      ? { contains: filter.enterprise.entity.email }
+                      : undefined,
+                    phone: filter.enterprise.entity.phone
+                      ? { contains: filter.enterprise.entity.phone }
+                      : undefined,
+                    address: filter.enterprise.entity.address
+                      ? { contains: filter.enterprise.entity.address }
+                      : undefined,
+                  }
+                : undefined,
             }
           : undefined,
       },

@@ -102,30 +102,32 @@ export const loanSelect = async (req: Request, res: Response): Promise<void> => 
           lte: filter.monthsMax ? filter.monthsMax : undefined,
         },
         supplierUuid: filter.supplierUuid?.length ? { in: filter.supplierUuid } : undefined,
-        transaction: {
-          name: filter.transaction.name ? { contains: filter.transaction.name } : undefined,
-          description: filter.transaction.description
-            ? { contains: filter.transaction.description }
-            : undefined,
-          register: {
-            gte: filter.transaction.registerMin ? filter.transaction.registerMin : undefined,
-            lte: filter.transaction.registerMax ? filter.transaction.registerMax : undefined,
-          },
-          date: {
-            gte: filter.transaction.dateMin ? filter.transaction.dateMin : undefined,
-            lte: filter.transaction.dateMax ? filter.transaction.dateMax : undefined,
-          },
-          amount: {
-            gte: filter.transaction.amountMin ? filter.transaction.amountMin : undefined,
-            lte: filter.transaction.amountMax ? filter.transaction.amountMax : undefined,
-          },
-          userUuid: filter.transaction.userUuid?.length
-            ? { in: filter.transaction.userUuid }
-            : undefined,
-          projectUuid: filter.transaction.projectUuid?.length
-            ? { in: filter.transaction.projectUuid }
-            : undefined,
-        },
+        transaction: filter.transaction
+          ? {
+              name: filter.transaction.name ? { contains: filter.transaction.name } : undefined,
+              description: filter.transaction.description
+                ? { contains: filter.transaction.description }
+                : undefined,
+              register: {
+                gte: filter.transaction.registerMin ? filter.transaction.registerMin : undefined,
+                lte: filter.transaction.registerMax ? filter.transaction.registerMax : undefined,
+              },
+              date: {
+                gte: filter.transaction.dateMin ? filter.transaction.dateMin : undefined,
+                lte: filter.transaction.dateMax ? filter.transaction.dateMax : undefined,
+              },
+              amount: {
+                gte: filter.transaction.amountMin ? filter.transaction.amountMin : undefined,
+                lte: filter.transaction.amountMax ? filter.transaction.amountMax : undefined,
+              },
+              userUuid: filter.transaction.userUuid?.length
+                ? { in: filter.transaction.userUuid }
+                : undefined,
+              projectUuid: filter.transaction.projectUuid?.length
+                ? { in: filter.transaction.projectUuid }
+                : undefined,
+            }
+          : undefined,
       },
     })
 
