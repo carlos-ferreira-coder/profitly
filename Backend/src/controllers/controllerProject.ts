@@ -36,6 +36,11 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
       return
     }
 
+    const filter = {
+      ...params.data,
+      ...query.data,
+    }
+
     // check if has token
     const token = req.user
     if (!token) {
@@ -109,17 +114,17 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
         },
       },
       where: {
-        uuid: params.data.key === 'all' ? undefined : params.data.key,
-        name: query.data.name ? { contains: query.data.name } : undefined,
-        description: query.data.description ? { contains: query.data.description } : undefined,
+        uuid: filter.key === 'all' ? undefined : filter.key,
+        name: filter.name ? { contains: filter.name } : undefined,
+        description: filter.description ? { contains: filter.description } : undefined,
         register: {
-          gte: query.data.registerMin ? query.data.registerMin : undefined,
-          lte: query.data.registerMax ? query.data.registerMax : undefined,
+          gte: filter.registerMin ? filter.registerMin : undefined,
+          lte: filter.registerMax ? filter.registerMax : undefined,
         },
-        active: query.data.active?.length === 1 ? query.data.active[0] : undefined,
-        userUuid: query.data.userUuid?.length ? { in: query.data.userUuid } : undefined,
-        clientUuid: query.data.clientUuid?.length ? { in: query.data.clientUuid } : undefined,
-        statusUuid: query.data.statusUuid?.length ? { in: query.data.statusUuid } : undefined,
+        active: filter.active?.length === 1 ? filter.active[0] : undefined,
+        userUuid: filter.userUuid?.length ? { in: filter.userUuid } : undefined,
+        clientUuid: filter.clientUuid?.length ? { in: filter.clientUuid } : undefined,
+        statusUuid: filter.statusUuid?.length ? { in: filter.statusUuid } : undefined,
       },
     })
 

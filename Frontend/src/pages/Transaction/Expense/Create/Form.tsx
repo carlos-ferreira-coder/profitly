@@ -31,12 +31,14 @@ const Form = () => {
   type SchemaProps = z.infer<typeof schema>
 
   const defaultValues = {
-    name: '',
-    description: '',
-    date: '',
-    amount: '',
-    projectUuid: '',
     supplierUuid: undefined,
+    transaction: {
+      name: '',
+      description: '',
+      date: '',
+      amount: '',
+      projectUuid: '',
+    },
   }
 
   // Hookform
@@ -64,7 +66,7 @@ const Form = () => {
   }
 
   useEffect(() => {
-    setValue('projectUuid', project ? project.uuid : '')
+    setValue('transaction.projectUuid', project ? project.uuid : '')
   }, [project, setValue])
 
   useEffect(() => {
@@ -112,11 +114,13 @@ const Form = () => {
             type="text"
             icon={faSignature}
             iconPosition="left"
-            {...register('name')}
+            {...register('transaction.name')}
             placeholder="Digite o nome"
           />
         </div>
-        {errors.name && <Alert type="danger" size="sm" data={[errors.name.message || '']} />}
+        {errors.transaction?.name && (
+          <Alert type="danger" size="sm" data={[errors.transaction.name.message || '']} />
+        )}
       </div>
 
       <div className="mb-6">
@@ -132,12 +136,12 @@ const Form = () => {
             type="text"
             icon={faAlignLeft}
             iconPosition="left"
-            {...register('description')}
+            {...register('transaction.description')}
             placeholder="Digite a descrição"
           />
         </div>
-        {errors.description && (
-          <Alert type="danger" size="sm" data={[errors.description.message || '']} />
+        {errors.transaction?.description && (
+          <Alert type="danger" size="sm" data={[errors.transaction.description.message || '']} />
         )}
       </div>
 
@@ -147,7 +151,7 @@ const Form = () => {
         </label>
         <div className="relative">
           <Controller
-            name="date"
+            name="transaction.date"
             control={control}
             render={({ field }) => (
               <InputPattern
@@ -162,7 +166,9 @@ const Form = () => {
             )}
           />
         </div>
-        {errors.date && <Alert type="danger" size="sm" data={[errors.date.message || '']} />}
+        {errors.transaction?.date && (
+          <Alert type="danger" size="sm" data={[errors.transaction.date.message || '']} />
+        )}
       </div>
 
       <div className="mb-6">
@@ -171,7 +177,7 @@ const Form = () => {
         </label>
         <div className="relative">
           <Controller
-            name="amount"
+            name="transaction.amount"
             control={control}
             render={({ field }) => (
               <InputNumeric
@@ -190,7 +196,9 @@ const Form = () => {
             )}
           />
         </div>
-        {errors.amount && <Alert type="danger" size="sm" data={[errors.amount.message || '']} />}
+        {errors.transaction?.amount && (
+          <Alert type="danger" size="sm" data={[errors.transaction.amount.message || '']} />
+        )}
       </div>
 
       <div className="mb-6">
@@ -201,12 +209,18 @@ const Form = () => {
           Projeto <span className="text-slate-400">?</span>
         </label>
         <div className="relative">
-          <Input type="text" id="projectUuid" disabled hidden {...register('projectUuid')} />
+          <Input
+            type="text"
+            id="projectUuid"
+            disabled
+            hidden
+            {...register('transaction.projectUuid')}
+          />
 
           <ProjectSearch project={project} setProject={setProject} />
         </div>
-        {errors.projectUuid && (
-          <Alert type="danger" size="sm" data={[errors.projectUuid.message || '']} />
+        {errors.transaction?.projectUuid && (
+          <Alert type="danger" size="sm" data={[errors.transaction.projectUuid.message || '']} />
         )}
       </div>
 

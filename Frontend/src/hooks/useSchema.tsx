@@ -26,8 +26,7 @@ export const loginSchema = z
     }
   })
 
-export const authSchema = z.object({
-  uuid: zodUuid('cargo/função'),
+export const authCreateSchema = z.object({
   name: zodString('cargo/função', true),
   admin: zodBoolean('autorização de administrador'),
   project: zodBoolean('autorização de editar projetos'),
@@ -35,7 +34,8 @@ export const authSchema = z.object({
   financial: zodBoolean('autorização de informações financeiras'),
 })
 
-export const authCreateSchema = z.object({
+export const authSchema = z.object({
+  uuid: zodUuid('cargo/função'),
   name: zodString('cargo/função', true),
   admin: zodBoolean('autorização de administrador'),
   project: zodBoolean('autorização de editar projetos'),
@@ -63,99 +63,25 @@ export const statusDeleteSchema = z.object({
   priority: zodString('prioridade', true),
 })
 
-const entityCreateSchema = {
+const entitySchema = z.object({
   name: zodString('nome completo', true),
   email: zodEmail('email', true),
   phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).transform((s) =>
     s === '' ? undefined : s
   ),
   address: zodString('endereço', false).transform((s) => (s === '' ? undefined : s)),
-}
+})
 
-const entityUpdateSchema = {
-  name: zodString('nome completo', true),
-  email: zodEmail('email', true),
-  phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false)
-    .transform((s) => (s === '' ? undefined : s))
-    .nullable(),
-  address: zodString('endereço', false)
-    .transform((s) => (s === '' ? undefined : s))
-    .nullable(),
-}
+const personSchema = z.object({
+  cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true),
+  entity: entitySchema,
+})
 
-const entityDeleteSchema = {
-  name: zodString('nome completo', true),
-  email: zodEmail('email', true),
-  phone: zodRegex('contato', /^$|^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false)
-    .transform((s) => (s === '' ? undefined : s))
-    .nullable(),
-  address: zodString('endereço', false)
-    .transform((s) => (s === '' ? undefined : s))
-    .nullable(),
-}
-
-const personCreateSchema = (optional: boolean) => {
-  return {
-    cpf: optional
-      ? zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true).optional()
-      : zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true),
-    ...entityCreateSchema,
-  }
-}
-
-const personUpdateSchema = (optional: boolean) => {
-  return {
-    cpf: optional
-      ? zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true).optional()
-      : zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true),
-    ...entityUpdateSchema,
-  }
-}
-
-const personDeleteSchema = (optional: boolean) => {
-  return {
-    cpf: optional
-      ? zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true).optional()
-      : zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, true),
-    ...entityDeleteSchema,
-  }
-}
-
-const enterpriseCreateSchema = (optional: boolean) => {
-  return {
-    cnpj: optional
-      ? zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, true).optional()
-      : zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, true),
-    fantasy: optional
-      ? zodString('nome fantasia', true).optional()
-      : zodString('nome fantasia', true),
-    ...entityCreateSchema,
-  }
-}
-
-const enterpriseUpdateSchema = (optional: boolean) => {
-  return {
-    cnpj: optional
-      ? zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, true).optional()
-      : zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, true),
-    fantasy: optional
-      ? zodString('nome fantasia', true).optional()
-      : zodString('nome fantasia', true),
-    ...entityUpdateSchema,
-  }
-}
-
-const enterpriseDeleteSchema = (optional: boolean) => {
-  return {
-    cnpj: optional
-      ? zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, true).optional()
-      : zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, true),
-    fantasy: optional
-      ? zodString('nome fantasia', true).optional()
-      : zodString('nome fantasia', true),
-    ...entityDeleteSchema,
-  }
-}
+const enterpriseSchema = z.object({
+  cnpj: zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, true),
+  fantasy: zodString('nome fantasia', true),
+  entity: entitySchema,
+})
 
 export const userCreateSchema = z
   .object({
@@ -169,7 +95,7 @@ export const userCreateSchema = z
       false
     ).transform((s) => (s === '' ? undefined : s)),
     authUuid: zodUuid('cargo/função'),
-    ...personCreateSchema(false),
+    person: personSchema,
   })
   .superRefine(({ password, passwordCheck }, ctx) => {
     if (password !== passwordCheck) {
@@ -181,22 +107,15 @@ export const userCreateSchema = z
     }
   })
 
-export const userUpdateSchema = z.object({
+export const userSchema = z.object({
   uuid: zodUuid('usuário'),
   username: zodString('nome de usuário', true),
   active: zodBoolean('ativo'),
-  hourlyRate: zodRegex('valor da hora', /^$|^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, false)
-    .transform((s) => (s === '' ? undefined : s))
-    .nullable(),
+  hourlyRate: zodRegex('valor da hora', /^$|^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, false).transform(
+    (s) => (s === '' ? undefined : s)
+  ),
   authUuid: zodUuid('cargo/função'),
-  ...personUpdateSchema(false),
-})
-
-export const userDeleteSchema = z.object({
-  uuid: zodUuid('usuário'),
-  username: zodString('nome de usuário', true),
-  active: zodBoolean('ativo'),
-  ...personDeleteSchema,
+  person: personSchema,
 })
 
 export const userUpdatePasswordSchema = (auth: boolean) => {
@@ -245,82 +164,68 @@ export const userFilePhotoSchema = z
 export const clientCreateSchema = z
   .object({
     active: zodBoolean('ativo'),
-    type: zodRegex('tipo', /^(Person|Enterprise)$/, true),
-    ...personCreateSchema(true),
-    ...enterpriseCreateSchema(true),
+    type: zodRegex('tipo', /^(person|enterprise)$/, true),
+    person: personSchema.optional(),
+    enterprise: enterpriseSchema.optional(),
   })
-  .superRefine(({ cpf, cnpj, fantasy }, ctx) => {
-    if (!(cpf || (cnpj && fantasy))) {
+  .superRefine(({ person, enterprise }, ctx) => {
+    if (!(person || enterprise)) {
       ctx.addIssue({
         code: 'custom',
         message: 'O cliente precisa ser pessoa fisica ou juridica!',
-        path: ['cpf', 'cnpj'],
+        path: ['person', 'enterprise'],
       })
     }
 
-    if (cpf && cnpj) {
+    if (person && enterprise) {
       ctx.addIssue({
         code: 'custom',
         message: 'Cadastre separadamente pessoa fisica e juridica!',
-        path: ['cpf', 'cnpj'],
+        path: ['person', 'enterprise'],
       })
     }
   })
 
-export const clientUpdateSchema = z.object({
+export const clientSchema = z.object({
   uuid: zodUuid('cliente'),
   active: zodBoolean('ativo'),
-  ...personUpdateSchema(true),
-  ...enterpriseUpdateSchema(true),
-})
-
-export const clientDeleteSchema = z.object({
-  uuid: zodUuid('cliente'),
-  active: zodBoolean('ativo'),
-  ...personDeleteSchema(true),
-  ...enterpriseDeleteSchema(true),
+  person: personSchema.optional(),
+  enterprise: enterpriseSchema.optional(),
 })
 
 export const supplierCreateSchema = z
   .object({
     active: zodBoolean('ativo'),
     type: zodRegex('tipo', /^(Person|Enterprise)$/, true),
-    ...personCreateSchema(true),
-    ...enterpriseCreateSchema(true),
+    person: personSchema.optional(),
+    enterprise: enterpriseSchema.optional(),
   })
-  .superRefine(({ cpf, cnpj, fantasy }, ctx) => {
-    if (!(cpf || (cnpj && fantasy))) {
+  .superRefine(({ person, enterprise }, ctx) => {
+    if (!(person || enterprise)) {
       ctx.addIssue({
         code: 'custom',
         message: 'O cliente precisa ser pessoa fisica ou juridica!',
-        path: ['cpf', 'cnpj'],
+        path: ['person', 'enterprise'],
       })
     }
 
-    if (cpf && cnpj) {
+    if (person && enterprise) {
       ctx.addIssue({
         code: 'custom',
         message: 'Cadastre separadamente pessoa fisica e juridica!',
-        path: ['cpf', 'cnpj'],
+        path: ['person', 'enterprise'],
       })
     }
   })
 
-export const supplierUpdateSchema = z.object({
+export const supplierSchema = z.object({
   uuid: zodUuid('fornecedor'),
   active: zodBoolean('ativo'),
-  ...personUpdateSchema(true),
-  ...enterpriseUpdateSchema(true),
+  person: personSchema.optional(),
+  enterprise: enterpriseSchema.optional(),
 })
 
-export const supplierDeleteSchema = z.object({
-  uuid: zodUuid('fornecedor'),
-  active: zodBoolean('ativo'),
-  ...personDeleteSchema(true),
-  ...enterpriseDeleteSchema(true),
-})
-
-const transactionCreateSchema = {
+const transactionSchema = z.object({
   name: zodString('nome', true),
   description: zodString('descrição', true),
   date: zodRegex(
@@ -341,18 +246,17 @@ const transactionCreateSchema = {
     false
   )
     .transform((s) => (s === '' ? undefined : s))
-    .nullable()
     .optional(),
-}
+})
 
 export const expenseCreateSchema = z.object({
   supplierUuid: zodUuid('fornecedor'),
-  ...transactionCreateSchema,
+  transaction: transactionSchema,
 })
 
 export const incomeCreateSchema = z.object({
   clientUuid: zodUuid('cliente'),
-  ...transactionCreateSchema,
+  transaction: transactionSchema,
 })
 
 export const refundCreateSchema = z
@@ -363,7 +267,6 @@ export const refundCreateSchema = z
       false
     )
       .transform((s) => (s === '' ? undefined : s))
-      .nullable()
       .optional(),
     supplierUuid: zodRegex(
       'uuid de fornecedor',
@@ -371,9 +274,8 @@ export const refundCreateSchema = z
       false
     )
       .transform((s) => (s === '' ? undefined : s))
-      .nullable()
       .optional(),
-    ...transactionCreateSchema,
+    transaction: transactionSchema,
   })
   .superRefine(({ clientUuid, supplierUuid }, ctx) => {
     if (!(clientUuid || supplierUuid)) {
@@ -389,7 +291,7 @@ export const loanCreateSchema = z.object({
   installment: zodRegex('parcela', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
   months: zodRegex('nº de meses', /^\d+$/, true),
   supplierUuid: zodUuid('fornecedor'),
-  ...transactionCreateSchema,
+  transaction: transactionSchema,
 })
 
 export const projectCreateSchema = z.object({
@@ -402,7 +304,6 @@ export const projectCreateSchema = z.object({
     false
   )
     .transform((s) => (s === '' ? undefined : s))
-    .nullable()
     .optional(),
   clientUuid: zodUuid('cliente'),
   statusUuid: zodUuid('status'),
@@ -413,7 +314,7 @@ export const projectUpdateSchema = z.object({
   name: zodString('nome', true),
   description: zodString('descrição', true),
   active: zodBoolean('ativo'),
-  userUuid: zodUuid('usuário').nullable().optional(),
+  userUuid: zodUuid('usuário').optional(),
   clientUuid: zodUuid('cliente'),
   statusUuid: zodUuid('status'),
 })
@@ -434,7 +335,7 @@ export const projectDeleteSchema = z.object({
     return `20${year}-${month}-${day}T${hour}:${minute}:00`
   }),
   active: zodBoolean('ativo'),
-  userUuid: zodUuid('usuário').nullable().optional(),
+  userUuid: zodUuid('usuário').optional(),
   clientUuid: zodUuid('cliente'),
   statusUuid: zodUuid('status'),
 })
@@ -492,24 +393,40 @@ const taskSchema = z
       /^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
       false
     )
-      .transform((s) => (s === '' || s === null ? undefined : s))
+      .transform((s) => (s === '' ? undefined : s))
       .optional(),
     budgetUuid: zodRegex(
       'uuid de orçamento',
       /^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
       false
     )
-      .transform((s) => (s === '' || s === null ? undefined : s))
+      .transform((s) => (s === '' ? undefined : s))
       .optional(),
     taskExpense: taskExpenseSchema.optional(),
     taskActivity: taskActivitySchema.optional(),
   })
-  .superRefine(({ beginDate, endDate }, ctx) => {
+  .superRefine(({ beginDate, endDate, taskExpense, taskActivity }, ctx) => {
     if (beginDate > endDate) {
       ctx.addIssue({
         code: 'custom',
         message: 'A data final deve ser posterior a data inicial!',
         path: ['endDate'],
+      })
+    }
+
+    if (!(taskExpense || taskActivity)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'A tarefa precisa ser despesa ou atividade!',
+        path: ['taskExpense', 'taskActivity'],
+      })
+    }
+
+    if (taskExpense && taskActivity) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Cadastre separadamente despesa e atividade!',
+        path: ['taskExpense', 'taskActivity'],
       })
     }
   })

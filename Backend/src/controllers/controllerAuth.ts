@@ -169,6 +169,11 @@ export const authSelect = async (req: Request, res: Response): Promise<void> => 
       return
     }
 
+    const filter = {
+      ...params.data,
+      ...query.data,
+    }
+
     // get user form token
     const userToken = getUserFromToken(req, res)
     if (!userToken) return
@@ -177,18 +182,34 @@ export const authSelect = async (req: Request, res: Response): Promise<void> => 
     const auth = await prisma.auth.findMany({
       where: {
         uuid:
-          params.data.key === 'all'
+          filter.key === 'all'
             ? undefined
-            : params.data.key === 'this'
+            : filter.key === 'this'
               ? userToken.authUuid
-              : params.data.key,
-        name: query.data.name ? { contains: query.data.name } : undefined,
-        admin: query.data.auth?.includes('admin') ? true : undefined,
-        project: query.data.auth?.includes('project') ? true : undefined,
-        personal: query.data.auth?.includes('personal') ? true : undefined,
-        financial: query.data.auth?.includes('financial') ? true : undefined,
+              : filter.key,
+        name: filter.name ? { contains: filter.name } : undefined,
+        admin: filter.auth?.includes('admin')
+          ? true
+          : filter.notAuth?.includes('admin')
+            ? false
+            : undefined,
+        project: filter.auth?.includes('project')
+          ? true
+          : filter.notAuth?.includes('project')
+            ? false
+            : undefined,
+        personal: filter.auth?.includes('personal')
+          ? true
+          : filter.notAuth?.includes('personal')
+            ? false
+            : undefined,
+        financial: filter.auth?.includes('financial')
+          ? true
+          : filter.notAuth?.includes('financial')
+            ? false
+            : undefined,
       },
-    }) // TODO inserir notAuth no where
+    })
     if (!auth) {
       res.status(401).json({ message: 'Autorização não encontrada!' })
       return

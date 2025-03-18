@@ -5,13 +5,15 @@ import LogoDark from '../../../images/logo/logo-dark.png'
 import Logo from '../../../images/logo/logo.png'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { UserProps } from '../../../types/Database'
+import { AuthProps, UserProps } from '../../../types/Database'
 import Form from './Form'
 import Loader from '../../../components/Loader'
+import { Options } from '../../../components/Form/Select'
 
 const Delete = () => {
   const { uuid } = useParams()
   const [user, setUser] = useState<UserProps | null>(null)
+  const [authOptions, setAuthOptions] = useState<Options[] | null>(null)
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
 
   // Get user
@@ -23,7 +25,20 @@ const Delete = () => {
         } = await axios.get(`/user/select/${uuid}`, {
           withCredentials: true,
         })
+
+        const { data: resAuths } = await axios.get('/auth/select/all', { withCredentials: true })
+
+        // Configure options
+        const options: Options[] = [
+          ...resAuths.map((auth: AuthProps) => ({
+            value: auth.uuid,
+            label: auth.name,
+            disabled: false,
+          })),
+        ]
+
         setUser(resUser)
+        setAuthOptions(options)
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])
       }
@@ -38,7 +53,7 @@ const Delete = () => {
         <div className="flex flex-wrap items-center">
           {alertErrors && <Alert type="danger" size="lg" data={alertErrors} />}
 
-          {user ? (
+          {user && authOptions ? (
             <>
               <div className="hidden w-full xl:block xl:w-1/2">
                 <div className="py-17.5 px-26 text-center">
@@ -62,7 +77,7 @@ const Delete = () => {
                     Deletar funcionário
                   </h2>
 
-                  <Form user={user} />
+                  <Form user={user} authOptions={authOptions} />
                 </div>
               </div>
             </>

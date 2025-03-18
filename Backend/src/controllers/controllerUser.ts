@@ -61,6 +61,11 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
       return
     }
 
+    const filter = {
+      ...params.data,
+      ...query.data,
+    }
+
     // check token
     const token = req.user
     if (!token) {
@@ -86,26 +91,27 @@ export const userSelect = async (req: Request, res: Response): Promise<void> => 
         },
       },
       where: {
-        uuid:
-          params.data.key === 'all'
-            ? undefined
-            : params.data.key === 'this'
-              ? token.uuid
-              : params.data.key,
-        username: query.data.username ? { contains: query.data.username } : undefined,
-        active: query.data.active?.length === 1 ? query.data.active[0] : undefined,
+        uuid: filter.key === 'all' ? undefined : filter.key === 'this' ? token.uuid : filter.key,
+        username: filter.username ? { contains: filter.username } : undefined,
+        active: filter.active?.length === 1 ? filter.active[0] : undefined,
         hourlyRate: {
-          gte: query.data.hourlyRateMin ? query.data.hourlyRateMin : undefined,
-          lte: query.data.hourlyRateMax ? query.data.hourlyRateMax : undefined,
+          gte: filter.hourlyRateMin ? filter.hourlyRateMin : undefined,
+          lte: filter.hourlyRateMax ? filter.hourlyRateMax : undefined,
         },
-        authUuid: query.data.authUuid?.length ? { in: query.data.authUuid } : undefined,
+        authUuid: filter.authUuid?.length ? { in: filter.authUuid } : undefined,
         person: {
-          cpf: query.data.cpf ? { contains: query.data.cpf } : undefined,
+          cpf: filter.person.cpf ? { contains: filter.person.cpf } : undefined,
           entity: {
-            name: query.data.name ? { contains: query.data.name } : undefined,
-            email: query.data.email ? { contains: query.data.email } : undefined,
-            phone: query.data.phone ? { contains: query.data.phone } : undefined,
-            address: query.data.address ? { contains: query.data.address } : undefined,
+            name: filter.person.entity.name ? { contains: filter.person.entity.name } : undefined,
+            email: filter.person.entity.email
+              ? { contains: filter.person.entity.email }
+              : undefined,
+            phone: filter.person.entity.phone
+              ? { contains: filter.person.entity.phone }
+              : undefined,
+            address: filter.person.entity.address
+              ? { contains: filter.person.entity.address }
+              : undefined,
           },
         },
       },
@@ -143,20 +149,22 @@ export const userCreate = async (req: Request, res: Response): Promise<void> => 
     }
 
     // check if cpf is valid
-    if (!validateCPF(body.data.cpf)) {
+    if (!validateCPF(body.data.person.cpf)) {
       res.status(401).json({ message: 'CPF inválido!' })
       return
     }
 
     // check if cpf has registered
-    const cpf = await prisma.person.findUnique({ where: { cpf: body.data.cpf } })
+    const cpf = await prisma.person.findUnique({ where: { cpf: body.data.person.cpf } })
     if (cpf) {
       res.status(401).json({ message: 'Esse CPF já foi registrado!' })
       return
     }
 
     // check if email has registered
-    const email = await prisma.entity.findUnique({ where: { email: body.data.email } })
+    const email = await prisma.entity.findUnique({
+      where: { email: body.data.person.entity.email },
+    })
     if (email) {
       res.status(401).json({ message: 'Esse email já foi registrado!' })
       return
@@ -192,16 +200,16 @@ export const userCreate = async (req: Request, res: Response): Promise<void> => 
 
     const entity = await prisma.entity.create({
       data: {
-        name: body.data.name,
-        email: body.data.email,
-        phone: body.data.phone,
-        address: body.data.address,
+        name: body.data.person.entity.name,
+        email: body.data.person.entity.email,
+        phone: body.data.person.entity.phone,
+        address: body.data.person.entity.address,
       },
     })
     await prisma.person.create({
       data: {
         id: entity.id,
-        cpf: body.data.cpf,
+        cpf: body.data.person.cpf,
       },
     })
     await prisma.user.create({
@@ -248,7 +256,9 @@ export const userUpdate = async (req: Request, res: Response): Promise<void> => 
     }
 
     // check if email has registered
-    const email = await prisma.entity.findUnique({ where: { email: body.data.email } })
+    const email = await prisma.entity.findUnique({
+      where: { email: body.data.person.entity.email },
+    })
     if (email && email.id !== user.id) {
       res.status(401).json({ message: 'Esse email já foi registrado!' })
       return
@@ -306,10 +316,10 @@ export const userUpdate = async (req: Request, res: Response): Promise<void> => 
     })
     await prisma.entity.update({
       data: {
-        name: body.data.name,
-        email: body.data.email,
-        phone: body.data.phone,
-        address: body.data.address,
+        name: body.data.person.entity.name,
+        email: body.data.person.entity.email,
+        phone: body.data.person.entity.phone,
+        address: body.data.person.entity.address,
       },
       where: {
         id: userUpdated.id,

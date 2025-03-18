@@ -8,6 +8,22 @@ import {
   keySchema,
   uuidSchema,
 } from '@utils/schema'
+import { Client, Person, Enterprise, Entity } from '@prisma/client'
+
+type ClientProps = Client & {
+  person: (Person & { entity: Entity }) | null
+  enterprise: (Enterprise & { entity: Entity }) | null
+}
+
+const responseClients = (clients: ClientProps[]) => {
+  return clients.map((client) => {
+    return {
+      ...client,
+      person: client.person ? client.person : undefined,
+      enterprise: client.enterprise ? client.enterprise : undefined,
+    }
+  })
+}
 
 export const clientSelect = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -25,6 +41,11 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
       return
     }
 
+    const filter = {
+      ...params.data,
+      ...query.data,
+    }
+
     // check if has token
     const token = req.user
     if (!token) {
@@ -32,14 +53,6 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
       return
     }
 
-    const entityFilter = {
-      name: query.data.name ? { contains: query.data.name } : undefined,
-      email: query.data.email ? { contains: query.data.email } : undefined,
-      phone: query.data.phone ? { contains: query.data.phone } : undefined,
-      address: query.data.address ? { contains: query.data.address } : undefined,
-    }
-
-    // TODO retificar cpf, cnpj e fantasy
     // server request
     const clients = await prisma.client.findMany({
       include: {
@@ -55,31 +68,51 @@ export const clientSelect = async (req: Request, res: Response): Promise<void> =
         },
       },
       where: {
-        uuid: params.data.key === 'all' ? undefined : params.data.key,
-        active: query.data.active?.length === 1 ? query.data.active[0] : undefined,
-        OR: [
-          query.data.cnpj || query.data.fantasy
-            ? { person: { is: null } }
-            : {
-                person: {
-                  cpf: query.data.cpf ? { contains: query.data.cpf } : undefined,
-                  entity: entityFilter,
-                },
+        uuid: filter.key === 'all' ? undefined : filter.key,
+        active: filter.active?.length === 1 ? filter.active[0] : undefined,
+        person: filter.person
+          ? {
+              cpf: filter.person.cpf,
+              entity: {
+                name: filter.person.entity.name
+                  ? { contains: filter.person.entity.name }
+                  : undefined,
+                email: filter.person.entity.email
+                  ? { contains: filter.person.entity.email }
+                  : undefined,
+                phone: filter.person.entity.phone
+                  ? { contains: filter.person.entity.phone }
+                  : undefined,
+                address: filter.person.entity.address
+                  ? { contains: filter.person.entity.address }
+                  : undefined,
               },
-          query.data.cpf
-            ? { enterprise: { is: null } }
-            : {
-                enterprise: {
-                  cnpj: query.data.cnpj ? { contains: query.data.cnpj } : undefined,
-                  fantasy: query.data.fantasy ? { contains: query.data.fantasy } : undefined,
-                  entity: entityFilter,
-                },
+            }
+          : undefined,
+        enterprise: filter.enterprise
+          ? {
+              cnpj: filter.enterprise.cnpj,
+              fantasy: filter.enterprise.fantasy,
+              entity: {
+                name: filter.enterprise.entity.name
+                  ? { contains: filter.enterprise.entity.name }
+                  : undefined,
+                email: filter.enterprise.entity.email
+                  ? { contains: filter.enterprise.entity.email }
+                  : undefined,
+                phone: filter.enterprise.entity.phone
+                  ? { contains: filter.enterprise.entity.phone }
+                  : undefined,
+                address: filter.enterprise.entity.address
+                  ? { contains: filter.enterprise.entity.address }
+                  : undefined,
               },
-        ],
+            }
+          : undefined,
       },
     })
 
-    res.status(200).json(clients)
+    res.status(200).json(responseClients(clients))
     return
   } catch (e) {
     console.log(e)
@@ -105,14 +138,14 @@ export const clientCreate = async (req: Request, res: Response): Promise<void> =
     }
 
     // check if cpf is valid
-    if (body.data.cpf) {
-      if (!validateCPF(body.data.cpf)) {
+    if (body.data.person) {
+      if (!validateCPF(body.data.person.cpf)) {
         res.status(401).json({ message: 'CPF inválido!' })
         return
       }
 
       // check if cpf has registered
-      const person = await prisma.person.findUnique({ where: { cpf: body.data.cpf } })
+      const person = await prisma.person.findUnique({ where: { cpf: body.data.person.cpf } })
       if (person) {
         res.status(401).json({ message: 'Esse CPF já foi registrado!' })
         return
@@ -120,14 +153,16 @@ export const clientCreate = async (req: Request, res: Response): Promise<void> =
     }
 
     // check if cnpj is valid
-    if (body.data.cnpj) {
-      if (!validateCNPJ(body.data.cnpj)) {
+    if (body.data.enterprise) {
+      if (!validateCNPJ(body.data.enterprise.cnpj)) {
         res.status(401).json({ message: 'CNPJ inválido!' })
         return
       }
 
       // check if cnpj has registered
-      const enterprise = await prisma.enterprise.findUnique({ where: { cnpj: body.data.cnpj } })
+      const enterprise = await prisma.enterprise.findUnique({
+        where: { cnpj: body.data.enterprise.cnpj },
+      })
       if (enterprise) {
         res.status(401).json({ message: 'Esse CNPJ já foi registrado!' })
         return
@@ -135,7 +170,8 @@ export const clientCreate = async (req: Request, res: Response): Promise<void> =
     }
 
     // check if email has registered
-    const email = await prisma.entity.findUnique({ where: { email: body.data.email } })
+    const bodyEntity = (body.data.person?.entity || body.data.enterprise?.entity)!
+    const email = await prisma.entity.findUnique({ where: { email: bodyEntity.email } })
     if (email) {
       res.status(401).json({ message: 'Esse email já foi registrado!' })
       return
@@ -144,26 +180,26 @@ export const clientCreate = async (req: Request, res: Response): Promise<void> =
     // create resource
     const entity = await prisma.entity.create({
       data: {
-        name: body.data.name,
-        email: body.data.email,
-        phone: body.data.phone,
-        address: body.data.address,
+        name: bodyEntity.name,
+        email: bodyEntity.email,
+        phone: bodyEntity.phone,
+        address: bodyEntity.address,
       },
     })
-    if (body.data.cnpj && body.data.fantasy) {
+    if (body.data.enterprise) {
       await prisma.enterprise.create({
         data: {
           id: entity.id,
-          cnpj: body.data.cnpj,
-          fantasy: body.data.fantasy,
+          cnpj: body.data.enterprise.cnpj,
+          fantasy: body.data.enterprise.fantasy,
         },
       })
     }
-    if (body.data.cpf) {
+    if (body.data.person) {
       await prisma.person.create({
         data: {
           id: entity.id,
-          cpf: body.data.cpf,
+          cpf: body.data.person.cpf,
         },
       })
     }
@@ -171,8 +207,8 @@ export const clientCreate = async (req: Request, res: Response): Promise<void> =
       data: {
         id: entity.id,
         active: body.data.active,
-        personId: body.data.cpf ? entity.id : undefined,
-        enterpriseId: body.data.cnpj ? entity.id : undefined,
+        personId: body.data.person ? entity.id : undefined,
+        enterpriseId: body.data.enterprise ? entity.id : undefined,
       },
     })
 
@@ -209,7 +245,8 @@ export const clientUpdate = async (req: Request, res: Response): Promise<void> =
     }
 
     // check if email has registered
-    const email = await prisma.entity.findUnique({ where: { email: body.data.email } })
+    const bodyEntity = (body.data.person?.entity || body.data.enterprise?.entity)!
+    const email = await prisma.entity.findUnique({ where: { email: bodyEntity.email } })
     if (email && email.id !== client.id) {
       res.status(401).json({ message: 'Esse email já foi registrado!' })
       return
@@ -224,10 +261,10 @@ export const clientUpdate = async (req: Request, res: Response): Promise<void> =
         uuid: body.data.uuid,
       },
     })
-    if (body.data.fantasy) {
+    if (body.data.enterprise) {
       await prisma.enterprise.update({
         data: {
-          fantasy: body.data.fantasy,
+          fantasy: body.data.enterprise.fantasy,
         },
         where: {
           id: clientUpdated.id,
@@ -236,10 +273,10 @@ export const clientUpdate = async (req: Request, res: Response): Promise<void> =
     }
     await prisma.entity.update({
       data: {
-        name: body.data.name,
-        email: body.data.email,
-        phone: body.data.phone,
-        address: body.data.address,
+        name: bodyEntity.name,
+        email: bodyEntity.email,
+        phone: bodyEntity.phone,
+        address: bodyEntity.address,
       },
       where: {
         id: clientUpdated.id,

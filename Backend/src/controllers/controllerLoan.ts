@@ -48,6 +48,11 @@ export const loanSelect = async (req: Request, res: Response): Promise<void> => 
       return
     }
 
+    const filter = {
+      ...params.data,
+      ...query.data,
+    }
+
     // check if has token
     const token = req.user
     if (!token) {
@@ -87,33 +92,39 @@ export const loanSelect = async (req: Request, res: Response): Promise<void> => 
         },
       },
       where: {
-        uuid: params.data.key === 'all' ? undefined : params.data.key,
+        uuid: filter.key === 'all' ? undefined : filter.key,
         installment: {
-          gte: query.data.installmentMin ? query.data.installmentMin : undefined,
-          lte: query.data.installmentMax ? query.data.installmentMax : undefined,
+          gte: filter.installmentMin ? filter.installmentMin : undefined,
+          lte: filter.installmentMax ? filter.installmentMax : undefined,
         },
         months: {
-          gte: query.data.monthsMin ? query.data.monthsMin : undefined,
-          lte: query.data.monthsMax ? query.data.monthsMax : undefined,
+          gte: filter.monthsMin ? filter.monthsMin : undefined,
+          lte: filter.monthsMax ? filter.monthsMax : undefined,
         },
-        supplierUuid: query.data.supplierUuid?.length ? { in: query.data.supplierUuid } : undefined,
+        supplierUuid: filter.supplierUuid?.length ? { in: filter.supplierUuid } : undefined,
         transaction: {
-          name: query.data.name ? { contains: query.data.name } : undefined,
-          description: query.data.description ? { contains: query.data.description } : undefined,
+          name: filter.transaction.name ? { contains: filter.transaction.name } : undefined,
+          description: filter.transaction.description
+            ? { contains: filter.transaction.description }
+            : undefined,
           register: {
-            gte: query.data.registerMin ? query.data.registerMin : undefined,
-            lte: query.data.registerMax ? query.data.registerMax : undefined,
+            gte: filter.transaction.registerMin ? filter.transaction.registerMin : undefined,
+            lte: filter.transaction.registerMax ? filter.transaction.registerMax : undefined,
           },
           date: {
-            gte: query.data.dateMin ? query.data.dateMin : undefined,
-            lte: query.data.dateMax ? query.data.dateMax : undefined,
+            gte: filter.transaction.dateMin ? filter.transaction.dateMin : undefined,
+            lte: filter.transaction.dateMax ? filter.transaction.dateMax : undefined,
           },
           amount: {
-            gte: query.data.amountMin ? query.data.amountMin : undefined,
-            lte: query.data.amountMax ? query.data.amountMax : undefined,
+            gte: filter.transaction.amountMin ? filter.transaction.amountMin : undefined,
+            lte: filter.transaction.amountMax ? filter.transaction.amountMax : undefined,
           },
-          userUuid: query.data.userUuid?.length ? { in: query.data.userUuid } : undefined,
-          projectUuid: query.data.projectUuid?.length ? { in: query.data.projectUuid } : undefined,
+          userUuid: filter.transaction.userUuid?.length
+            ? { in: filter.transaction.userUuid }
+            : undefined,
+          projectUuid: filter.transaction.projectUuid?.length
+            ? { in: filter.transaction.projectUuid }
+            : undefined,
         },
       },
     })
@@ -150,8 +161,10 @@ export const loanCreate = async (req: Request, res: Response): Promise<void> => 
     }
 
     // check if project has registered
-    if (body.data.projectUuid) {
-      const project = await prisma.project.findUnique({ where: { uuid: body.data.projectUuid } })
+    if (body.data.transaction.projectUuid) {
+      const project = await prisma.project.findUnique({
+        where: { uuid: body.data.transaction.projectUuid },
+      })
       if (!project) {
         res.status(401).json({ message: 'Projeto não econtrado!' })
         return
@@ -168,13 +181,13 @@ export const loanCreate = async (req: Request, res: Response): Promise<void> => 
     // create resource
     const transaction = await prisma.transaction.create({
       data: {
-        name: body.data.name,
-        description: body.data.description,
+        name: body.data.transaction.name,
+        description: body.data.transaction.description,
         register: new Date(),
-        date: body.data.date,
-        amount: body.data.amount,
+        date: body.data.transaction.date,
+        amount: body.data.transaction.amount,
         userUuid: token.uuid,
-        projectUuid: body.data.projectUuid,
+        projectUuid: body.data.transaction.projectUuid,
       },
     })
     await prisma.loan.create({

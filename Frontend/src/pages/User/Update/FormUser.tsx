@@ -18,7 +18,7 @@ import Alert from '../../../components/Alert/Index'
 import { Input, InputNumeric, InputPattern } from '../../../components/Form/Input'
 import Switcher from '../../../components/Form/Switcher'
 import Button from '../../../components/Form/Button'
-import { userUpdateSchema } from '../../../hooks/useSchema'
+import { userSchema } from '../../../hooks/useSchema'
 import { UserProps } from '../../../types/Database'
 import { useNavigate } from 'react-router-dom'
 import { AxiosError } from 'axios'
@@ -30,7 +30,7 @@ const FormUser = ({ user, authOptions }: { user: UserProps; authOptions: Options
   const [alertSuccesses, setAlertSuccesses] = useState<(string | JSX.Element)[] | null>(null)
 
   // User schema
-  const schema = userUpdateSchema
+  const schema = userSchema
   type SchemaProps = z.infer<typeof schema>
 
   const defaultValues = {
@@ -39,11 +39,15 @@ const FormUser = ({ user, authOptions }: { user: UserProps; authOptions: Options
     active: user.active,
     hourlyRate: user.hourlyRate,
     authUuid: user.authUuid,
-    cpf: user.person.cpf,
-    name: user.person.entity.name,
-    email: user.person.entity.email,
-    phone: user.person.entity.phone,
-    address: user.person.entity.address,
+    person: {
+      cpf: user.person.cpf,
+      entity: {
+        name: user.person.entity.name,
+        email: user.person.entity.email,
+        phone: user.person.entity.phone,
+        address: user.person.entity.address,
+      },
+    },
   }
 
   // Hookform
@@ -127,7 +131,7 @@ const FormUser = ({ user, authOptions }: { user: UserProps; authOptions: Options
           </label>
           <div className="relative">
             <Controller
-              name="cpf"
+              name="person.cpf"
               control={control}
               render={({ field }) => (
                 <InputPattern
@@ -143,7 +147,9 @@ const FormUser = ({ user, authOptions }: { user: UserProps; authOptions: Options
               )}
             />
           </div>
-          {errors.cpf && <Alert type="danger" size="sm" data={[errors.cpf.message || '']} />}
+          {errors.person?.cpf && (
+            <Alert type="danger" size="sm" data={[errors.person.cpf.message || '']} />
+          )}
         </div>
 
         <div className="relative">
@@ -198,11 +204,13 @@ const FormUser = ({ user, authOptions }: { user: UserProps; authOptions: Options
             type="text"
             icon={faUser}
             iconPosition="left"
-            {...register('name')}
+            {...register('person.entity.name')}
             placeholder="Digite o nome completo"
           />
         </div>
-        {errors.name && <Alert type="danger" size="sm" data={[errors.name.message || '']} />}
+        {errors.person?.entity?.name && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.name.message || '']} />
+        )}
       </div>
 
       <div className="mb-5.5">
@@ -219,11 +227,13 @@ const FormUser = ({ user, authOptions }: { user: UserProps; authOptions: Options
             icon={faEnvelope}
             iconPosition="left"
             autoComplete="email"
-            {...register('email')}
+            {...register('person.entity.email')}
             placeholder="Digite o email"
           />
         </div>
-        {errors.email && <Alert type="danger" size="sm" data={[errors.email.message || '']} />}
+        {errors.person?.entity?.email && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.email.message || '']} />
+        )}
       </div>
 
       <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
@@ -298,7 +308,7 @@ const FormUser = ({ user, authOptions }: { user: UserProps; authOptions: Options
         </label>
         <div className="relative">
           <Controller
-            name="phone"
+            name="person.entity.phone"
             control={control}
             render={({ field }) => (
               <InputPattern
@@ -314,7 +324,9 @@ const FormUser = ({ user, authOptions }: { user: UserProps; authOptions: Options
             )}
           />
         </div>
-        {errors.phone && <Alert type="danger" size="sm" data={[errors.phone.message || '']} />}
+        {errors.person?.entity?.phone && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.phone.message || '']} />
+        )}
       </div>
 
       <div className="mb-5.5">
@@ -330,11 +342,13 @@ const FormUser = ({ user, authOptions }: { user: UserProps; authOptions: Options
             type="text"
             icon={faLocationDot}
             iconPosition="left"
-            {...register('address')}
+            {...register('person.entity.address')}
             placeholder="Digite o endereço"
           />
         </div>
-        {errors.address && <Alert type="danger" size="sm" data={[errors.address.message || '']} />}
+        {errors.person?.entity?.address && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.address.message || '']} />
+        )}
       </div>
 
       {alertErrors && <Alert type="danger" size="lg" data={alertErrors} />}

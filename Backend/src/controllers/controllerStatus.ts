@@ -25,6 +25,11 @@ export const statusSelect = async (req: Request, res: Response): Promise<void> =
       return
     }
 
+    const filter = {
+      ...params.data,
+      ...query.data,
+    }
+
     // check if has token
     const token = req.user
     if (!token) {
@@ -35,10 +40,10 @@ export const statusSelect = async (req: Request, res: Response): Promise<void> =
     // server request
     const status = await prisma.status.findMany({
       where: {
-        uuid: params.data.key === 'all' ? undefined : params.data.key,
-        name: query.data.name ? { contains: query.data.name } : undefined,
-        description: query.data.description ? { contains: query.data.description } : undefined,
-        priority: query.data.priority ? { in: query.data.priority } : undefined,
+        uuid: filter.key === 'all' ? undefined : filter.key,
+        name: filter.name ? { contains: filter.name } : undefined,
+        description: filter.description ? { contains: filter.description } : undefined,
+        priority: filter.priority ? { in: filter.priority } : undefined,
       },
     })
 

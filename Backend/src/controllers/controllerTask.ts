@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { prisma } from '@/server'
-import { keySchema, tasksSelectSchema, tasksUpdateSchema } from '@utils/schema'
+import { tasksSelectSchema, tasksUpdateSchema } from '@utils/schema'
 import { authorization } from '@utils/auth'
 import { TaskExpense, TaskActivity, Task } from '@prisma/client'
 import { numberToCurrency } from '@utils/currency'
@@ -46,13 +46,6 @@ const responseTasks = (tasks: TaskProps[]) => {
 
 export const tasksSelect = async (req: Request, res: Response): Promise<void> => {
   try {
-    // check params
-    const params = keySchema.safeParse(req.params)
-    if (!params.success) {
-      res.status(401).json({ message: `Params inválido: ${JSON.stringify(params.error.format())}` })
-      return
-    }
-
     // check query
     const query = tasksSelectSchema.safeParse(req.query)
     if (!query.success) {
@@ -74,20 +67,7 @@ export const tasksSelect = async (req: Request, res: Response): Promise<void> =>
         taskActivity: true,
       },
       where: {
-        name: query.data.name ? { contains: query.data.name } : undefined,
-        description: query.data.description ? { contains: query.data.description } : undefined,
-        finished: query.data.finished?.length === 1 ? query.data.finished[0] : undefined,
-        beginDate: {
-          gte: query.data.beginDateMin ? query.data.beginDateMin : undefined,
-          lte: query.data.beginDateMax ? query.data.beginDateMax : undefined,
-        },
-        endDate: {
-          gte: query.data.endDateMin ? query.data.endDateMin : undefined,
-          lte: query.data.endDateMax ? query.data.endDateMax : undefined,
-        },
-        statusUuid: query.data.statusUuid?.length ? { in: query.data.statusUuid } : undefined,
         projectUuid: query.data.projectUuid?.length ? { in: query.data.projectUuid } : undefined,
-        userUuid: query.data.userUuid?.length ? { in: query.data.userUuid } : undefined,
         budgetUuid: null,
       },
     })

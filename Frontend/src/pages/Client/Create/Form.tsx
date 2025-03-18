@@ -32,14 +32,26 @@ const Form = () => {
 
   const defaultValues = {
     active: true,
-    type: 'Enterprise',
-    cpf: undefined,
-    cnpj: undefined,
-    fantasy: undefined,
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
+    type: 'enterprise',
+    person: {
+      cpf: '',
+      entity: {
+        name: '',
+        email: '',
+        phone: '',
+        address: '',
+      },
+    },
+    enterprise: {
+      cnpj: '',
+      fantasy: '',
+      entity: {
+        name: '',
+        email: '',
+        phone: '',
+        address: '',
+      },
+    },
   }
 
   // Hookform
@@ -53,13 +65,22 @@ const Form = () => {
     formState: { errors },
   } = useForm<SchemaProps>({
     resolver: zodResolver(schema),
-    defaultValues: defaultValues,
+    defaultValues: {
+      ...defaultValues,
+      person: undefined,
+    },
   })
 
   useEffect(() => {
-    setValue('cpf', undefined)
-    setValue('cnpj', undefined)
-    setValue('fantasy', undefined)
+    if (watch('type') === 'person') {
+      setValue('person', { ...defaultValues.person })
+      setValue('enterprise', undefined)
+    }
+
+    if (watch('type') === 'enterprise') {
+      setValue('person', undefined)
+      setValue('enterprise', { ...defaultValues.enterprise })
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch('type')])
@@ -68,7 +89,10 @@ const Form = () => {
   const handleReset = () => {
     setAlertErrors(null)
     setAlertSuccesses(null)
-    reset(defaultValues)
+    reset({
+      ...defaultValues,
+      person: undefined,
+    })
   }
 
   // Create client in backend
@@ -81,6 +105,7 @@ const Form = () => {
       const response = await axios.post('/client/create', data, {
         withCredentials: true,
       })
+
       setAlertSuccesses([
         response.data.message,
         <Button
@@ -116,8 +141,8 @@ const Form = () => {
                 icon={faBriefcase}
                 iconPosition="left"
                 options={[
-                  { value: 'Person', label: 'Pessoa', disabled: false },
-                  { value: 'Enterprise', label: 'Empresa', disabled: false },
+                  { value: 'person', label: 'Pessoa', disabled: false },
+                  { value: 'enterprise', label: 'Empresa', disabled: false },
                 ]}
               />
             )}
@@ -127,56 +152,61 @@ const Form = () => {
       </div>
 
       <div className="flex justify-between gap-5 mb-6">
-        <div className="w-full" style={{ display: watch().type === 'Person' ? 'block' : 'none' }}>
-          <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="cpf">
-            CPF <span className="text-danger">*</span>
-          </label>
-          <div className="relative">
-            <Controller
-              name="cpf"
-              control={control}
-              render={({ field }) => (
-                <InputPattern
-                  {...field}
-                  id="cpf"
-                  mask="_"
-                  icon={faAddressCard}
-                  iconPosition="left"
-                  format="###.###.###-##"
-                  placeholder="Digite o cpf"
-                />
-              )}
-            />
+        {watch('person') && (
+          <div className="w-full">
+            <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="cpf">
+              CPF <span className="text-danger">*</span>
+            </label>
+            <div className="relative">
+              <Controller
+                name="person.cpf"
+                control={control}
+                render={({ field }) => (
+                  <InputPattern
+                    {...field}
+                    id="cpf"
+                    mask="_"
+                    icon={faAddressCard}
+                    iconPosition="left"
+                    format="###.###.###-##"
+                    placeholder="Digite o cpf"
+                  />
+                )}
+              />
+            </div>
+            {errors.person?.cpf && (
+              <Alert type="danger" size="sm" data={[errors.person.cpf.message || '']} />
+            )}
           </div>
-          {errors.cpf && <Alert type="danger" size="sm" data={[errors.cpf.message || '']} />}
-        </div>
+        )}
 
-        <div
-          className="w-full"
-          style={{ display: watch().type === 'Enterprise' ? 'block' : 'none' }}
-        >
-          <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="cnpj">
-            CNPJ <span className="text-danger">*</span>
-          </label>
-          <div className="relative">
-            <Controller
-              name="cnpj"
-              control={control}
-              render={({ field }) => (
-                <InputPattern
-                  {...field}
-                  id="cnpj"
-                  mask="_"
-                  icon={faAddressCard}
-                  iconPosition="left"
-                  format="##.###.###/####-##"
-                  placeholder="Digite o cnpj"
-                />
-              )}
-            />
+        {watch('enterprise') && (
+          <div className="w-full">
+            <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="cnpj">
+              CNPJ <span className="text-danger">*</span>
+            </label>
+            <div className="relative">
+              <Controller
+                name="enterprise.cnpj"
+                control={control}
+                render={({ field }) => (
+                  <InputPattern
+                    {...field}
+                    id="cnpj"
+                    mask="_"
+                    icon={faAddressCard}
+                    iconPosition="left"
+                    format="##.###.###/####-##"
+                    placeholder="Digite o cnpj"
+                  />
+                )}
+              />
+            </div>
+            {errors.enterprise?.cnpj && (
+              <Alert type="danger" size="sm" data={[errors.enterprise.cnpj.message || '']} />
+            )}
           </div>
-          {errors.cnpj && <Alert type="danger" size="sm" data={[errors.cnpj.message || '']} />}
-        </div>
+        )}
 
         <div className="relative">
           <div className="flex justify-center">
@@ -203,52 +233,91 @@ const Form = () => {
           Nome <span className="text-danger">*</span>
         </label>
         <div className="relative">
-          <Input
-            id="name"
-            type="text"
-            icon={faUserTie}
-            iconPosition="left"
-            autoComplete="name"
-            {...register('name')}
-            placeholder="Digite o nome"
-          />
+          {watch('person') && (
+            <Input
+              id="name"
+              type="text"
+              icon={faUserTie}
+              iconPosition="left"
+              {...register('person.entity.name')}
+              placeholder="Digite o nome"
+            />
+          )}
+
+          {watch('enterprise') && (
+            <Input
+              id="name"
+              type="text"
+              icon={faUserTie}
+              iconPosition="left"
+              {...register('enterprise.entity.name')}
+              placeholder="Digite o nome"
+            />
+          )}
         </div>
-        {errors.name && <Alert type="danger" size="sm" data={[errors.name.message || '']} />}
+        {errors.person?.entity?.name && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.name.message || '']} />
+        )}
+        {errors.enterprise?.entity?.name && (
+          <Alert type="danger" size="sm" data={[errors.enterprise.entity.name.message || '']} />
+        )}
       </div>
 
-      <div className="mb-6" style={{ display: watch().type === 'Enterprise' ? 'block' : 'none' }}>
-        <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="fantasy">
-          Nome fantasia <span className="text-danger">*</span>
-        </label>
-        <div className="relative">
-          <Input
-            id="fantasy"
-            type="text"
-            icon={faUser}
-            iconPosition="left"
-            {...register('fantasy')}
-            placeholder="Digite o nome do fantasia"
-          />
+      {watch('enterprise') && (
+        <div className="mb-6">
+          <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="fantasy">
+            Nome fantasia <span className="text-danger">*</span>
+          </label>
+          <div className="relative">
+            <Input
+              id="fantasy"
+              type="text"
+              icon={faUser}
+              iconPosition="left"
+              {...register('enterprise.fantasy')}
+              placeholder="Digite o nome do fantasia"
+            />
+          </div>
+          {errors.enterprise?.fantasy && (
+            <Alert type="danger" size="sm" data={[errors.enterprise.fantasy.message || '']} />
+          )}
         </div>
-        {errors.fantasy && <Alert type="danger" size="sm" data={[errors.fantasy.message || '']} />}
-      </div>
+      )}
 
       <div className="mb-6">
         <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="email">
           Email <span className="text-danger">*</span>
         </label>
         <div className="relative">
-          <Input
-            id="email"
-            type="text"
-            icon={faEnvelope}
-            iconPosition="left"
-            autoComplete="email"
-            {...register('email')}
-            placeholder="Digite o email"
-          />
+          {watch('person') && (
+            <Input
+              id="email"
+              type="text"
+              icon={faEnvelope}
+              iconPosition="left"
+              autoComplete="email"
+              {...register('person.entity.email')}
+              placeholder="Digite o email"
+            />
+          )}
+          {watch('enterprise') && (
+            <Input
+              id="email"
+              type="text"
+              icon={faEnvelope}
+              iconPosition="left"
+              autoComplete="email"
+              {...register('enterprise.entity.email')}
+              placeholder="Digite o email"
+            />
+          )}
         </div>
-        {errors.email && <Alert type="danger" size="sm" data={[errors.email.message || '']} />}
+        {errors.person?.entity?.email && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.email.message || '']} />
+        )}
+        {errors.enterprise?.entity?.email && (
+          <Alert type="danger" size="sm" data={[errors.enterprise.entity.email.message || '']} />
+        )}
       </div>
 
       <div className="mb-6">
@@ -256,24 +325,49 @@ const Form = () => {
           Contato <span className="text-slate-400">?</span>
         </label>
         <div className="relative">
-          <Controller
-            name="phone"
-            control={control}
-            render={({ field }) => (
-              <InputPattern
-                {...field}
-                id="phone"
-                mask="_"
-                icon={faPhone}
-                iconPosition="left"
-                format="(##) # ####-####"
-                autoComplete="phone"
-                placeholder="Digite o telefone"
-              />
-            )}
-          />
+          {watch('person') && (
+            <Controller
+              name="person.entity.phone"
+              control={control}
+              render={({ field }) => (
+                <InputPattern
+                  {...field}
+                  id="phone"
+                  mask="_"
+                  icon={faPhone}
+                  iconPosition="left"
+                  format="(##) # ####-####"
+                  autoComplete="phone"
+                  placeholder="Digite o telefone"
+                />
+              )}
+            />
+          )}
+          {watch('enterprise') && (
+            <Controller
+              name="enterprise.entity.phone"
+              control={control}
+              render={({ field }) => (
+                <InputPattern
+                  {...field}
+                  id="phone"
+                  mask="_"
+                  icon={faPhone}
+                  iconPosition="left"
+                  format="(##) # ####-####"
+                  autoComplete="phone"
+                  placeholder="Digite o telefone"
+                />
+              )}
+            />
+          )}
         </div>
-        {errors.phone && <Alert type="danger" size="sm" data={[errors.phone.message || '']} />}
+        {errors.person?.entity?.phone && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.phone.message || '']} />
+        )}
+        {errors.enterprise?.entity?.phone && (
+          <Alert type="danger" size="sm" data={[errors.enterprise.entity.phone.message || '']} />
+        )}
       </div>
 
       <div className="mb-6">
@@ -281,16 +375,33 @@ const Form = () => {
           Endereço <span className="text-slate-400">?</span>
         </label>
         <div className="relative">
-          <Input
-            id="address"
-            type="text"
-            icon={faLocationDot}
-            iconPosition="left"
-            {...register('address')}
-            placeholder="Digite o endereço"
-          />
+          {watch('person') && (
+            <Input
+              id="address"
+              type="text"
+              icon={faLocationDot}
+              iconPosition="left"
+              {...register('person.entity.address')}
+              placeholder="Digite o endereço"
+            />
+          )}
+          {watch('enterprise') && (
+            <Input
+              id="address"
+              type="text"
+              icon={faLocationDot}
+              iconPosition="left"
+              {...register('enterprise.entity.address')}
+              placeholder="Digite o endereço"
+            />
+          )}
         </div>
-        {errors.address && <Alert type="danger" size="sm" data={[errors.address.message || '']} />}
+        {errors.person?.entity?.address && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.address.message || '']} />
+        )}
+        {errors.enterprise?.entity?.address && (
+          <Alert type="danger" size="sm" data={[errors.enterprise.entity.address.message || '']} />
+        )}
       </div>
 
       {alertErrors && <Alert type="danger" size="lg" data={alertErrors} />}

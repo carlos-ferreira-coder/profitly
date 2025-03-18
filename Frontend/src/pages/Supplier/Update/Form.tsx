@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { SupplierProps } from '../../../types/Database'
 import Switcher from '../../../components/Form/Switcher'
-import { supplierUpdateSchema } from '../../../hooks/useSchema'
+import { supplierSchema } from '../../../hooks/useSchema'
 
 const Form = ({ supplier }: { supplier: SupplierProps }) => {
   const navigate = useNavigate()
@@ -26,21 +26,10 @@ const Form = ({ supplier }: { supplier: SupplierProps }) => {
   const [alertSuccesses, setAlertSuccesses] = useState<(string | JSX.Element)[] | null>(null)
 
   // Supplier schema
-  const schema = supplierUpdateSchema
+  const schema = supplierSchema
   type SchemaProps = z.infer<typeof schema>
 
-  const entity = (supplier.enterprise?.entity || supplier.person?.entity)!
-  const defaultValues = {
-    uuid: supplier.uuid,
-    active: supplier.active,
-    cpf: supplier.person?.cpf,
-    cnpj: supplier.enterprise?.cnpj,
-    fantasy: supplier.enterprise?.fantasy,
-    name: entity.name,
-    email: entity.email,
-    phone: entity.phone,
-    address: entity.address,
-  }
+  const defaultValues = { ...supplier }
 
   // Hookform
   const {
@@ -95,14 +84,14 @@ const Form = ({ supplier }: { supplier: SupplierProps }) => {
       {errors.uuid && <Alert type="danger" size="sm" data={[errors.uuid.message || '']} />}
 
       <div className="flex justify-between gap-5 mb-6">
-        {supplier.enterprise ? (
+        {supplier.enterprise && (
           <div className="w-full">
             <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="cnpj">
               CNPJ <span className="text-danger">*</span>
             </label>
             <div className="relative">
               <Controller
-                name="cnpj"
+                name="enterprise.cnpj"
                 control={control}
                 render={({ field }) => (
                   <InputPattern
@@ -117,16 +106,19 @@ const Form = ({ supplier }: { supplier: SupplierProps }) => {
                 )}
               />
             </div>
-            {errors.cnpj && <Alert type="danger" size="sm" data={[errors.cnpj.message || '']} />}
+            {errors.enterprise?.cnpj && (
+              <Alert type="danger" size="sm" data={[errors.enterprise.cnpj.message || '']} />
+            )}
           </div>
-        ) : (
+        )}
+        {supplier.person && (
           <div className="w-full">
             <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="cpf">
               CPF <span className="text-danger">*</span>
             </label>
             <div className="relative">
               <Controller
-                name="cpf"
+                name="person.cpf"
                 control={control}
                 render={({ field }) => (
                   <InputPattern
@@ -141,7 +133,9 @@ const Form = ({ supplier }: { supplier: SupplierProps }) => {
                 )}
               />
             </div>
-            {errors.cpf && <Alert type="danger" size="sm" data={[errors.cpf.message || '']} />}
+            {errors.person?.cpf && (
+              <Alert type="danger" size="sm" data={[errors.person.cpf.message || '']} />
+            )}
           </div>
         )}
 
@@ -170,9 +164,31 @@ const Form = ({ supplier }: { supplier: SupplierProps }) => {
           Nome <span className="text-danger">*</span>
         </label>
         <div className="relative">
-          <Input id="name" type="text" icon={faUserTie} iconPosition="left" {...register('name')} />
+          {supplier.person && (
+            <Input
+              id="name"
+              type="text"
+              icon={faUserTie}
+              iconPosition="left"
+              {...register('person.entity.name')}
+            />
+          )}
+          {supplier.enterprise && (
+            <Input
+              id="name"
+              type="text"
+              icon={faUserTie}
+              iconPosition="left"
+              {...register('enterprise.entity.name')}
+            />
+          )}
         </div>
-        {errors.name && <Alert type="danger" size="sm" data={[errors.name.message || '']} />}
+        {errors.person?.entity?.name && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.name.message || '']} />
+        )}
+        {errors.enterprise?.entity?.name && (
+          <Alert type="danger" size="sm" data={[errors.enterprise.entity.name.message || '']} />
+        )}
       </div>
 
       {supplier.enterprise && (
@@ -186,11 +202,11 @@ const Form = ({ supplier }: { supplier: SupplierProps }) => {
               type="text"
               icon={faUser}
               iconPosition="left"
-              {...register('fantasy')}
+              {...register('enterprise.fantasy')}
             />
           </div>
-          {errors.fantasy && (
-            <Alert type="danger" size="sm" data={[errors.fantasy.message || '']} />
+          {errors.enterprise?.fantasy && (
+            <Alert type="danger" size="sm" data={[errors.enterprise.fantasy.message || '']} />
           )}
         </div>
       )}
@@ -200,15 +216,31 @@ const Form = ({ supplier }: { supplier: SupplierProps }) => {
           Email <span className="text-danger">*</span>
         </label>
         <div className="relative">
-          <Input
-            id="email"
-            type="text"
-            icon={faEnvelope}
-            iconPosition="left"
-            {...register('email')}
-          />
+          {supplier.person && (
+            <Input
+              id="email"
+              type="text"
+              icon={faEnvelope}
+              iconPosition="left"
+              {...register('person.entity.email')}
+            />
+          )}
+          {supplier.enterprise && (
+            <Input
+              id="email"
+              type="text"
+              icon={faEnvelope}
+              iconPosition="left"
+              {...register('enterprise.entity.email')}
+            />
+          )}
         </div>
-        {errors.email && <Alert type="danger" size="sm" data={[errors.email.message || '']} />}
+        {errors.person?.entity?.email && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.email.message || '']} />
+        )}
+        {errors.enterprise?.entity?.email && (
+          <Alert type="danger" size="sm" data={[errors.enterprise.entity.email.message || '']} />
+        )}
       </div>
 
       <div className="mb-6">
@@ -216,24 +248,48 @@ const Form = ({ supplier }: { supplier: SupplierProps }) => {
           Contato <span className="text-slate-400">?</span>
         </label>
         <div className="relative">
-          <Controller
-            name="phone"
-            control={control}
-            render={({ field }) => (
-              <InputPattern
-                {...field}
-                id="phone"
-                mask="_"
-                icon={faPhone}
-                iconPosition="left"
-                format="(##) # ####-####"
-                autoComplete="phone"
-                placeholder="Digite o telefone"
-              />
-            )}
-          />
+          {supplier.person && (
+            <Controller
+              name="person.entity.phone"
+              control={control}
+              render={({ field }) => (
+                <InputPattern
+                  {...field}
+                  id="phone"
+                  mask="_"
+                  icon={faPhone}
+                  iconPosition="left"
+                  format="(##) # ####-####"
+                  autoComplete="phone"
+                  placeholder="Digite o telefone"
+                />
+              )}
+            />
+          )}
+          {supplier.enterprise && (
+            <Controller
+              name="enterprise.entity.phone"
+              control={control}
+              render={({ field }) => (
+                <InputPattern
+                  {...field}
+                  id="phone"
+                  mask="_"
+                  icon={faPhone}
+                  iconPosition="left"
+                  format="(##) # ####-####"
+                  placeholder="Digite o telefone"
+                />
+              )}
+            />
+          )}
         </div>
-        {errors.phone && <Alert type="danger" size="sm" data={[errors.phone.message || '']} />}
+        {errors.person?.entity?.phone && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.phone.message || '']} />
+        )}
+        {errors.enterprise?.entity?.phone && (
+          <Alert type="danger" size="sm" data={[errors.enterprise.entity.phone.message || '']} />
+        )}
       </div>
 
       <div className="mb-6">
@@ -241,16 +297,33 @@ const Form = ({ supplier }: { supplier: SupplierProps }) => {
           Endereço <span className="text-slate-400">?</span>
         </label>
         <div className="relative">
-          <Input
-            id="address"
-            type="text"
-            icon={faLocationDot}
-            iconPosition="left"
-            {...register('address')}
-            placeholder="Digite o endereço"
-          />
+          {supplier.person && (
+            <Input
+              id="address"
+              type="text"
+              icon={faLocationDot}
+              iconPosition="left"
+              {...register('person.entity.address')}
+              placeholder="Digite o endereço"
+            />
+          )}
+          {supplier.enterprise && (
+            <Input
+              id="address"
+              type="text"
+              icon={faLocationDot}
+              iconPosition="left"
+              {...register('enterprise.entity.address')}
+              placeholder="Digite o endereço"
+            />
+          )}
         </div>
-        {errors.address && <Alert type="danger" size="sm" data={[errors.address.message || '']} />}
+        {errors.person?.entity?.address && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.address.message || '']} />
+        )}
+        {errors.enterprise?.entity?.address && (
+          <Alert type="danger" size="sm" data={[errors.enterprise.entity.address.message || '']} />
+        )}
       </div>
 
       {alertErrors && <Alert type="danger" size="lg" data={alertErrors} />}

@@ -28,6 +28,7 @@ const responseBudgets = (budgets: BudgetProps[]) => {
   return budgets.map((budget) => {
     return {
       ...budget,
+      register: budget.register ? formatDate(budget.register) : undefined,
       tasks: budget.tasks.map((task) => {
         return {
           ...task,
@@ -68,6 +69,11 @@ export const budgetSelect = async (req: Request, res: Response): Promise<void> =
       return
     }
 
+    const filter = {
+      ...params.data,
+      ...query.data,
+    }
+
     // check if has token
     const token = req.user
     if (!token) {
@@ -87,10 +93,9 @@ export const budgetSelect = async (req: Request, res: Response): Promise<void> =
         },
       },
       where: {
-        uuid: params.data.key === 'all' ? undefined : params.data.key,
-        register: {
-          gte: query.data.registerMin ? query.data.registerMin : undefined,
-          lte: query.data.registerMax ? query.data.registerMax : undefined,
+        uuid: filter.key === 'all' ? undefined : filter.key,
+        project: {
+          uuid: filter.projectUuid?.length ? { in: filter.projectUuid } : undefined,
         },
       },
     })

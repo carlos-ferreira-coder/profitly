@@ -40,11 +40,15 @@ const Form = ({ authOptions }: { authOptions: Options[] }) => {
     active: true,
     hourlyRate: '',
     authUuid: '',
-    cpf: '',
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
+    person: {
+      entity: {
+        cpf: '',
+        name: '',
+        email: '',
+        phone: '',
+        address: '',
+      },
+    },
   }
 
   // Hookform
@@ -104,7 +108,7 @@ const Form = ({ authOptions }: { authOptions: Options[] }) => {
           </label>
           <div className="relative">
             <Controller
-              name="cpf"
+              name="person.cpf"
               control={control}
               render={({ field }) => (
                 <InputPattern
@@ -119,7 +123,9 @@ const Form = ({ authOptions }: { authOptions: Options[] }) => {
               )}
             />
           </div>
-          {errors.cpf && <Alert type="danger" size="sm" data={[errors.cpf.message || '']} />}
+          {errors.person?.cpf && (
+            <Alert type="danger" size="sm" data={[errors.person.cpf.message || '']} />
+          )}
         </div>
 
         <div className="relative">
@@ -172,11 +178,13 @@ const Form = ({ authOptions }: { authOptions: Options[] }) => {
             icon={faUser}
             iconPosition="left"
             autoComplete="name"
-            {...register('name')}
+            {...register('person.entity.name')}
             placeholder="Digite o nome completo"
           />
         </div>
-        {errors.name && <Alert type="danger" size="sm" data={[errors.name.message || '']} />}
+        {errors.person?.entity?.name && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.name.message || '']} />
+        )}
       </div>
 
       <div className="flex justify-between gap-5 mb-6">
@@ -248,11 +256,13 @@ const Form = ({ authOptions }: { authOptions: Options[] }) => {
             type="text"
             icon={faEnvelope}
             iconPosition="left"
-            {...register('email')}
+            {...register('person.entity.email')}
             placeholder="Digite o email"
           />
         </div>
-        {errors.email && <Alert type="danger" size="sm" data={[errors.email.message || '']} />}
+        {errors.person?.entity?.email && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.email.message || '']} />
+        )}
       </div>
 
       <div className="mb-6">
@@ -302,7 +312,7 @@ const Form = ({ authOptions }: { authOptions: Options[] }) => {
         </label>
         <div className="relative">
           <Controller
-            name="phone"
+            name="person.entity.phone"
             control={control}
             render={({ field }) => (
               <InputPattern
@@ -318,7 +328,9 @@ const Form = ({ authOptions }: { authOptions: Options[] }) => {
             )}
           />
         </div>
-        {errors.phone && <Alert type="danger" size="sm" data={[errors.phone.message || '']} />}
+        {errors.person?.entity?.phone && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.phone.message || '']} />
+        )}
       </div>
 
       <div className="mb-6">
@@ -331,11 +343,13 @@ const Form = ({ authOptions }: { authOptions: Options[] }) => {
             type="text"
             icon={faLocationDot}
             iconPosition="left"
-            {...register('address')}
+            {...register('person.entity.address')}
             placeholder="Digite o endereço"
           />
         </div>
-        {errors.address && <Alert type="danger" size="sm" data={[errors.address.message || '']} />}
+        {errors.person?.entity?.address && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.address.message || '']} />
+        )}
       </div>
 
       {alertErrors && <Alert type="danger" size="lg" data={alertErrors} />}

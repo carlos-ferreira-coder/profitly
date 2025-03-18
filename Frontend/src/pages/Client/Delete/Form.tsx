@@ -16,7 +16,7 @@ import Button from '../../../components/Form/Button'
 import { useForm, Controller } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { clientDeleteSchema } from '../../../hooks/useSchema'
+import { clientSchema } from '../../../hooks/useSchema'
 import { ClientProps } from '../../../types/Database'
 
 const Form = ({ client }: { client: ClientProps }) => {
@@ -26,21 +26,10 @@ const Form = ({ client }: { client: ClientProps }) => {
   const [alertSuccesses, setAlertSuccesses] = useState<(string | JSX.Element)[] | null>(null)
 
   // Client schema
-  const schema = clientDeleteSchema
+  const schema = clientSchema
   type SchemaProps = z.infer<typeof schema>
 
-  const entity = (client.enterprise?.entity || client.person?.entity)!
-  const defaultValues = {
-    uuid: client.uuid,
-    active: client.active,
-    cpf: client.person?.cpf,
-    cnpj: client.enterprise?.cnpj,
-    fantasy: client.enterprise?.fantasy,
-    name: entity.name,
-    email: entity.email,
-    phone: entity.phone,
-    address: entity.address,
-  }
+  const defaultValues = { ...client }
 
   // Hookform
   const {
@@ -89,14 +78,14 @@ const Form = ({ client }: { client: ClientProps }) => {
       {errors.uuid && <Alert type="danger" size="sm" data={[errors.uuid.message || '']} />}
 
       <div className="flex justify-between gap-5 mb-6">
-        {client.enterprise ? (
+        {client.enterprise && (
           <div className="w-full">
             <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="cnpj">
               CNPJ
             </label>
             <div className="relative">
               <Controller
-                name="cnpj"
+                name="enterprise.cnpj"
                 control={control}
                 render={({ field }) => (
                   <InputPattern
@@ -112,16 +101,19 @@ const Form = ({ client }: { client: ClientProps }) => {
                 )}
               />
             </div>
-            {errors.cnpj && <Alert type="danger" size="sm" data={[errors.cnpj.message || '']} />}
+            {errors.enterprise?.cnpj && (
+              <Alert type="danger" size="sm" data={[errors.enterprise.cnpj.message || '']} />
+            )}
           </div>
-        ) : (
+        )}
+        {client.person && (
           <div className="w-full">
             <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="cpf">
               CPF
             </label>
             <div className="relative">
               <Controller
-                name="cpf"
+                name="person.cpf"
                 control={control}
                 render={({ field }) => (
                   <InputPattern
@@ -137,7 +129,9 @@ const Form = ({ client }: { client: ClientProps }) => {
                 )}
               />
             </div>
-            {errors.cpf && <Alert type="danger" size="sm" data={[errors.cpf.message || '']} />}
+            {errors.person?.cpf && (
+              <Alert type="danger" size="sm" data={[errors.person.cpf.message || '']} />
+            )}
           </div>
         )}
 
@@ -166,17 +160,35 @@ const Form = ({ client }: { client: ClientProps }) => {
           Nome
         </label>
         <div className="relative">
-          <Input
-            disabled
-            id="name"
-            type="text"
-            icon={faUserTie}
-            iconPosition="left"
-            {...register('name')}
-            className="bg-slate-200 dark:bg-slate-700"
-          />
+          {client.person && (
+            <Input
+              disabled
+              id="name"
+              type="text"
+              icon={faUserTie}
+              iconPosition="left"
+              {...register('person.entity.name')}
+              className="bg-slate-200 dark:bg-slate-700"
+            />
+          )}
+          {client.enterprise && (
+            <Input
+              disabled
+              id="name"
+              type="text"
+              icon={faUserTie}
+              iconPosition="left"
+              {...register('enterprise.entity.name')}
+              className="bg-slate-200 dark:bg-slate-700"
+            />
+          )}
         </div>
-        {errors.name && <Alert type="danger" size="sm" data={[errors.name.message || '']} />}
+        {errors.person?.entity?.name && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.name.message || '']} />
+        )}
+        {errors.enterprise?.entity?.name && (
+          <Alert type="danger" size="sm" data={[errors.enterprise.entity.name.message || '']} />
+        )}
       </div>
 
       {client.enterprise && (
@@ -191,12 +203,12 @@ const Form = ({ client }: { client: ClientProps }) => {
               type="text"
               icon={faUser}
               iconPosition="left"
-              {...register('fantasy')}
+              {...register('enterprise.fantasy')}
               className="bg-slate-200 dark:bg-slate-700"
             />
           </div>
-          {errors.fantasy && (
-            <Alert type="danger" size="sm" data={[errors.fantasy.message || '']} />
+          {errors.enterprise?.fantasy && (
+            <Alert type="danger" size="sm" data={[errors.enterprise.fantasy.message || '']} />
           )}
         </div>
       )}
@@ -206,17 +218,35 @@ const Form = ({ client }: { client: ClientProps }) => {
           Email
         </label>
         <div className="relative">
-          <Input
-            disabled
-            id="email"
-            type="text"
-            icon={faEnvelope}
-            iconPosition="left"
-            {...register('email')}
-            className="bg-slate-200 dark:bg-slate-700"
-          />
+          {client.person && (
+            <Input
+              disabled
+              id="email"
+              type="text"
+              icon={faEnvelope}
+              iconPosition="left"
+              {...register('person.entity.email')}
+              className="bg-slate-200 dark:bg-slate-700"
+            />
+          )}
+          {client.enterprise && (
+            <Input
+              disabled
+              id="email"
+              type="text"
+              icon={faEnvelope}
+              iconPosition="left"
+              {...register('enterprise.entity.email')}
+              className="bg-slate-200 dark:bg-slate-700"
+            />
+          )}
         </div>
-        {errors.email && <Alert type="danger" size="sm" data={[errors.email.message || '']} />}
+        {errors.person?.entity?.email && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.email.message || '']} />
+        )}
+        {errors.enterprise?.entity?.email && (
+          <Alert type="danger" size="sm" data={[errors.enterprise.entity.email.message || '']} />
+        )}
       </div>
 
       <div className="mb-6">
@@ -224,26 +254,53 @@ const Form = ({ client }: { client: ClientProps }) => {
           Contato
         </label>
         <div className="relative">
-          <Controller
-            name="phone"
-            control={control}
-            render={({ field }) => (
-              <InputPattern
-                {...field}
-                id="phone"
-                mask="_"
-                disabled
-                icon={faPhone}
-                iconPosition="left"
-                format="(##) # ####-####"
-                autoComplete="phone"
-                placeholder="Digite o telefone"
-                className="bg-slate-200 dark:bg-slate-700"
-              />
-            )}
-          />
+          {client.person && (
+            <Controller
+              name="person.entity.phone"
+              control={control}
+              render={({ field }) => (
+                <InputPattern
+                  {...field}
+                  id="phone"
+                  mask="_"
+                  disabled
+                  icon={faPhone}
+                  iconPosition="left"
+                  format="(##) # ####-####"
+                  autoComplete="phone"
+                  placeholder="Digite o telefone"
+                  className="bg-slate-200 dark:bg-slate-700"
+                />
+              )}
+            />
+          )}
+          {client.enterprise && (
+            <Controller
+              name="enterprise.entity.phone"
+              control={control}
+              render={({ field }) => (
+                <InputPattern
+                  {...field}
+                  id="phone"
+                  mask="_"
+                  disabled
+                  icon={faPhone}
+                  iconPosition="left"
+                  format="(##) # ####-####"
+                  autoComplete="phone"
+                  placeholder="Digite o telefone"
+                  className="bg-slate-200 dark:bg-slate-700"
+                />
+              )}
+            />
+          )}
         </div>
-        {errors.phone && <Alert type="danger" size="sm" data={[errors.phone.message || '']} />}
+        {errors.person?.entity?.phone && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.phone.message || '']} />
+        )}
+        {errors.enterprise?.entity?.phone && (
+          <Alert type="danger" size="sm" data={[errors.enterprise.entity.phone.message || '']} />
+        )}
       </div>
 
       <div className="mb-6">
@@ -251,18 +308,37 @@ const Form = ({ client }: { client: ClientProps }) => {
           Endereço
         </label>
         <div className="relative">
-          <Input
-            id="address"
-            type="text"
-            disabled
-            icon={faLocationDot}
-            iconPosition="left"
-            {...register('address')}
-            placeholder="Digite o endereço"
-            className="bg-slate-200 dark:bg-slate-700"
-          />
+          {client.person && (
+            <Input
+              id="address"
+              type="text"
+              disabled
+              icon={faLocationDot}
+              iconPosition="left"
+              {...register('person.entity.address')}
+              placeholder="Digite o endereço"
+              className="bg-slate-200 dark:bg-slate-700"
+            />
+          )}
+          {client.enterprise && (
+            <Input
+              id="address"
+              type="text"
+              disabled
+              icon={faLocationDot}
+              iconPosition="left"
+              {...register('enterprise.entity.address')}
+              placeholder="Digite o endereço"
+              className="bg-slate-200 dark:bg-slate-700"
+            />
+          )}
         </div>
-        {errors.address && <Alert type="danger" size="sm" data={[errors.address.message || '']} />}
+        {errors.person?.entity?.address && (
+          <Alert type="danger" size="sm" data={[errors.person.entity.address.message || '']} />
+        )}
+        {errors.enterprise?.entity?.address && (
+          <Alert type="danger" size="sm" data={[errors.enterprise.entity.address.message || '']} />
+        )}
       </div>
 
       {alertErrors && <Alert type="danger" size="lg" data={alertErrors} />}
