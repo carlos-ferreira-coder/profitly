@@ -1,18 +1,18 @@
 import { Request, Response } from 'express'
 import { prisma } from '@/server'
-import {
-  keySchema,
-  taskActivitySelectSchema,
-  taskExpenseSelectSchema,
-  tasksActivityUpdateSchema,
-  tasksExpenseUpdateSchema,
-} from '@utils/schema'
+import { keySchema, tasksSelectSchema, tasksUpdateSchema } from '@utils/schema'
 import { authorization } from '@utils/auth'
 import { TaskExpense, TaskActivity, Task } from '@prisma/client'
 import { numberToCurrency } from '@utils/currency'
 
-type TaskExpenseProps = TaskExpense & { task: Task }
-type TaskActivityProps = TaskActivity & { task: Task }
+type TaskProps = Task & {
+  taskExpense?: TaskExpense | null
+  taskActivity?: TaskActivity | null
+}
+
+type TasksProps = {
+  tasks: TaskProps[]
+}
 
 const formatDate = (date: Date) => {
   const year = String(date.getFullYear()).slice(-2)
@@ -24,37 +24,34 @@ const formatDate = (date: Date) => {
   return `${day}/${month}/${year} ${hour}:${minute}`
 }
 
-const responseTasksExpense = (tasksExpense: TaskExpenseProps[]) => {
-  return tasksExpense.map((taskExpense) => {
+const responseTasks = (tasks: TasksProps[]) => {
+  return tasks.map((obj) => {
     return {
-      ...taskExpense,
-      amount: numberToCurrency(taskExpense.amount.toNumber(), 'BRL'),
-      task: {
-        ...taskExpense.task,
-        beginDate: formatDate(taskExpense.task.beginDate),
-        endDate: formatDate(taskExpense.task.endDate),
-        revenue: numberToCurrency(taskExpense.task.revenue.toNumber(), 'BRL'),
-      },
+      tasks: obj.tasks.map((task) => {
+        return {
+          ...task,
+          beginDate: formatDate(task.beginDate),
+          endDate: formatDate(task.endDate),
+          revenue: numberToCurrency(task.revenue.toNumber(), 'BRL'),
+          taskExpense: task.taskExpense
+            ? {
+                ...task.taskExpense,
+                amount: numberToCurrency(task.taskExpense.amount.toNumber(), 'BRL'),
+              }
+            : undefined,
+          taskActivity: task.taskActivity
+            ? {
+                ...task.taskActivity,
+                hourlyRate: numberToCurrency(task.taskActivity.hourlyRate.toNumber(), 'BRL'),
+              }
+            : undefined,
+        }
+      }),
     }
   })
 }
 
-const responseTasksActivity = (tasksActivity: TaskActivityProps[]) => {
-  return tasksActivity.map((taskActivity) => {
-    return {
-      ...taskActivity,
-      hourlyRate: numberToCurrency(taskActivity.hourlyRate.toNumber(), 'BRL'),
-      task: {
-        ...taskActivity.task,
-        beginDate: formatDate(taskActivity.task.beginDate),
-        endDate: formatDate(taskActivity.task.endDate),
-        revenue: numberToCurrency(taskActivity.task.revenue.toNumber(), 'BRL'),
-      },
-    }
-  })
-}
-
-export const tasksExpenseSelect = async (req: Request, res: Response): Promise<void> => {
+export const tasksSelect = async (req: Request, res: Response): Promise<void> => {
   try {
     // check params
     const params = keySchema.safeParse(req.params)
@@ -64,7 +61,7 @@ export const tasksExpenseSelect = async (req: Request, res: Response): Promise<v
     }
 
     // check query
-    const query = taskExpenseSelectSchema.safeParse(req.query)
+    const query = tasksSelectSchema.safeParse(req.query)
     if (!query.success) {
       res.status(401).json({ message: `Query inválido: ${JSON.stringify(query.error.format())}` })
       return
@@ -78,41 +75,52 @@ export const tasksExpenseSelect = async (req: Request, res: Response): Promise<v
     }
 
     // server request
-    const tasksExpense = await prisma.taskExpense.findMany({
+    const tasks = await prisma.task.findMany({
       include: {
-        task: true,
+        taskExpense: true,
+        taskActivity: true,
       },
       where: {
-        uuid: params.data.key === 'all' ? undefined : params.data.key,
-        amount: {
-          gte: query.data.amountMin ? query.data.amountMin : undefined,
-          lte: query.data.amountMax ? query.data.amountMax : undefined,
+        name: query.data.name ? { contains: query.data.name } : undefined,
+        description: query.data.description ? { contains: query.data.description } : undefined,
+        finished: query.data.finished?.length === 1 ? query.data.finished[0] : undefined,
+        beginDate: {
+          gte: query.data.beginDateMin ? query.data.beginDateMin : undefined,
+          lte: query.data.beginDateMax ? query.data.beginDateMax : undefined,
         },
-        task: {
-          name: query.data.name ? { contains: query.data.name } : undefined,
-          description: query.data.description ? { contains: query.data.description } : undefined,
-          finished: query.data.finished?.length === 1 ? query.data.finished[0] : undefined,
-          beginDate: {
-            gte: query.data.beginDateMin ? query.data.beginDateMin : undefined,
-            lte: query.data.beginDateMax ? query.data.beginDateMax : undefined,
-          },
-          endDate: {
-            gte: query.data.endDateMin ? query.data.endDateMin : undefined,
-            lte: query.data.endDateMax ? query.data.endDateMax : undefined,
-          },
-          revenue: {
-            gte: query.data.revenueMin ? query.data.revenueMin : undefined,
-            lte: query.data.revenueMax ? query.data.revenueMax : undefined,
-          },
-          statusUuid: query.data.statusUuid?.length ? { in: query.data.statusUuid } : undefined,
-          projectUuid: query.data.projectUuid?.length ? { in: query.data.projectUuid } : undefined,
-          userUuid: query.data.userUuid?.length ? { in: query.data.userUuid } : undefined,
-          budgetUuid: query.data.budgetUuid?.length ? { in: query.data.budgetUuid } : undefined,
+        endDate: {
+          gte: query.data.endDateMin ? query.data.endDateMin : undefined,
+          lte: query.data.endDateMax ? query.data.endDateMax : undefined,
         },
+        statusUuid: query.data.statusUuid?.length ? { in: query.data.statusUuid } : undefined,
+        projectUuid: query.data.projectUuid?.length ? { in: query.data.projectUuid } : undefined,
+        userUuid: query.data.userUuid?.length ? { in: query.data.userUuid } : undefined,
+        budgetUuid: null,
+        originalTaskId: null,
+        OR: [
+          {
+            taskExpense: {
+              uuid: params.data.key === 'all' ? undefined : params.data.key,
+              amount: {
+                gte: query.data.amountMin ? query.data.amountMin : undefined,
+                lte: query.data.amountMax ? query.data.amountMax : undefined,
+              },
+            },
+          },
+          {
+            taskActivity: {
+              uuid: params.data.key === 'all' ? undefined : params.data.key,
+              hourlyRate: {
+                gte: query.data.hourlyRateMin ? query.data.hourlyRateMin : undefined,
+                lte: query.data.hourlyRateMax ? query.data.hourlyRateMax : undefined,
+              },
+            },
+          },
+        ],
       },
     })
 
-    res.status(200).json(responseTasksExpense(tasksExpense))
+    res.status(200).json(responseTasks([{ tasks: tasks }]))
     return
   } catch (e) {
     console.log(e)
@@ -121,82 +129,14 @@ export const tasksExpenseSelect = async (req: Request, res: Response): Promise<v
   }
 }
 
-export const tasksActivitySelect = async (req: Request, res: Response): Promise<void> => {
-  try {
-    // check params
-    const params = keySchema.safeParse(req.params)
-    if (!params.success) {
-      res.status(401).json({ message: `Params inválido: ${JSON.stringify(params.error.format())}` })
-      return
-    }
-
-    // check query
-    const query = taskActivitySelectSchema.safeParse(req.query)
-    if (!query.success) {
-      res.status(401).json({ message: `Query inválido: ${JSON.stringify(query.error.format())}` })
-      return
-    }
-
-    // check if has token
-    const token = req.user
-    if (!token) {
-      res.status(401).json({ message: 'Token não encontrado!' })
-      return
-    }
-
-    // server request
-    const tasksActivity = await prisma.taskActivity.findMany({
-      include: {
-        task: true,
-      },
-      where: {
-        uuid: params.data.key === 'all' ? undefined : params.data.key,
-        hourlyRate: {
-          gte: query.data.hourlyRateMin ? query.data.hourlyRateMin : undefined,
-          lte: query.data.hourlyRateMax ? query.data.hourlyRateMax : undefined,
-        },
-        task: {
-          name: query.data.name ? { contains: query.data.name } : undefined,
-          description: query.data.description ? { contains: query.data.description } : undefined,
-          finished: query.data.finished?.length === 1 ? query.data.finished[0] : undefined,
-          beginDate: {
-            gte: query.data.beginDateMin ? query.data.beginDateMin : undefined,
-            lte: query.data.beginDateMax ? query.data.beginDateMax : undefined,
-          },
-          endDate: {
-            gte: query.data.endDateMin ? query.data.endDateMin : undefined,
-            lte: query.data.endDateMax ? query.data.endDateMax : undefined,
-          },
-          revenue: {
-            gte: query.data.revenueMin ? query.data.revenueMin : undefined,
-            lte: query.data.revenueMax ? query.data.revenueMax : undefined,
-          },
-          statusUuid: query.data.statusUuid?.length ? { in: query.data.statusUuid } : undefined,
-          projectUuid: query.data.projectUuid?.length ? { in: query.data.projectUuid } : undefined,
-          userUuid: query.data.userUuid?.length ? { in: query.data.userUuid } : undefined,
-          budgetUuid: query.data.budgetUuid?.length ? { in: query.data.budgetUuid } : undefined,
-        },
-      },
-    })
-
-    res.status(200).json(responseTasksActivity(tasksActivity))
-    return
-  } catch (e) {
-    console.log(e)
-    res.status(500).json({ message: 'Erro no servidor!' })
-    return
-  }
-}
-
-export const tasksExpenseUpdate = async (req: Request, res: Response): Promise<void> => {
+export const tasksUpdate = async (req: Request, res: Response): Promise<void> => {
   try {
     // check schema
-    const body = tasksExpenseUpdateSchema.safeParse(req.body)
+    const body = tasksUpdateSchema.safeParse(req.body)
     if (!body.success) {
       res.status(401).json({ message: `Body inválido: ${JSON.stringify(body.error.format())}` })
       return
     }
-    const tasks = body.data.tasks
 
     // check if has token
     const token = req.user
@@ -211,211 +151,232 @@ export const tasksExpenseUpdate = async (req: Request, res: Response): Promise<v
       return
     }
 
-    const projectUuids = new Set(tasks.map(({ projectUuid }) => projectUuid))
+    const projectUuids = new Set(body.data.tasks.map(({ projectUuid }) => projectUuid))
     if (projectUuids.size !== 1) {
       res.status(401).json({ message: 'As tarefas devem ser de um único projeto!' })
       return
     }
     const projectUuid = [...projectUuids][0]
 
-    const tasksExpenseToCreate = tasks
-      .filter(({ uuid }) => uuid === '')
-      .map(({ uuid, ...task }) => task)
+    type TE = {
+      name: string
+      description: string
+      finished: boolean
+      beginDate: Date
+      endDate: Date
+      revenue: number
+      statusUuid: string
+      projectUuid: string
+      userUuid?: string
+      budgetUuid?: string
+      taskExpense: {
+        uuid: string
+        amount: number
+      }
+    }
 
-    const tasksExpenseToUpdate = tasks.filter(({ uuid }) => uuid !== '')
+    type TA = {
+      name: string
+      description: string
+      finished: boolean
+      beginDate: Date
+      endDate: Date
+      revenue: number
+      statusUuid: string
+      projectUuid: string
+      userUuid?: string
+      budgetUuid?: string
+      taskActivity: {
+        uuid: string
+        hourlyRate: number
+      }
+    }
 
-    const tasksExpenseToDelete = await prisma.taskExpense.findMany({
-      where: {
-        uuid: {
-          notIn: tasksExpenseToUpdate.map(({ uuid }) => uuid),
-        },
-        task: {
-          budgetUuid: null,
-          projectUuid: projectUuid,
+    let tasks: {
+      create: { expense: TE[]; activity: TA[] }
+      update: { expense: TE[]; activity: TA[] }
+      delete: {
+        expense: { id: number; uuid: string }[]
+        activity: { id: number; uuid: string }[]
+      }
+    } = body.data.tasks.reduce(
+      (acc, task) => {
+        if (task.taskExpense) {
+          const formattedTask = {
+            ...task,
+            taskExpense: { ...task.taskExpense },
+          }
+
+          if (task.taskExpense.uuid === '') acc.create.expense.push(formattedTask)
+          else acc.update.expense.push(formattedTask)
+        }
+
+        if (task.taskActivity) {
+          const formattedTask = {
+            ...task,
+            taskActivity: { ...task.taskActivity },
+          }
+
+          if (task.taskActivity.uuid === '') acc.create.activity.push(formattedTask)
+          else acc.update.activity.push(formattedTask)
+        }
+
+        return acc
+      },
+      {
+        create: { expense: [] as TE[], activity: [] as TA[] },
+        update: { expense: [] as TE[], activity: [] as TA[] },
+        delete: {
+          expense: [] as { id: number; uuid: string }[],
+          activity: [] as { id: number; uuid: string }[],
         },
       },
-    })
+    )
 
-    // create resource
-    tasksExpenseToCreate.map(async (task) => {
-      const created = await prisma.task.create({
-        data: {
-          name: task.name,
-          description: task.description,
-          finished: task.finished,
-          beginDate: task.beginDate,
-          endDate: task.endDate,
-          revenue: task.revenue,
-          statusUuid: task.statusUuid,
-          projectUuid: projectUuid,
-          userUuid: task.userUuid,
-          budgetUuid: null,
-        },
-      })
-      await prisma.taskExpense.create({
-        data: {
-          id: created.id,
-          amount: task.amount,
-        },
-      })
-    })
-
-    tasksExpenseToUpdate.map(async (task) => {
-      const updated = await prisma.taskExpense.update({
-        data: {
-          amount: task.amount,
-        },
+    const [expenseTasks, activityTasks] = await Promise.all([
+      prisma.taskExpense.findMany({
         where: {
-          uuid: task.uuid,
+          uuid: { notIn: tasks.update.expense.map(({ taskExpense }) => taskExpense.uuid) },
+          task: {
+            budgetUuid: null,
+            projectUuid: projectUuid,
+          },
         },
-      })
-      await prisma.task.update({
-        data: {
-          name: task.name,
-          description: task.description,
-          finished: task.finished,
-          beginDate: task.beginDate,
-          endDate: task.endDate,
-          revenue: task.revenue,
-          statusUuid: task.statusUuid,
-          projectUuid: projectUuid,
-          userUuid: task.userUuid,
-          budgetUuid: null,
-        },
+      }),
+      prisma.taskActivity.findMany({
         where: {
-          id: updated.id,
+          uuid: { notIn: tasks.update.activity.map(({ taskActivity }) => taskActivity.uuid) },
+          task: {
+            budgetUuid: null,
+            projectUuid: projectUuid,
+          },
         },
-      })
-    })
+      }),
+    ])
 
-    tasksExpenseToDelete.map(async (task) => {
-      const deleted = await prisma.taskExpense.delete({
-        where: { uuid: task.uuid },
-      })
-      await prisma.task.delete({
-        where: { id: deleted.id },
-      })
-    })
+    tasks.delete.expense = expenseTasks.map((task) => ({ id: task.id, uuid: task.uuid }))
+    tasks.delete.activity = activityTasks.map((task) => ({ id: task.id, uuid: task.uuid }))
 
-    res.status(201).json({ message: 'As tarefas de despesa do projeto foram atualizadas.' })
-    return
-  } catch (e) {
-    console.log(e)
-    res.status(500).json({ message: 'Erro no servidor!' })
-    return
-  }
-}
+    await Promise.all([
+      ...tasks.create.expense.map(async (task) => {
+        const taskCreated = await prisma.task.create({
+          data: {
+            name: task.name,
+            description: task.description,
+            finished: task.finished,
+            beginDate: task.beginDate,
+            endDate: task.endDate,
+            revenue: task.revenue,
+            statusUuid: task.statusUuid,
+            projectUuid: projectUuid,
+            userUuid: task.userUuid,
+          },
+        })
+        await prisma.taskExpense.create({
+          data: {
+            id: taskCreated.id,
+            amount: task.taskExpense.amount,
+          },
+        })
+      }),
+      ...tasks.create.activity.map(async (task) => {
+        const taskCreated = await prisma.task.create({
+          data: {
+            name: task.name,
+            description: task.description,
+            finished: task.finished,
+            beginDate: task.beginDate,
+            endDate: task.endDate,
+            revenue: task.revenue,
+            statusUuid: task.statusUuid,
+            projectUuid: projectUuid,
+            userUuid: task.userUuid,
+          },
+        })
+        await prisma.taskActivity.create({
+          data: {
+            id: taskCreated.id,
+            hourlyRate: task.taskActivity.hourlyRate,
+          },
+        })
+      }),
+    ])
 
-export const tasksActivityUpdate = async (req: Request, res: Response): Promise<void> => {
-  try {
-    // check schema
-    const body = tasksActivityUpdateSchema.safeParse(req.body)
-    if (!body.success) {
-      res.status(401).json({ message: `Body inválido: ${JSON.stringify(body.error.format())}` })
-      return
-    }
-    const tasks = body.data.tasks
+    await Promise.all([
+      ...tasks.update.expense.map(async (task) => {
+        const taskUpdated = await prisma.taskExpense.update({
+          data: {
+            amount: task.taskExpense.amount,
+          },
+          where: {
+            uuid: task.taskExpense.uuid,
+          },
+        })
+        await prisma.task.update({
+          data: {
+            name: task.name,
+            description: task.description,
+            finished: task.finished,
+            beginDate: task.beginDate,
+            endDate: task.endDate,
+            revenue: task.revenue,
+            statusUuid: task.statusUuid,
+            projectUuid: projectUuid,
+            userUuid: task.userUuid,
+          },
+          where: {
+            id: taskUpdated.id,
+          },
+        })
+      }),
+      ...tasks.update.activity.map(async (task) => {
+        const taskUpdated = await prisma.taskActivity.update({
+          data: {
+            hourlyRate: task.taskActivity.hourlyRate,
+          },
+          where: {
+            uuid: task.taskActivity.uuid,
+          },
+        })
+        await prisma.task.update({
+          data: {
+            name: task.name,
+            description: task.description,
+            finished: task.finished,
+            beginDate: task.beginDate,
+            endDate: task.endDate,
+            revenue: task.revenue,
+            statusUuid: task.statusUuid,
+            projectUuid: projectUuid,
+            userUuid: task.userUuid,
+          },
+          where: {
+            id: taskUpdated.id,
+          },
+        })
+      }),
+    ])
 
-    // check if has token
-    const token = req.user
-    if (!token) {
-      res.status(401).json({ message: 'Token não encontrado!' })
-      return
-    }
+    await Promise.all([
+      ...tasks.delete.expense.map(async (task) => {
+        const budgetTaskDeleted = await prisma.taskExpense.delete({
+          where: { uuid: task.uuid },
+        })
+        await prisma.task.delete({
+          where: { id: budgetTaskDeleted.id },
+        })
+      }),
+      ...tasks.delete.activity.map(async (task) => {
+        const budgetTaskDeleted = await prisma.taskActivity.delete({
+          where: { uuid: task.uuid },
+        })
+        await prisma.task.delete({
+          where: { id: budgetTaskDeleted.id },
+        })
+      }),
+    ])
 
-    // check if user has authorization
-    if (!(await authorization('project', token.authUuid))) {
-      res.status(401).json({ message: 'Usuário sem autorização para editar esses dados!' })
-      return
-    }
-
-    const projectUuids = new Set(tasks.map(({ projectUuid }) => projectUuid))
-    if (projectUuids.size !== 1) {
-      res.status(401).json({ message: 'As tarefas devem ser de um único projeto!' })
-      return
-    }
-    const projectUuid = [...projectUuids][0]
-
-    const tasksActivityToCreate = tasks
-      .filter(({ uuid }) => uuid === '')
-      .map(({ uuid, ...task }) => task)
-
-    const tasksActivityToUpdate = tasks.filter(({ uuid }) => uuid !== '')
-
-    const tasksActivityToDelete = await prisma.taskExpense.findMany({
-      where: {
-        uuid: {
-          notIn: tasksActivityToUpdate.map(({ uuid }) => uuid),
-        },
-        task: {
-          budgetUuid: null,
-          projectUuid: projectUuid,
-        },
-      },
-    })
-
-    // create resource
-    tasksActivityToCreate.map(async (task) => {
-      const created = await prisma.task.create({
-        data: {
-          name: task.name,
-          description: task.description,
-          finished: task.finished,
-          beginDate: task.beginDate,
-          endDate: task.endDate,
-          revenue: task.revenue,
-          statusUuid: task.statusUuid,
-          projectUuid: projectUuid,
-          userUuid: task.userUuid,
-          budgetUuid: null,
-        },
-      })
-      await prisma.taskExpense.create({
-        data: {
-          id: created.id,
-          amount: task.hourlyRate,
-        },
-      })
-    })
-
-    tasksActivityToUpdate.map(async (task) => {
-      const updated = await prisma.taskExpense.update({
-        data: {
-          amount: task.hourlyRate,
-        },
-        where: {
-          uuid: task.uuid,
-        },
-      })
-      await prisma.task.update({
-        data: {
-          name: task.name,
-          description: task.description,
-          finished: task.finished,
-          beginDate: task.beginDate,
-          endDate: task.endDate,
-          revenue: task.revenue,
-          statusUuid: task.statusUuid,
-          projectUuid: projectUuid,
-          userUuid: task.userUuid,
-          budgetUuid: null,
-        },
-        where: {
-          id: updated.id,
-        },
-      })
-    })
-
-    tasksActivityToDelete.map(async (task) => {
-      const deleted = await prisma.taskExpense.delete({
-        where: { uuid: task.uuid },
-      })
-      await prisma.task.delete({
-        where: { id: deleted.id },
-      })
-    })
-
-    res.status(201).json({ message: 'As tarefas de atividade do projeto foram atualizadas.' })
+    res.status(201).json({ message: 'As tarefas do orçamento foram atualizadas.' })
     return
   } catch (e) {
     console.log(e)

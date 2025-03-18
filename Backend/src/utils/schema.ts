@@ -518,6 +518,64 @@ export const budgetSelectSchema = z.object({
   registerMax: zodString('registro', false).optional(),
 })
 
+export const tasksSelectSchema = z.object({
+  name: zodString('nome', false).optional(),
+  description: zodString('descrição', false).optional(),
+  finished: zodRegex('finalizado', /^(false|true)(,(false|true))?$/, false)
+    .transform((s) => s.split(',').map((i) => i === 'true'))
+    .optional(),
+  beginDateMin: zodString('data inicial', false).optional(),
+  beginDateMax: zodString('data inicial', false).optional(),
+  endDateMin: zodString('data final', false).optional(),
+  endDateMax: zodString('data final', false).optional(),
+  revenueMin: zodString('lucro', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
+    .optional(),
+  revenueMax: zodString('lucro', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
+    .optional(),
+  statusUuid: zodRegex(
+    'uuid(s) de status',
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
+    false,
+  )
+    .transform((s) => s.split(','))
+    .optional(),
+  projectUuid: zodRegex(
+    'uuid(s) de projeto',
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
+    false,
+  )
+    .transform((s) => s.split(','))
+    .optional(),
+  userUuid: zodRegex(
+    'uuid(s) de usuário',
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
+    false,
+  )
+    .transform((s) => s.split(','))
+    .optional(),
+  budgetUuid: zodRegex(
+    'uuid(s) de orçamento',
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
+    false,
+  )
+    .transform((s) => s.split(','))
+    .optional(),
+  amountMin: zodString('quantia', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
+    .optional(),
+  amountMax: zodString('quantia', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
+    .optional(),
+  hourlyRateMin: zodString('valor da hora', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
+    .optional(),
+  hourlyRateMax: zodString('valor da hora', false)
+    .transform((s) => currencyToNumber(s, 'BRL'))
+    .optional(),
+})
+
 const taskUpdateSchema = z.object({
   name: zodString('nome', true),
   description: zodString('descrição', true),
@@ -563,6 +621,10 @@ const taskUpdateSchema = z.object({
 
 export const budgetTasksUpdateSchema = z.object({
   uuid: zodUuid('orçamento'),
+  tasks: z.array(taskUpdateSchema),
+})
+
+export const tasksUpdateSchema = z.object({
   tasks: z.array(taskUpdateSchema),
 })
 
