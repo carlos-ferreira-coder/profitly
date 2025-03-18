@@ -97,6 +97,7 @@ export const tasksSelect = async (req: Request, res: Response): Promise<void> =>
         userUuid: query.data.userUuid?.length ? { in: query.data.userUuid } : undefined,
         budgetUuid: null,
         originalTaskId: null,
+        /*
         OR: [
           {
             taskExpense: {
@@ -117,6 +118,7 @@ export const tasksSelect = async (req: Request, res: Response): Promise<void> =>
             },
           },
         ],
+        */
       },
     })
 
