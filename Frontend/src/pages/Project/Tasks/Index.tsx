@@ -20,6 +20,9 @@ const Tasks = () => {
           withCredentials: true,
         })
 
+        console.log(resTasks)
+        console.log(JSON.stringify(resTasks))
+
         setTasks(resTasks)
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])
