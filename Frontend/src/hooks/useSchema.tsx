@@ -492,19 +492,17 @@ const taskSchema = z
       /^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
       false
     )
-      .transform((s) => (s === '' ? undefined : s))
-      .nullable()
+      .transform((s) => (s === '' || s === null ? undefined : s))
       .optional(),
     budgetUuid: zodRegex(
       'uuid de orçamento',
       /^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
       false
     )
-      .transform((s) => (s === '' ? undefined : s))
-      .nullable()
+      .transform((s) => (s === '' || s === null ? undefined : s))
       .optional(),
-    taskExpense: taskExpenseSchema.nullable().optional(),
-    taskActivity: taskActivitySchema.nullable().optional(),
+    taskExpense: taskExpenseSchema.optional(),
+    taskActivity: taskActivitySchema.optional(),
   })
   .superRefine(({ beginDate, endDate }, ctx) => {
     if (beginDate > endDate) {
@@ -524,20 +522,6 @@ export const tasksSchema = z.object({
 
 export const budgetSchema = z.object({
   uuid: zodUuid('orçamento'),
-  register: zodRegex(
-    'registro',
-    /^(0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/(\d{2}) ([01]\d|2[0-3]):[0-5]\d$/,
-    true
-  )
-    .transform((s) => {
-      const [date, time] = s.split(' ')
-      const [hour, minute] = time.split(':')
-      const [day, month, year] = date.split('/')
-
-      return `20${year}-${month}-${day}T${hour}:${minute}:00`
-    })
-    .nullable()
-    .optional(),
   tasks: z.array(taskSchema).min(1, {
     message: 'Insira as tarefas para prosseguir!',
   }),
