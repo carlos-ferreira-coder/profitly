@@ -38,8 +38,8 @@ const Form = () => {
       entity: {
         name: '',
         email: '',
-        phone: undefined,
-        address: undefined,
+        phone: '',
+        address: '',
       },
     },
     enterprise: {
@@ -48,8 +48,8 @@ const Form = () => {
       entity: {
         name: '',
         email: '',
-        phone: undefined,
-        address: undefined,
+        phone: '',
+        address: '',
       },
     },
   }

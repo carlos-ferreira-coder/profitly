@@ -19,8 +19,28 @@ const responseClients = (clients: ClientProps[]) => {
   return clients.map((client) => {
     return {
       ...client,
-      person: client.person ? client.person : undefined,
-      enterprise: client.enterprise ? client.enterprise : undefined,
+      person: client.person
+        ? {
+            ...client.person,
+            entity: {
+              ...client.person.entity,
+              phone: client.person.entity.phone ? client.person.entity.phone : undefined,
+              address: client.person.entity.address ? client.person.entity.address : undefined,
+            },
+          }
+        : undefined,
+      enterprise: client.enterprise
+        ? {
+            ...client.enterprise,
+            entity: {
+              ...client.enterprise.entity,
+              phone: client.enterprise.entity.phone ? client.enterprise.entity.phone : undefined,
+              address: client.enterprise.entity.address
+                ? client.enterprise.entity.address
+                : undefined,
+            },
+          }
+        : undefined,
     }
   })
 }

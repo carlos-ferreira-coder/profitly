@@ -19,8 +19,30 @@ const responseSuppliers = (suppliers: SupplierProps[]) => {
   return suppliers.map((supplier) => {
     return {
       ...supplier,
-      person: supplier.person ? supplier.person : undefined,
-      enterprise: supplier.enterprise ? supplier.enterprise : undefined,
+      person: supplier.person
+        ? {
+            ...supplier.person,
+            entity: {
+              ...supplier.person.entity,
+              phone: supplier.person.entity.phone ? supplier.person.entity.phone : undefined,
+              address: supplier.person.entity.address ? supplier.person.entity.address : undefined,
+            },
+          }
+        : undefined,
+      enterprise: supplier.enterprise
+        ? {
+            ...supplier.enterprise,
+            entity: {
+              ...supplier.enterprise.entity,
+              phone: supplier.enterprise.entity.phone
+                ? supplier.enterprise.entity.phone
+                : undefined,
+              address: supplier.enterprise.entity.address
+                ? supplier.enterprise.entity.address
+                : undefined,
+            },
+          }
+        : undefined,
     }
   })
 }

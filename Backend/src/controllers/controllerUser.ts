@@ -32,15 +32,25 @@ const responseUsers = (users: UserProps[], uuid: string, auth: Auth) => {
 
     return {
       ...user,
-      password: null,
-      cpf: auth.personal || isMain ? user.person.cpf : null,
-      name: auth.personal || isMain ? user.person.entity.name : null,
-      phone: auth.personal || isMain ? user.person.entity.phone : null,
-      address: auth.personal || isMain ? user.person.entity.address : null,
+      password: undefined,
       hourlyRate:
         (auth.financial || isMain) && user.hourlyRate
           ? numberToCurrency(user.hourlyRate.toNumber(), 'BRL')
-          : null,
+          : undefined,
+      person: {
+        cpf: auth.personal || isMain ? user.person.cpf : undefined,
+        entity: {
+          name: auth.personal || isMain ? user.person.entity.name : undefined,
+          phone:
+            (auth.personal || isMain) && user.person.entity.phone
+              ? user.person.entity.phone
+              : undefined,
+          address:
+            (auth.personal || isMain) && user.person.entity.address
+              ? user.person.entity.address
+              : undefined,
+        },
+      },
     }
   })
 }
