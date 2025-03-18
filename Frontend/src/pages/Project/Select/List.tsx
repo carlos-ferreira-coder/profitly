@@ -13,7 +13,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { useNavigate } from 'react-router-dom'
 import { ProjectProps } from '../../../types/Database'
-import { currencyToNumber } from '../../../hooks/useCurrency'
 import { useAuth } from '../../../context/AuthContext'
 
 const ProjectDescInfo = ({ project }: { project: ProjectProps }) => (
@@ -183,15 +182,13 @@ const List = ({ projects }: { projects: ProjectProps[] }) => {
                 <FontAwesomeIcon icon={faFileInvoiceDollar} />
               </Button>
 
-              {currencyToNumber(project.budget.total, 'BRL') !== 0 && (
-                <Button
-                  color="warning"
-                  className="w-8 h-8"
-                  onClick={() => navigate(`/project/tasks/${project.uuid}`)}
-                >
-                  <FontAwesomeIcon icon={faListCheck} />
-                </Button>
-              )}
+              <Button
+                color="warning"
+                className="w-8 h-8"
+                onClick={() => navigate(`/project/tasks/${project.uuid}`)}
+              >
+                <FontAwesomeIcon icon={faListCheck} />
+              </Button>
 
               <Button
                 color="danger"
