@@ -234,7 +234,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
     setAlertSuccesses(null)
 
     try {
-      const response = await axios.put('/task/expense/update', data, { withCredentials: true })
+      const response = await axios.put('/tasks/update', data, { withCredentials: true })
 
       setAlertSuccesses([
         response.data.message,
