@@ -40,6 +40,7 @@ const responseUsers = (users: UserProps[], uuid: string, auth: Auth) => {
       person: {
         cpf: auth.personal || isMain ? user.person.cpf : undefined,
         entity: {
+          ...user.person.entity,
           name: auth.personal || isMain ? user.person.entity.name : undefined,
           phone:
             (auth.personal || isMain) && user.person.entity.phone
