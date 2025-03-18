@@ -133,14 +133,14 @@ export const budgetTasksUpdate = async (req: Request, res: Response): Promise<vo
     }
 
     const projectUuids = new Set(body.data.tasks.map(({ projectUuid }) => projectUuid))
-    if (projectUuids.size !== 1) {
+    if (projectUuids.size > 1) {
       res.status(401).json({ message: 'As tarefas devem ser de um único projeto!' })
       return
     }
     const projectUuid = [...projectUuids][0]
 
     const budgetUuids = new Set(body.data.tasks.map(({ budgetUuid }) => budgetUuid))
-    if (budgetUuids.size !== 1) {
+    if (budgetUuids.size > 1) {
       res.status(401).json({ message: 'As tarefas devem ser de um único projeto!' })
       return
     }
@@ -252,6 +252,7 @@ export const budgetTasksUpdate = async (req: Request, res: Response): Promise<vo
         where: { uuid: budget.uuid },
       })
     }
+
     await Promise.all([
       ...tasks.create.expense.map(async (task) => {
         const budgetTaskCreated = await prisma.task.create({

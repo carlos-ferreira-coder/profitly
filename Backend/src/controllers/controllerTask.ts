@@ -125,7 +125,7 @@ export const tasksUpdate = async (req: Request, res: Response): Promise<void> =>
     }
 
     const projectUuids = new Set(body.data.tasks.map(({ projectUuid }) => projectUuid))
-    if (projectUuids.size !== 1) {
+    if (projectUuids.size > 1) {
       res.status(401).json({ message: 'As tarefas devem ser de um único projeto!' })
       return
     }
