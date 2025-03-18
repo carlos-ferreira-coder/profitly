@@ -151,9 +151,8 @@ const Form = ({ user, authOptions }: { user: UserProps; authOptions: Options[] }
           <div className="flex items-center h-13">
             <Controller
               name="active"
-              disabled
               control={control}
-              render={({ field }) => <Switcher {...field} />}
+              render={({ field }) => <Switcher disabled {...field} />}
             />
           </div>
         </div>

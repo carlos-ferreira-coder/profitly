@@ -65,7 +65,10 @@ const Form = () => {
     formState: { errors },
   } = useForm<SchemaProps>({
     resolver: zodResolver(schema),
-    defaultValues: defaultValues,
+    defaultValues: {
+      ...defaultValues,
+      person: undefined,
+    },
   })
 
   useEffect(() => {
