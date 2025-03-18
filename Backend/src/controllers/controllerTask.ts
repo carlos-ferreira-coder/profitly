@@ -27,6 +27,7 @@ const responseTasks = (tasks: TaskProps[]) => {
       beginDate: formatDate(task.beginDate),
       endDate: formatDate(task.endDate),
       revenue: numberToCurrency(task.revenue.toNumber(), 'BRL'),
+      budgetUuid: undefined,
       taskExpense: task.taskExpense
         ? {
             ...task.taskExpense,
