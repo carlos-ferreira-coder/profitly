@@ -133,15 +133,15 @@ export const budgetTasksUpdate = async (req: Request, res: Response): Promise<vo
     }
 
     const projectUuids = new Set(body.data.tasks.map(({ projectUuid }) => projectUuid))
-    if (projectUuids.size > 1) {
-      res.status(401).json({ message: 'As tarefas devem ser de um único projeto!' })
+    if (projectUuids.size !== 1) {
+      res.status(401).json({ message: 'As tarefas devem ter um único projeto!' })
       return
     }
     const projectUuid = [...projectUuids][0]
 
     const budgetUuids = new Set(body.data.tasks.map(({ budgetUuid }) => budgetUuid))
-    if (budgetUuids.size > 1) {
-      res.status(401).json({ message: 'As tarefas devem ser de um único projeto!' })
+    if (budgetUuids.size !== 1) {
+      res.status(401).json({ message: 'As tarefas devem ter um único orçamento!' })
       return
     }
     const budgetUuid = [...budgetUuids][0]
