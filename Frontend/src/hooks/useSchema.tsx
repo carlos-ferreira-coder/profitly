@@ -515,14 +515,10 @@ const taskSchema = z
   })
 
 export const tasksSchema = z.object({
-  tasks: z.array(taskSchema).min(1, {
-    message: 'Insira as tarefas para prosseguir!',
-  }),
+  tasks: z.array(taskSchema),
 })
 
 export const budgetSchema = z.object({
   uuid: zodUuid('orçamento'),
-  tasks: z.array(taskSchema).min(1, {
-    message: 'Insira as tarefas para prosseguir!',
-  }),
+  tasks: z.array(taskSchema),
 })
