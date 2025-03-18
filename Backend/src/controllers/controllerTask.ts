@@ -10,10 +10,6 @@ type TaskProps = Task & {
   taskActivity?: TaskActivity | null
 }
 
-type TasksProps = {
-  tasks: TaskProps[]
-}
-
 const formatDate = (date: Date) => {
   const year = String(date.getFullYear()).slice(-2)
   const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -24,29 +20,25 @@ const formatDate = (date: Date) => {
   return `${day}/${month}/${year} ${hour}:${minute}`
 }
 
-const responseTasks = (tasks: TasksProps[]) => {
-  return tasks.map((obj) => {
+const responseTasks = (tasks: TaskProps[]) => {
+  return tasks.map((task) => {
     return {
-      tasks: obj.tasks.map((task) => {
-        return {
-          ...task,
-          beginDate: formatDate(task.beginDate),
-          endDate: formatDate(task.endDate),
-          revenue: numberToCurrency(task.revenue.toNumber(), 'BRL'),
-          taskExpense: task.taskExpense
-            ? {
-                ...task.taskExpense,
-                amount: numberToCurrency(task.taskExpense.amount.toNumber(), 'BRL'),
-              }
-            : undefined,
-          taskActivity: task.taskActivity
-            ? {
-                ...task.taskActivity,
-                hourlyRate: numberToCurrency(task.taskActivity.hourlyRate.toNumber(), 'BRL'),
-              }
-            : undefined,
-        }
-      }),
+      ...task,
+      beginDate: formatDate(task.beginDate),
+      endDate: formatDate(task.endDate),
+      revenue: numberToCurrency(task.revenue.toNumber(), 'BRL'),
+      taskExpense: task.taskExpense
+        ? {
+            ...task.taskExpense,
+            amount: numberToCurrency(task.taskExpense.amount.toNumber(), 'BRL'),
+          }
+        : undefined,
+      taskActivity: task.taskActivity
+        ? {
+            ...task.taskActivity,
+            hourlyRate: numberToCurrency(task.taskActivity.hourlyRate.toNumber(), 'BRL'),
+          }
+        : undefined,
     }
   })
 }
@@ -96,34 +88,12 @@ export const tasksSelect = async (req: Request, res: Response): Promise<void> =>
         projectUuid: query.data.projectUuid?.length ? { in: query.data.projectUuid } : undefined,
         userUuid: query.data.userUuid?.length ? { in: query.data.userUuid } : undefined,
         budgetUuid: null,
-        /*
-        OR: [
-          {
-            taskExpense: {
-              uuid: params.data.key === 'all' ? undefined : params.data.key,
-              amount: {
-                gte: query.data.amountMin ? query.data.amountMin : undefined,
-                lte: query.data.amountMax ? query.data.amountMax : undefined,
-              },
-            },
-          },
-          {
-            taskActivity: {
-              uuid: params.data.key === 'all' ? undefined : params.data.key,
-              hourlyRate: {
-                gte: query.data.hourlyRateMin ? query.data.hourlyRateMin : undefined,
-                lte: query.data.hourlyRateMax ? query.data.hourlyRateMax : undefined,
-              },
-            },
-          },
-        ],
-        */
       },
     })
 
     console.log(tasks)
 
-    res.status(200).json(responseTasks([{ tasks: tasks }]))
+    res.status(200).json(responseTasks(tasks))
     return
   } catch (e) {
     console.log(e)
