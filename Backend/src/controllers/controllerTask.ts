@@ -209,7 +209,7 @@ export const tasksUpdate = async (req: Request, res: Response): Promise<void> =>
     const [expenseTasks, activityTasks] = await Promise.all([
       prisma.taskExpense.findMany({
         where: {
-          uuid: { notIn: tasks.update.expense.map(({ taskExpense }) => taskExpense.uuid) },
+          uuid: { notIn: tasks.update.expense.map(({ taskExpense: { uuid } }) => uuid) },
           task: {
             budgetUuid: null,
             projectUuid: projectUuid,
@@ -218,7 +218,7 @@ export const tasksUpdate = async (req: Request, res: Response): Promise<void> =>
       }),
       prisma.taskActivity.findMany({
         where: {
-          uuid: { notIn: tasks.update.activity.map(({ taskActivity }) => taskActivity.uuid) },
+          uuid: { notIn: tasks.update.activity.map(({ taskActivity: { uuid } }) => uuid) },
           task: {
             budgetUuid: null,
             projectUuid: projectUuid,
@@ -227,8 +227,8 @@ export const tasksUpdate = async (req: Request, res: Response): Promise<void> =>
       }),
     ])
 
-    tasks.delete.expense = expenseTasks.map((task) => ({ id: task.id, uuid: task.uuid }))
-    tasks.delete.activity = activityTasks.map((task) => ({ id: task.id, uuid: task.uuid }))
+    tasks.delete.expense = expenseTasks.map(({ id, uuid }) => ({ id, uuid }))
+    tasks.delete.activity = activityTasks.map(({ id, uuid }) => ({ id, uuid }))
 
     await Promise.all([
       ...tasks.create.expense.map(async (task) => {
