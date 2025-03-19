@@ -116,8 +116,8 @@ const Filter = ({
       username: data.username || undefined,
       hourlyRateMin: data.hourlyRateMin ? currencyToNumber(data.hourlyRateMin, 'BRL') : undefined,
       hourlyRateMax: data.hourlyRateMax ? currencyToNumber(data.hourlyRateMax, 'BRL') : undefined,
-      active: data.active.map(({ key }) => key),
-      authUuid: data.authUuid.map(({ key }) => key),
+      active: data.active.filter(({ value }) => value).map(({ key }) => key),
+      authUuid: data.authUuid.filter(({ value }) => value).map(({ key }) => key),
       person:
         data.person.cpf !== '' || Object.values(data.person.entity).some((value) => value !== '')
           ? {

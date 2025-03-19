@@ -90,7 +90,7 @@ export const statusUpdateSchema = z.object({
 
 const entitySelectSchema = z.object({
   name: zodString('nome', false).optional(),
-  email: zodEmail('email', false).optional(),
+  email: zodRegex('email', /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, false).optional(),
   phone: zodRegex('contato', /^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).optional(),
   address: zodString('endereço', false).optional(),
 })
