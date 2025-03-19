@@ -50,6 +50,9 @@ const FormUser = ({ user, authOptions }: { user: UserProps; authOptions: Options
     },
   }
 
+  console.log(user)
+  console.log(defaultValues)
+
   // Hookform
   const {
     reset,
