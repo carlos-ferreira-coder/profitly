@@ -36,8 +36,6 @@ const Select = () => {
           withCredentials: true,
         })
 
-        console.log(location.search)
-
         setUsers(data)
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])

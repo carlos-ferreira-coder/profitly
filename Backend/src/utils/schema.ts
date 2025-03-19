@@ -44,16 +44,10 @@ export const authCheckSchema = z.object({
 
 export const authSelectSchema = z.object({
   name: zodString('nome', true).optional(),
-  auth: zodRegex(
-    'cargo/função',
-    /^(admin|project|personal|financial)(,(admin|project|personal|financial))*$/,
-    true,
-  ).optional(),
-  notAuth: zodRegex(
-    'cargo/função',
-    /^(admin|project|personal|financial)(,(admin|project|personal|financial))*$/,
-    true,
-  ).optional(),
+  auth: z.array(zodRegex('cargo/função', /^(admin|project|personal|financial)$/, true)).optional(),
+  notAuth: z
+    .array(zodRegex('cargo/função', /^(admin|project|personal|financial)$/, true))
+    .optional(),
 })
 
 export const authCreateSchema = z.object({
@@ -76,9 +70,7 @@ export const authUpdateSchema = z.object({
 export const statusSelectSchema = z.object({
   name: zodString('nome', true).optional(),
   description: zodString('descrição', true).optional(),
-  priority: zodRegex('prioridade', /^\d+(,\d+)*$/, true)
-    .transform((s) => s.split(',').map((i) => parseInt(i, 10)))
-    .optional(),
+  priority: z.array(zodNumber('prioridade', 1)).optional(),
 })
 
 export const statusCreateSchema = z.object({
@@ -95,9 +87,9 @@ export const statusUpdateSchema = z.object({
 })
 
 const entitySelectSchema = z.object({
-  name: zodString('nome', true).optional(),
-  email: zodString('email', true).optional(),
-  phone: zodString('contato', false).optional(),
+  name: zodString('nome', false).optional(),
+  email: zodEmail('email', false).optional(),
+  phone: zodRegex('contato', /^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).optional(),
   address: zodString('endereço', false).optional(),
 })
 
@@ -116,7 +108,7 @@ const entityUpdateSchema = z.object({
 })
 
 const personSelectSchema = z.object({
-  cpf: zodString('cpf', true),
+  cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, false).optional(),
   entity: entitySelectSchema.optional(),
 })
 
@@ -147,23 +139,11 @@ const enterpriseUpdateSchema = z.object({
 })
 
 export const userSelectSchema = z.object({
-  username: zodString('nome de usuário', true).optional(),
-  active: zodRegex('ativo', /^(false|true)(,(false|true))?$/, true)
-    .transform((s) => s.split(',').map((i) => i === 'true'))
-    .optional(),
-  hourlyRateMin: zodRegex('valor da hora', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, false)
-    .transform((s) => currencyToNumber(s, 'BRL'))
-    .optional(),
-  hourlyRateMax: zodRegex('valor da hora', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, false)
-    .transform((s) => currencyToNumber(s, 'BRL'))
-    .optional(),
-  authUuid: zodRegex(
-    'uuid(s) de permissões',
-    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(,([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))*$/,
-    true,
-  )
-    .transform((s) => s.split(','))
-    .optional(),
+  username: zodString('nome de usuário', false).optional(),
+  active: z.array(zodBoolean('ativo')).optional(),
+  hourlyRateMin: zodNumber('valor da hora', 0.0).optional(),
+  hourlyRateMax: zodNumber('valor da hora', 0.0).optional(),
+  authUuid: z.array(zodUuid('autorização')).optional(),
   person: personSelectSchema.optional(),
 })
 

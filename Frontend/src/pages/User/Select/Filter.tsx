@@ -15,6 +15,7 @@ import {
   faUserTie,
 } from '@fortawesome/free-solid-svg-icons'
 import qs from 'qs'
+import { currencyToNumber } from '../../../hooks/useCurrency'
 
 const Filter = ({
   auths,
@@ -111,51 +112,30 @@ const Filter = ({
   const filter = (data: FilterProps) => {
     setFiltering('filter')
 
-    const query = qs.stringify(data, { encode: false })
+    console.log(data)
 
-    navigate(`/user/select?${query}`)
-
-    /*
-    let urlQuery = ''
-
-    // Function to add query in url
-    const appendQuery = (key: string, value: string) => {
-      const encodeKey = encodeURIComponent(key)
-      const encodeValue = encodeURIComponent(value)
-
-      if (urlQuery === '') {
-        return `?${encodeKey}=${encodeValue}`
-      }
-      return `${urlQuery}&${encodeKey}=${encodeValue}`
+    const query = {
+      username: data.username === '' ? data.username : undefined,
+      hourlyRateMin:
+        data.hourlyRateMin === '' ? currencyToNumber(data.hourlyRateMin, 'BRL') : undefined,
+      hourlyRateMax:
+        data.hourlyRateMax === '' ? currencyToNumber(data.hourlyRateMax, 'BRL') : undefined,
+      active: data.active.map(({ key }) => key),
+      authUuid: data.authUuid.map(({ key }) => key),
+      person: {
+        cpf: data.person.cpf === '' ? data.person.cpf : undefined,
+        entity: {
+          name: data.person.entity.name === '' ? data.person.entity.name : undefined,
+          email: data.person.entity.email === '' ? data.person.entity.email : undefined,
+          phone: data.person.entity.phone === '' ? data.person.entity.phone : undefined,
+          address: data.person.entity.address === '' ? data.person.entity.address : undefined,
+        },
+      },
     }
 
-    // Get all filters
-    ;(Object.keys(data) as Array<keyof FilterProps>).forEach((key) => {
-      const value = data[key]
+    console.log(query)
 
-      if (typeof value === 'string') {
-        if (value !== '') urlQuery = appendQuery(key, value)
-      }
-
-      if (typeof value === 'object') {
-        let keys = ''
-        value.map((item: { key: string | boolean; name: string; value: boolean }) => {
-          if (item.value) {
-            if (keys === '') keys = `${item.key}`
-            else keys = `${keys},${item.key}`
-          }
-        })
-        if (keys !== '') urlQuery = appendQuery(key, keys)
-      }
-    })
-
-    if (location.search === urlQuery) {
-      setFiltering('idle')
-    } else {
-      navigate(`/user/select${urlQuery}`)
-    }
-
-    */
+    navigate(`/user/select?${qs.stringify(query, { encode: false })}`)
   }
 
   return (

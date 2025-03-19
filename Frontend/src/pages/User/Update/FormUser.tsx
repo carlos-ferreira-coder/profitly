@@ -226,7 +226,6 @@ const FormUser = ({ user, authOptions }: { user: UserProps; authOptions: Options
             type="text"
             icon={faEnvelope}
             iconPosition="left"
-            autoComplete="email"
             {...register('person.entity.email')}
             placeholder="Digite o email"
           />
