@@ -115,20 +115,20 @@ const Filter = ({
     console.log(data)
 
     const query = {
-      username: data.username === '' ? data.username : undefined,
+      username: data.username !== '' ? data.username : undefined,
       hourlyRateMin:
-        data.hourlyRateMin === '' ? currencyToNumber(data.hourlyRateMin, 'BRL') : undefined,
+        data.hourlyRateMin !== '' ? currencyToNumber(data.hourlyRateMin, 'BRL') : undefined,
       hourlyRateMax:
-        data.hourlyRateMax === '' ? currencyToNumber(data.hourlyRateMax, 'BRL') : undefined,
+        data.hourlyRateMax !== '' ? currencyToNumber(data.hourlyRateMax, 'BRL') : undefined,
       active: data.active.map(({ key }) => key),
       authUuid: data.authUuid.map(({ key }) => key),
       person: {
-        cpf: data.person.cpf === '' ? data.person.cpf : undefined,
+        cpf: data.person.cpf !== '' ? data.person.cpf : undefined,
         entity: {
-          name: data.person.entity.name === '' ? data.person.entity.name : undefined,
-          email: data.person.entity.email === '' ? data.person.entity.email : undefined,
-          phone: data.person.entity.phone === '' ? data.person.entity.phone : undefined,
-          address: data.person.entity.address === '' ? data.person.entity.address : undefined,
+          name: data.person.entity.name !== '' ? data.person.entity.name : undefined,
+          email: data.person.entity.email !== '' ? data.person.entity.email : undefined,
+          phone: data.person.entity.phone !== '' ? data.person.entity.phone : undefined,
+          address: data.person.entity.address !== '' ? data.person.entity.address : undefined,
         },
       },
     }
