@@ -2,9 +2,19 @@ import { AuthProps } from '../../../types/Database'
 import Button from '../../../components/Form/Button'
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Input, InputNumeric } from '../../../components/Form/Input'
+import { Input, InputNumeric, InputPattern } from '../../../components/Form/Input'
 import { Checkbox } from '../../../components/Form/Checkbox'
 import { useAuth } from '../../../context/AuthContext'
+import {
+  faAddressCard,
+  faDollarSign,
+  faEnvelope,
+  faLocationDot,
+  faPhone,
+  faUser,
+  faUserTie,
+} from '@fortawesome/free-solid-svg-icons'
+import qs from 'qs'
 
 const Filter = ({
   auths,
@@ -21,12 +31,16 @@ const Filter = ({
 
   // Filter props
   type FilterProps = {
-    cpf: string
-    email: string
-    name: string
+    person: {
+      cpf: string
+      entity: {
+        name: string
+        email: string
+        phone: string
+        address: string
+      }
+    }
     username: string
-    phone: string
-    address: string
     hourlyRateMin: string
     hourlyRateMax: string
     allActive: boolean
@@ -44,12 +58,16 @@ const Filter = ({
   }
 
   const defaultValues = {
-    cpf: '',
-    email: '',
-    name: '',
+    person: {
+      cpf: '',
+      entity: {
+        name: '',
+        email: '',
+        phone: '',
+        address: '',
+      },
+    },
     username: '',
-    phone: '',
-    address: '',
     hourlyRateMin: '',
     hourlyRateMax: '',
     allActive: true,
@@ -92,6 +110,12 @@ const Filter = ({
   // Pass filter on url
   const filter = (data: FilterProps) => {
     setFiltering('filter')
+
+    const query = qs.stringify(data, { encode: false })
+
+    navigate(`/user/select?${query}`)
+
+    /*
     let urlQuery = ''
 
     // Function to add query in url
@@ -130,6 +154,8 @@ const Filter = ({
     } else {
       navigate(`/user/select${urlQuery}`)
     }
+
+    */
   }
 
   return (
@@ -144,11 +170,12 @@ const Filter = ({
           </label>
           <div className="relative">
             <Input
-              type="text"
               id="username"
-              autoComplete="name"
+              type="text"
+              icon={faUserTie}
+              iconPosition="left"
               {...register('username')}
-              placeholder="Digite o usuário"
+              placeholder="Digite o nome do usuário"
             />
           </div>
         </div>
@@ -164,8 +191,9 @@ const Filter = ({
             <Input
               id="email"
               type="text"
-              autoComplete="email"
-              {...register('email')}
+              icon={faEnvelope}
+              iconPosition="left"
+              {...register('person.entity.email')}
               placeholder="Digite o email"
             />
           </div>
@@ -182,11 +210,12 @@ const Filter = ({
               </label>
               <div className="relative">
                 <Input
-                  type="text"
                   id="name"
-                  autoComplete="name"
-                  {...register('name')}
-                  placeholder="Digite o nome"
+                  type="text"
+                  icon={faUser}
+                  iconPosition="left"
+                  {...register('person.entity.name')}
+                  placeholder="Digite o nome completo"
                 />
               </div>
             </div>
@@ -199,7 +228,22 @@ const Filter = ({
                 CPF
               </label>
               <div className="relative">
-                <Input id="cpf" type="text" {...register('cpf')} placeholder="Digite o cpf" />
+                <Controller
+                  name="person.cpf"
+                  control={control}
+                  render={({ field }) => (
+                    <InputPattern
+                      {...field}
+                      id="cpf"
+                      mask="_"
+                      disabled
+                      icon={faAddressCard}
+                      iconPosition="left"
+                      format="###.###.###-##"
+                      placeholder="Digite o cpf"
+                    />
+                  )}
+                />
               </div>
             </div>
 
@@ -211,11 +255,21 @@ const Filter = ({
                 Contato
               </label>
               <div className="relative">
-                <Input
-                  id="phone"
-                  type="text"
-                  {...register('phone')}
-                  placeholder="Digite o contato"
+                <Controller
+                  name="person.entity.phone"
+                  control={control}
+                  render={({ field }) => (
+                    <InputPattern
+                      {...field}
+                      id="phone"
+                      mask="_"
+                      icon={faPhone}
+                      iconPosition="left"
+                      format="(##) # ####-####"
+                      autoComplete="phone"
+                      placeholder="Digite o telefone"
+                    />
+                  )}
                 />
               </div>
             </div>
@@ -231,7 +285,9 @@ const Filter = ({
                 <Input
                   id="address"
                   type="text"
-                  {...register('address')}
+                  icon={faLocationDot}
+                  iconPosition="left"
+                  {...register('person.entity.address')}
                   placeholder="Digite o endereço"
                 />
               </div>
@@ -255,14 +311,16 @@ const Filter = ({
                   render={({ field }) => (
                     <InputNumeric
                       {...field}
-                      id="hourlyRateMin"
+                      id="hourlyRate"
+                      icon={faDollarSign}
+                      iconPosition="left"
                       prefix={'R$ '}
                       fixedDecimalScale
                       decimalScale={2}
                       allowNegative={false}
                       decimalSeparator=","
                       thousandSeparator="."
-                      placeholder="Digite o valor minimo."
+                      placeholder="Digite o valor da hora minimo"
                     />
                   )}
                 />
@@ -283,14 +341,16 @@ const Filter = ({
                   render={({ field }) => (
                     <InputNumeric
                       {...field}
-                      id="hourlyRateMax"
+                      id="hourlyRate"
+                      icon={faDollarSign}
+                      iconPosition="left"
                       prefix={'R$ '}
                       fixedDecimalScale
                       decimalScale={2}
                       allowNegative={false}
                       decimalSeparator=","
                       thousandSeparator="."
-                      placeholder="Digite o valor máximo."
+                      placeholder="Digite o valor da hora maximo"
                     />
                   )}
                 />
