@@ -141,7 +141,7 @@ const enterpriseUpdateSchema = z.object({
 export const userSelectSchema = z.object({
   username: zodString('nome de usuário', false).optional(),
   active: z
-    .array(zodRegex('ativo', /^(true|false)$/, false).transform((s) => parseInt(s, 10)))
+    .array(zodRegex('ativo', /^(true|false)$/, false).transform((s) => s === 'true'))
     .optional(),
   hourlyRateMin: zodString('valor da hora', false)
     .transform((s) => parseInt(s))
