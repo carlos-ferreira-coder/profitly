@@ -196,7 +196,7 @@ export const clientSchema = z.object({
 export const supplierCreateSchema = z
   .object({
     active: zodBoolean('ativo'),
-    type: zodRegex('tipo', /^(Person|Enterprise)$/, true),
+    type: zodRegex('tipo', /^(person|enterprise)$/, true),
     person: personSchema.optional(),
     enterprise: enterpriseSchema.optional(),
   })
