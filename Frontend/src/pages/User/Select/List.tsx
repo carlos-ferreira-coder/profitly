@@ -42,12 +42,16 @@ const UserContactInfo = ({ user, auth }: { user: UserProps; auth: AuthProps | nu
     </p>
     {auth?.personal && (
       <>
-        <p>
-          <b>Contato: </b> {user.person.entity.phone}
-        </p>
-        <p>
-          <b>Endereço: </b> {user.person.entity.address}
-        </p>
+        {user.person.entity.phone && (
+          <p>
+            <b>Contato: </b> {user.person.entity.phone}
+          </p>
+        )}
+        {user.person.entity.address && (
+          <p>
+            <b>Endereço: </b> {user.person.entity.address}
+          </p>
+        )}
       </>
     )}
   </>

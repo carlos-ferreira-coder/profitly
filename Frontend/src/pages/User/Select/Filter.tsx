@@ -119,7 +119,7 @@ const Filter = ({
       active: data.active.filter(({ value }) => value).map(({ key }) => key),
       authUuid: data.authUuid.filter(({ value }) => value).map(({ key }) => key),
       person:
-        data.person.cpf !== '' || Object.values(data.person.entity).some((value) => value !== '')
+        data.person.cpf || Object.values(data.person.entity).some((value) => value !== '')
           ? {
               cpf: data.person.cpf || undefined,
               entity: Object.values(data.person.entity).some((value) => value !== '')
