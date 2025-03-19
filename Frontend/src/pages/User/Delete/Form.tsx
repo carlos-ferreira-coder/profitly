@@ -41,15 +41,15 @@ const Form = ({ user, authOptions }: { user: UserProps; authOptions: Options[] }
     uuid: user.uuid,
     username: user.username,
     active: user.active,
-    hourlyRate: user.hourlyRate,
+    hourlyRate: user.hourlyRate || '',
     authUuid: user.authUuid,
     person: {
       cpf: user.person.cpf,
       entity: {
         name: user.person.entity.name,
         email: user.person.entity.email,
-        phone: user.person.entity.phone,
-        address: user.person.entity.address,
+        phone: user.person.entity.phone || '',
+        address: user.person.entity.address || '',
       },
     },
   }
