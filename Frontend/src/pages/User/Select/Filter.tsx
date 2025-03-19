@@ -112,8 +112,6 @@ const Filter = ({
   const filter = (data: FilterProps) => {
     setFiltering('filter')
 
-    console.log(data)
-
     const query = {
       username: data.username || undefined,
       hourlyRateMin: data.hourlyRateMin ? currencyToNumber(data.hourlyRateMin, 'BRL') : undefined,
@@ -135,8 +133,6 @@ const Filter = ({
             }
           : undefined,
     }
-
-    console.log(query)
 
     navigate(`/user/select?${qs.stringify(query, { encode: false })}`)
   }
