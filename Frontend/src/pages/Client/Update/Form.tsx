@@ -31,7 +31,29 @@ const Form = ({ client }: { client: ClientProps }) => {
 
   console.log(client)
 
-  const defaultValues = { ...client }
+  const defaultValues = {
+    ...client,
+    person: client.person
+      ? {
+          ...client.person,
+          entity: {
+            ...client.person.entity,
+            phone: client.person.entity.phone || '',
+            address: client.person.entity.address || '',
+          },
+        }
+      : undefined,
+    enterprise: client.enterprise
+      ? {
+          ...client.enterprise,
+          entity: {
+            ...client.enterprise.entity,
+            phone: client.enterprise.entity.phone || '',
+            address: client.enterprise.entity.address || '',
+          },
+        }
+      : undefined,
+  }
 
   // Hookform
   const {

@@ -29,7 +29,29 @@ const Form = ({ supplier }: { supplier: SupplierProps }) => {
   const schema = supplierSchema
   type SchemaProps = z.infer<typeof schema>
 
-  const defaultValues = { ...supplier }
+  const defaultValues = {
+    ...supplier,
+    person: supplier.person
+      ? {
+          ...supplier.person,
+          entity: {
+            ...supplier.person.entity,
+            phone: supplier.person.entity.phone || '',
+            address: supplier.person.entity.address || '',
+          },
+        }
+      : undefined,
+    enterprise: supplier.enterprise
+      ? {
+          ...supplier.enterprise,
+          entity: {
+            ...supplier.enterprise.entity,
+            phone: supplier.enterprise.entity.phone || '',
+            address: supplier.enterprise.entity.address || '',
+          },
+        }
+      : undefined,
+  }
 
   // Hookform
   const {
