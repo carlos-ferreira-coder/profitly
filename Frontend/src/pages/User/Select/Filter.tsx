@@ -23,6 +23,7 @@ const Filter = ({
   type FilterProps = {
     cpf: string
     email: string
+    name: string
     username: string
     phone: string
     address: string
@@ -45,6 +46,7 @@ const Filter = ({
   const defaultValues = {
     cpf: '',
     email: '',
+    name: '',
     username: '',
     phone: '',
     address: '',
@@ -151,22 +153,6 @@ const Filter = ({
           </div>
         </div>
 
-        {auth?.personal && (
-          <>
-            <div className="mb-5.5">
-              <label
-                htmlFor="cpf"
-                className="mb-3 block text-sm font-medium text-black dark:text-white"
-              >
-                CPF
-              </label>
-              <div className="relative">
-                <Input id="cpf" type="text" {...register('cpf')} placeholder="Digite o cpf" />
-              </div>
-            </div>
-          </>
-        )}
-
         <div className="mb-5.5">
           <label
             htmlFor="email"
@@ -187,6 +173,36 @@ const Filter = ({
 
         {auth?.personal && (
           <>
+            <div className="mb-5.5">
+              <label
+                htmlFor="name"
+                className="mb-3 block text-sm font-medium text-black dark:text-white"
+              >
+                Nome completo
+              </label>
+              <div className="relative">
+                <Input
+                  type="text"
+                  id="name"
+                  autoComplete="name"
+                  {...register('name')}
+                  placeholder="Digite o nome"
+                />
+              </div>
+            </div>
+
+            <div className="mb-5.5">
+              <label
+                htmlFor="cpf"
+                className="mb-3 block text-sm font-medium text-black dark:text-white"
+              >
+                CPF
+              </label>
+              <div className="relative">
+                <Input id="cpf" type="text" {...register('cpf')} placeholder="Digite o cpf" />
+              </div>
+            </div>
+
             <div className="mb-5.5">
               <label
                 htmlFor="phone"
@@ -220,7 +236,11 @@ const Filter = ({
                 />
               </div>
             </div>
+          </>
+        )}
 
+        {auth?.financial && (
+          <>
             <div className="mb-5.5">
               <label
                 htmlFor="hourlyRateMin"
