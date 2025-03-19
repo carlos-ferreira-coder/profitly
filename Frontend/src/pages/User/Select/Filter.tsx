@@ -2,7 +2,7 @@ import { AuthProps } from '../../../types/Database'
 import Button from '../../../components/Form/Button'
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Input, InputNumeric, InputPattern } from '../../../components/Form/Input'
+import { Input, InputNumeric } from '../../../components/Form/Input'
 import { Checkbox } from '../../../components/Form/Checkbox'
 import { useAuth } from '../../../context/AuthContext'
 import {
@@ -207,21 +207,13 @@ const Filter = ({
                 CPF
               </label>
               <div className="relative">
-                <Controller
-                  name="person.cpf"
-                  control={control}
-                  render={({ field }) => (
-                    <InputPattern
-                      {...field}
-                      id="cpf"
-                      mask="_"
-                      disabled
-                      icon={faAddressCard}
-                      iconPosition="left"
-                      format="###.###.###-##"
-                      placeholder="Digite o cpf"
-                    />
-                  )}
+                <Input
+                  id="cpf"
+                  type="text"
+                  icon={faAddressCard}
+                  iconPosition="left"
+                  {...register('person.cpf')}
+                  placeholder="Digite o cpf"
                 />
               </div>
             </div>
@@ -234,21 +226,13 @@ const Filter = ({
                 Contato
               </label>
               <div className="relative">
-                <Controller
-                  name="person.entity.phone"
-                  control={control}
-                  render={({ field }) => (
-                    <InputPattern
-                      {...field}
-                      id="phone"
-                      mask="_"
-                      icon={faPhone}
-                      iconPosition="left"
-                      format="(##) # ####-####"
-                      autoComplete="phone"
-                      placeholder="Digite o telefone"
-                    />
-                  )}
+                <Input
+                  id="phone"
+                  type="text"
+                  icon={faPhone}
+                  iconPosition="left"
+                  {...register('person.entity.phone')}
+                  placeholder="Digite o telefone"
                 />
               </div>
             </div>

@@ -90,8 +90,8 @@ export const statusUpdateSchema = z.object({
 
 const entitySelectSchema = z.object({
   name: zodString('nome', false).optional(),
-  email: zodRegex('email', /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, false).optional(),
-  phone: zodRegex('contato', /^\(\d{2}\)\s\d{1}\s\d{4}-\d{4}$/, false).optional(),
+  email: zodString('email', false).optional(),
+  phone: zodString('contato', false).optional(),
   address: zodString('endereço', false).optional(),
 })
 
@@ -110,7 +110,7 @@ const entityUpdateSchema = z.object({
 })
 
 const personSelectSchema = z.object({
-  cpf: zodRegex('cpf', /^\d{3}\.\d{3}\.\d{3}-\d{2}$/, false).optional(),
+  cpf: zodString('cpf', false).optional(),
   entity: entitySelectSchema.optional(),
 })
 
@@ -124,7 +124,7 @@ const personUpdateSchema = z.object({
 })
 
 const enterpriseSelectSchema = z.object({
-  cnpj: zodRegex('cpf', /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, false).optional(),
+  cnpj: zodString('cpf', false).optional(),
   fantasy: zodString('nome fantasia', false).optional(),
   entity: entitySelectSchema.optional(),
 })
