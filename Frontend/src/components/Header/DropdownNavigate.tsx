@@ -14,7 +14,7 @@ const DropdownNavigate = ({ auth }: { auth: AuthProps }) => {
 
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
-      <div className="hidden md:block">
+      <div className="hidden lg:block">
         <Link to="#" onClick={() => setDropdownOpen(!dropdownOpen)}>
           <img src={LogoIcon} alt="Logo" className="w-12 h-12 block dark:hidden" />
           <img src={LogoIconDark} alt="Logo" className="w-12 h-12 hidden dark:block" />

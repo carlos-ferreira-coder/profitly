@@ -14,7 +14,7 @@ const Header = () => {
       <div className="flex flex-grow items-center justify-between px-2.5 shadow-2 md:px-4">
         <div className="left-0 mt-2.5 mb-2.5">{auth && <DropdownNavigate auth={auth} />}</div>
 
-        <div className="hidden h-full md:flex md:items-center md:justify-between md:gap-1.5 lg:gap-3 xl:gap-5">
+        <div className="hidden h-full lg:flex lg:items-center lg:justify-between lg:gap-3 xl:gap-5">
           {user && auth && <NavigateHeader auth={auth} />}
         </div>
 
