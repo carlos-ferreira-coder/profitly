@@ -10,20 +10,20 @@ const Transaction = () => {
       <Breadcrumb pageName="Transações" />
 
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-        <div className="flex flex-wrap items-center p-8">
-          <div className="flex justify-between gap-8 w-full">
-            <Button color="primary" onClick={() => navigate('/income/select')}>
+        <div className="flex flex-wrap items-center p-15">
+          <div className="flex justify-between gap-15 w-full mb-15">
+            <Button color="primary" onClick={() => navigate('/income/select')} className="w-25">
               Receita
             </Button>
-            <Button color="primary" onClick={() => navigate('/expense/select')}>
+            <Button color="primary" onClick={() => navigate('/expense/select')} className="w-25">
               Despesa
             </Button>
           </div>
-          <div className="flex justify-between gap-8 w-full">
-            <Button color="primary" onClick={() => navigate('/refund/select')}>
+          <div className="flex justify-between gap-15 w-full">
+            <Button color="primary" onClick={() => navigate('/refund/select')} className="w-25">
               Reembolso
             </Button>
-            <Button color="primary" onClick={() => navigate('/loan/select')}>
+            <Button color="primary" onClick={() => navigate('/loan/select')} className="w-25">
               Empréstimo
             </Button>
           </div>
