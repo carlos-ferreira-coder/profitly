@@ -10,13 +10,16 @@ import { faAngleRight, faXmark } from '@fortawesome/free-solid-svg-icons'
 
 const StatusInfo = ({ status }: { status: StatusProps }) => (
   <>
-    <div className="col-span-5 flex flex-col justify-center space-y-1">
+    <div className="col-span-3 flex flex-col justify-center space-y-1">
       <p>
         <b>Nome: </b> {status.name}
       </p>
       <p>
         <b>Descrição: </b> {status.description}
       </p>
+    </div>
+
+    <div className="col-span-2 flex flex-col justify-center space-y-1">
       <p>
         <b>Prioridade: </b> {status.priority < 4 ? 'Alta' : status.priority < 8 ? 'Média' : 'Baixa'}
       </p>
