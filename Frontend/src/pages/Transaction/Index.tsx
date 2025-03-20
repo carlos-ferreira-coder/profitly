@@ -14,14 +14,14 @@ const Transaction = () => {
           <div className="flex justify-between gap-15 w-full mb-15">
             <Button
               color="primary"
-              onClick={() => navigate('/income/select')}
+              onClick={() => navigate('/transaction/income/select')}
               className="h-15 w-25"
             >
               Receita
             </Button>
             <Button
               color="primary"
-              onClick={() => navigate('/expense/select')}
+              onClick={() => navigate('/transaction/expense/select')}
               className="h-15 w-25"
             >
               Despesa
@@ -30,12 +30,16 @@ const Transaction = () => {
           <div className="flex justify-between gap-15 w-full">
             <Button
               color="primary"
-              onClick={() => navigate('/refund/select')}
+              onClick={() => navigate('/transaction/refund/select')}
               className="h-15 w-25"
             >
               Reembolso
             </Button>
-            <Button color="primary" onClick={() => navigate('/loan/select')} className="h-15 w-25">
+            <Button
+              color="primary"
+              onClick={() => navigate('/transaction/loan/select')}
+              className="h-15 w-25"
+            >
               Empréstimo
             </Button>
           </div>
