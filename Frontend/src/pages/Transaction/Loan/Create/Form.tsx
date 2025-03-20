@@ -82,7 +82,7 @@ const Form = () => {
     setAlertSuccesses(null)
 
     try {
-      const response = await axios.post('/loan/create', data, {
+      const response = await axios.post('/transaction/loan/create', data, {
         withCredentials: true,
       })
 

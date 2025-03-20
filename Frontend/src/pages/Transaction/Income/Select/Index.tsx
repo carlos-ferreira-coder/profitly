@@ -18,7 +18,7 @@ const Select = () => {
   useEffect(() => {
     ;(async () => {
       try {
-        const { data } = await axios.get(`income/select/all${location.search}`, {
+        const { data } = await axios.get(`transaction/income/select/all${location.search}`, {
           withCredentials: true,
         })
 

@@ -88,7 +88,7 @@ const Form = () => {
     setAlertSuccesses(null)
 
     try {
-      const response = await axios.post('/refund/create', data, {
+      const response = await axios.post('/transaction/refund/create', data, {
         withCredentials: true,
       })
 

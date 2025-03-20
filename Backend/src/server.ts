@@ -11,10 +11,7 @@ import routerProject from '@routers/routerProject'
 import routerBudget from '@routers/routerBudget'
 import routerTasks from '@routers/routerTasks'
 import routerSupplier from '@routers/routerSupplier'
-import routerExpense from '@routers/routerExpense'
-import routerIncome from '@routers/routerIncome'
-import routerRefund from '@routers/routerRefund'
-import routerLoan from '@routers/routerLoan'
+import routerTransaction from '@routers/routerTransaction'
 
 const PORT = process.env.PORT || 3000
 const DOMAIN = process.env.RENDER_EXTERNAL_URL || ''
@@ -41,10 +38,7 @@ app.use('/project', auth, routerProject)
 app.use('/budget', auth, routerBudget)
 app.use('/tasks', auth, routerTasks)
 app.use('/supplier', auth, routerSupplier)
-app.use('/expense', auth, routerExpense)
-app.use('/income', auth, routerIncome)
-app.use('/refund', auth, routerRefund)
-app.use('/loan', auth, routerLoan)
+app.use('/transaction', auth, routerTransaction)
 
 app.use('/img/user', auth, express.static('src/images/users'))
 
