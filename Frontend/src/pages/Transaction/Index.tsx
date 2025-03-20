@@ -15,28 +15,28 @@ const Transaction = () => {
             <Button
               color="primary"
               onClick={() => navigate('/transaction/income/select')}
-              className="h-12 w-30"
+              className="h-12 w-full"
             >
               Receita
             </Button>
             <Button
               color="primary"
               onClick={() => navigate('/transaction/expense/select')}
-              className="h-12 w-30"
+              className="h-12 w-full"
             >
               Despesa
             </Button>
             <Button
               color="primary"
               onClick={() => navigate('/transaction/refund/select')}
-              className="h-12 w-30"
+              className="h-12 w-full"
             >
               Reembolso
             </Button>
             <Button
               color="primary"
               onClick={() => navigate('/transaction/loan/select')}
-              className="h-12 w-30"
+              className="h-12 w-full"
             >
               Empréstimo
             </Button>
