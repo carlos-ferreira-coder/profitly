@@ -42,8 +42,8 @@ const Transaction = () => {
             </Button>
           </div>
 
-          <div className="lg:flex hidden w-full">
-            <div className="w-full items-center">
+          <div className="lg:flex gap-8 hidden w-full">
+            <div className="flex flex-col w-full items-center space-y-8">
               <Button
                 color="primary"
                 onClick={() => navigate('/transaction/income/select')}
@@ -59,7 +59,7 @@ const Transaction = () => {
                 Reembolso
               </Button>
             </div>
-            <div className="w-full items-center">
+            <div className="flex flex-col w-full items-center space-y-8">
               <Button
                 color="primary"
                 onClick={() => navigate('/transaction/expense/select')}
