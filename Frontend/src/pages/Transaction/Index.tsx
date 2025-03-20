@@ -43,7 +43,7 @@ const Transaction = () => {
           </div>
 
           <div className="lg:flex hidden w-full">
-            <div className="">
+            <div className="w-full items-center">
               <Button
                 color="primary"
                 onClick={() => navigate('/transaction/income/select')}
@@ -59,7 +59,7 @@ const Transaction = () => {
                 Reembolso
               </Button>
             </div>
-            <div className="">
+            <div className="w-full items-center">
               <Button
                 color="primary"
                 onClick={() => navigate('/transaction/expense/select')}
