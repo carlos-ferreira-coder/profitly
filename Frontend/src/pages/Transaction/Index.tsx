@@ -11,17 +11,33 @@ const Transaction = () => {
 
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap items-center p-15">
-          <div className="flex flex-col gap-6">
-            <Button color="primary" onClick={() => navigate('/transaction/income/select')}>
+          <div className="flex flex-col space-y-2">
+            <Button
+              color="primary"
+              onClick={() => navigate('/transaction/income/select')}
+              className="h-12 w-30"
+            >
               Receita
             </Button>
-            <Button color="primary" onClick={() => navigate('/transaction/expense/select')}>
+            <Button
+              color="primary"
+              onClick={() => navigate('/transaction/expense/select')}
+              className="h-12 w-30"
+            >
               Despesa
             </Button>
-            <Button color="primary" onClick={() => navigate('/transaction/refund/select')}>
+            <Button
+              color="primary"
+              onClick={() => navigate('/transaction/refund/select')}
+              className="h-12 w-30"
+            >
               Reembolso
             </Button>
-            <Button color="primary" onClick={() => navigate('/transaction/loan/select')}>
+            <Button
+              color="primary"
+              onClick={() => navigate('/transaction/loan/select')}
+              className="h-12 w-30"
+            >
               Empréstimo
             </Button>
           </div>
