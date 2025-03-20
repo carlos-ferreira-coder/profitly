@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react'
 import { Input } from '../../components/Form/Input'
-import { UserProps } from '../../types/Database'
+import { AuthProps, UserProps } from '../../types/Database'
 import { api as axios, handleAxiosError, userPhotoURL } from '../../services/Axios'
 import Alert from '../../components/Alert/Index'
 import Loader from '../../components/Loader'
 import Button from '../../components/Form/Button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { useAuth } from '../../context/AuthContext'
 
-const UserInfo = ({ user }: { user: UserProps }) => (
+const UserInfo = ({ user, auth }: { user: UserProps; auth: AuthProps }) => (
   <>
-    <div className="col-span-2 flex flex-col justify-center items-center">
+    <div className="col-span-1 flex flex-col justify-center items-center">
       <img
         src={userPhotoURL(user.photo)}
         alt="User"
@@ -18,13 +19,21 @@ const UserInfo = ({ user }: { user: UserProps }) => (
       />
     </div>
 
-    <div className="col-span-6 flex flex-col justify-center space-y-1">
+    <div className="col-span-2 flex flex-col justify-center space-y-1">
       <p>
         <b>Usuário: </b> {user.username}
       </p>
       <p>
         <b>Email: </b> {user.person.entity.email}
       </p>
+    </div>
+
+    <div className="col-span-2 flex flex-col justify-center space-y-1">
+      {auth.financial && (
+        <p>
+          <b>Valor da hora: </b> {user.hourlyRate}
+        </p>
+      )}
     </div>
   </>
 )
@@ -36,6 +45,7 @@ const UserSearch = ({
   user: UserProps | null
   setUser: (value: UserProps | null) => void
 }) => {
+  const { auth } = useAuth()
   const [search, setSearch] = useState<string | null>('')
   const [users, setUsers] = useState<UserProps[] | null>(null)
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
@@ -61,9 +71,9 @@ const UserSearch = ({
 
   return (
     <>
-      {user ? (
-        <div className="grid grid-cols-9 gap-1 p-3 text-sm text-black dark:text-white shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50">
-          <UserInfo user={user} />
+      {user && auth ? (
+        <div className="grid grid-cols-6 gap-1 p-3 text-sm text-black dark:text-white shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50">
+          <UserInfo user={user} auth={auth} />
 
           <div className="col-span-1 flex flex-col justify-center items-center">
             <Button
@@ -89,7 +99,7 @@ const UserSearch = ({
             onChange={(e) => setSearch(e.target.value)}
           />
 
-          {users ? (
+          {users && auth ? (
             search === '' ? (
               <Button
                 color="primary"
@@ -123,9 +133,9 @@ const UserSearch = ({
               ).map((user) => (
                 <div
                   key={user.uuid}
-                  className="grid grid-cols-9 mt-2 w-full gap-1 p-3 shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
+                  className="grid grid-cols-6 mt-2 w-full gap-1 p-3 shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
                 >
-                  <UserInfo user={user} />
+                  <UserInfo user={user} auth={auth} />
 
                   <div className="col-span-1 flex flex-col justify-center items-center">
                     <Button

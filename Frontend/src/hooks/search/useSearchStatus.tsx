@@ -6,13 +6,7 @@ import Alert from '../../components/Alert/Index'
 import Loader from '../../components/Loader'
 import Button from '../../components/Form/Button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faAngleRight,
-  faAnglesDown,
-  faAnglesRight,
-  faAnglesUp,
-  faXmark,
-} from '@fortawesome/free-solid-svg-icons'
+import { faAngleRight, faXmark } from '@fortawesome/free-solid-svg-icons'
 
 const StatusInfo = ({ status }: { status: StatusProps }) => (
   <>
@@ -24,29 +18,7 @@ const StatusInfo = ({ status }: { status: StatusProps }) => (
         <b>Descrição: </b> {status.description}
       </p>
       <p>
-        <b>Prioridade: </b> {status.priority}
-      </p>
-      <p
-        className={`p-1 w-4/6 text-center text-white shadow-1 rounded-md border border-stroke dark:border-strokedark ${
-          status.priority < 4 ? 'bg-danger' : status.priority < 8 ? 'bg-warning' : 'bg-success'
-        }`}
-      >
-        {status.priority < 4 ? (
-          <>
-            <FontAwesomeIcon icon={faAnglesUp} className="mr-2" />
-            Alta
-          </>
-        ) : status.priority < 8 ? (
-          <>
-            <FontAwesomeIcon icon={faAnglesRight} className="mr-2" />
-            Média
-          </>
-        ) : (
-          <>
-            <FontAwesomeIcon icon={faAnglesDown} className="mr-2" />
-            Baixa
-          </>
-        )}
+        <b>Prioridade: </b> {status.priority < 4 ? 'Alta' : status.priority < 8 ? 'Média' : 'Baixa'}
       </p>
     </div>
   </>
