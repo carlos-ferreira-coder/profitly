@@ -10,8 +10,8 @@ const Transaction = () => {
       <Breadcrumb pageName="Transações" />
 
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-        <div className="flex flex-wrap items-center p-15">
-          <div className="flex flex-col space-y-2">
+        <div className="flex flex-wrap items-center p-8">
+          <div className="flex flex-col space-y-5">
             <Button
               color="primary"
               onClick={() => navigate('/transaction/income/select')}

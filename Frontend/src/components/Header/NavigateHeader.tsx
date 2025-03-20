@@ -16,7 +16,7 @@ const NavigateHeader = ({ auth }: { auth: AuthProps }) => {
       }`}
     >
       <Link to={`${page.route}`} className="flex items-center h-full">
-        <FontAwesomeIcon icon={page.icon} className="w-2" />
+        <FontAwesomeIcon icon={page.icon} className="h-8 w-5" />
         {page.title}
       </Link>
     </div>
