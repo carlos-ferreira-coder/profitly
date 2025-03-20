@@ -11,32 +11,32 @@ const Transaction = () => {
 
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap p-8 w-full items-center">
-          <div className="flex flex-col space-y-5">
+          <div className="flex flex-col w-full space-y-5">
             <Button
               color="primary"
               onClick={() => navigate('/transaction/income/select')}
-              className="h-12 w-full"
+              className="h-12"
             >
               Receita
             </Button>
             <Button
               color="primary"
               onClick={() => navigate('/transaction/expense/select')}
-              className="h-12 w-full"
+              className="h-12"
             >
               Despesa
             </Button>
             <Button
               color="primary"
               onClick={() => navigate('/transaction/refund/select')}
-              className="h-12 w-full"
+              className="h-12"
             >
               Reembolso
             </Button>
             <Button
               color="primary"
               onClick={() => navigate('/transaction/loan/select')}
-              className="h-12 w-full"
+              className="h-12"
             >
               Empréstimo
             </Button>
