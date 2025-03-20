@@ -16,7 +16,7 @@ const Tasks = () => {
   useEffect(() => {
     ;(async () => {
       try {
-        const { data: resTasks } = await axios.get(`tasks/select/all?projectUuid=${uuid}`, {
+        const { data: resTasks } = await axios.get(`tasks/select/all?projectUuid[0]=${uuid}`, {
           withCredentials: true,
         })
 
