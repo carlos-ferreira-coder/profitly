@@ -60,7 +60,11 @@ const List = ({ expenses }: { expenses: ExpenseProps[] }) => {
   return (
     <>
       <div className="flex justify-end">
-        <Button color="success" className="w-50 h-8" onClick={() => navigate('/expense/create/')}>
+        <Button
+          color="success"
+          className="w-50 h-8"
+          onClick={() => navigate('/transaction/expense/create/')}
+        >
           <FontAwesomeIcon icon={faPlus} className="mr-1" />
           Adicionar Despesa
         </Button>

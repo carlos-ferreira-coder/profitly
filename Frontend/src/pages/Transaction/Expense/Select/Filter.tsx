@@ -128,7 +128,7 @@ const Filter = ({
         : undefined,
     }
 
-    navigate(`/expense/select?${qs.stringify(query, { encode: false })}`)
+    navigate(`/transaction/expense/select?${qs.stringify(query, { encode: false })}`)
   }
 
   return (

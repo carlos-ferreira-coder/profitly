@@ -138,7 +138,7 @@ const Filter = ({
         : undefined,
     }
 
-    navigate(`/refund/select?${qs.stringify(query, { encode: false })}`)
+    navigate(`/transaction/refund/select?${qs.stringify(query, { encode: false })}`)
   }
 
   return (

@@ -66,7 +66,11 @@ const List = ({ loans }: { loans: LoanProps[] }) => {
   return (
     <>
       <div className="flex justify-end">
-        <Button color="success" className="w-50 h-8" onClick={() => navigate('/loan/create/')}>
+        <Button
+          color="success"
+          className="w-50 h-8"
+          onClick={() => navigate('/transaction/loan/create/')}
+        >
           <FontAwesomeIcon icon={faPlus} className="mr-1" />
           Adicionar Empréstimo
         </Button>
