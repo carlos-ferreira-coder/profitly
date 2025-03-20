@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { AuthProps } from '../../types/Database'
 import { getPagesByUseIn, PageProps } from '../../PagesConfig'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const NavigateHeader = ({ auth }: { auth: AuthProps }) => {
   const location = useLocation()
@@ -15,6 +16,7 @@ const NavigateHeader = ({ auth }: { auth: AuthProps }) => {
       }`}
     >
       <Link to={`${page.route}`} className="flex items-center h-full">
+        <FontAwesomeIcon icon={page.icon} className="w-2" />
         {page.title}
       </Link>
     </div>
