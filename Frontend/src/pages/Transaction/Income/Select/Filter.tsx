@@ -1,12 +1,20 @@
 import Button from '../../../../components/Form/Button'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Input } from '../../../../components/Form/Input'
+import { Input, InputNumeric, InputPattern } from '../../../../components/Form/Input'
 import { useEffect, useState } from 'react'
 import { UserProps, ProjectProps, ClientProps } from '../../../../types/Database'
 import UserSearch from '../../../../hooks/search/useSearchUser'
 import ProjectSearch from '../../../../hooks/search/useSearchProject'
 import ClientSearch from '../../../../hooks/search/useSearchClient'
+import qs from 'qs'
+import { currencyToNumber } from '../../../../hooks/useCurrency'
+import {
+  faAlignLeft,
+  faCalendar,
+  faDollarSign,
+  faFileInvoiceDollar,
+} from '@fortawesome/free-solid-svg-icons'
 
 const Filter = ({
   filtering,
@@ -23,44 +31,48 @@ const Filter = ({
 
   // Filter props
   type FilterProps = {
-    name: string
-    description: string
-    registerMin: string
-    registerMax: string
-    dateMin: string
-    dateMax: string
-    amountMin: string
-    amountMax: string
-    userUuid: string
-    projectUuid: string
+    transaction: {
+      name: string
+      description: string
+      registerMin: string
+      registerMax: string
+      dateMin: string
+      dateMax: string
+      amountMin: string
+      amountMax: string
+      userUuid: string
+      projectUuid: string
+    }
     clientUuid: string
   }
 
   const defaultValues = {
-    name: '',
-    description: '',
-    registerMin: '',
-    registerMax: '',
-    dateMin: '',
-    dateMax: '',
-    amountMin: '',
-    amountMax: '',
-    userUuid: '',
-    projectUuid: '',
+    transaction: {
+      name: '',
+      description: '',
+      registerMin: '',
+      registerMax: '',
+      dateMin: '',
+      dateMax: '',
+      amountMin: '',
+      amountMax: '',
+      userUuid: '',
+      projectUuid: '',
+    },
     clientUuid: '',
   }
 
   // Hookform
-  const { reset, register, setValue, handleSubmit } = useForm<FilterProps>({
+  const { reset, control, register, setValue, handleSubmit } = useForm<FilterProps>({
     defaultValues: defaultValues,
   })
 
   useEffect(() => {
-    setValue('userUuid', user ? user.uuid : '')
+    setValue('transaction.userUuid', user ? user.uuid : '')
   }, [user, setValue])
 
   useEffect(() => {
-    setValue('projectUuid', project ? project.uuid : '')
+    setValue('transaction.projectUuid', project ? project.uuid : '')
   }, [project, setValue])
 
   useEffect(() => {
@@ -83,33 +95,40 @@ const Filter = ({
   // Pass filter on url
   const filter = (data: FilterProps) => {
     setFiltering('filter')
-    let urlQuery = ''
 
-    // Function to add query in url
-    const appendQuery = (key: string, value: string) => {
-      const encodeKey = encodeURIComponent(key)
-      const encodeValue = encodeURIComponent(value)
+    const transformDate = (str: string) => {
+      if (!str) return undefined
 
-      if (urlQuery === '') {
-        return `?${encodeKey}=${encodeValue}`
-      }
-      return `${urlQuery}&${encodeKey}=${encodeValue}`
+      const [date, time] = str.split(' ')
+      const [hour, minute] = time.split(':')
+      const [day, month, year] = date.split('/')
+
+      return `20${year}-${month}-${day}T${hour}:${minute}:00`
     }
 
-    // Get all filters
-    ;(Object.keys(data) as Array<keyof FilterProps>).forEach((key) => {
-      const value = data[key]
-
-      if (typeof value === 'string') {
-        if (value !== '') urlQuery = appendQuery(key, value)
-      }
-    })
-
-    if (location.search === urlQuery) {
-      setFiltering('idle')
-    } else {
-      navigate(`/income/select${urlQuery}`)
+    const query = {
+      clientUuid: data.clientUuid || undefined,
+      transaction: Object.values(data.transaction).some((value) => value !== '')
+        ? {
+            name: data.transaction.name || undefined,
+            description: data.transaction.description || undefined,
+            registerMin: transformDate(data.transaction.registerMin),
+            registerMax: transformDate(data.transaction.registerMax),
+            dateMin: transformDate(data.transaction.dateMin),
+            dateMax: transformDate(data.transaction.dateMax),
+            amountMin: data.transaction.amountMin
+              ? currencyToNumber(data.transaction.amountMin, 'BRL')
+              : undefined,
+            amountMax: data.transaction.amountMax
+              ? currencyToNumber(data.transaction.amountMax, 'BRL')
+              : undefined,
+            userUuid: data.transaction.userUuid || undefined,
+            projectUuid: data.transaction.projectUuid || undefined,
+          }
+        : undefined,
     }
+
+    navigate(`/income/select?${qs.stringify(query, { encode: false })}`)
   }
 
   return (
@@ -123,7 +142,14 @@ const Filter = ({
             Nome
           </label>
           <div className="relative">
-            <Input id="name" type="text" {...register('name')} placeholder="Digite o nome" />
+            <Input
+              id="name"
+              type="text"
+              icon={faFileInvoiceDollar}
+              iconPosition="left"
+              {...register('transaction.name')}
+              placeholder="Digite o nome"
+            />
           </div>
         </div>
 
@@ -138,7 +164,9 @@ const Filter = ({
             <Input
               id="description"
               type="text"
-              {...register('description')}
+              icon={faAlignLeft}
+              iconPosition="left"
+              {...register('transaction.description')}
               placeholder="Digite a descrição"
             />
           </div>
@@ -152,11 +180,20 @@ const Filter = ({
             Data minima do registro
           </label>
           <div className="relative">
-            <Input
-              id="registerMin"
-              type="text"
-              {...register('registerMin')}
-              placeholder="Data minima do registro"
+            <Controller
+              name="transaction.registerMin"
+              control={control}
+              render={({ field }) => (
+                <InputPattern
+                  {...field}
+                  id="date"
+                  mask="_"
+                  icon={faCalendar}
+                  iconPosition="left"
+                  format="##/##/## ##:##"
+                  placeholder="dd/mm/aa --:--"
+                />
+              )}
             />
           </div>
         </div>
@@ -169,11 +206,20 @@ const Filter = ({
             Data máxima do registro
           </label>
           <div className="relative">
-            <Input
-              id="registerMax"
-              type="text"
-              {...register('registerMax')}
-              placeholder="Data máxima do registro"
+            <Controller
+              name="transaction.registerMax"
+              control={control}
+              render={({ field }) => (
+                <InputPattern
+                  {...field}
+                  id="date"
+                  mask="_"
+                  icon={faCalendar}
+                  iconPosition="left"
+                  format="##/##/## ##:##"
+                  placeholder="dd/mm/aa --:--"
+                />
+              )}
             />
           </div>
         </div>
@@ -186,11 +232,20 @@ const Filter = ({
             Data minima da transação
           </label>
           <div className="relative">
-            <Input
-              id="dateMin"
-              type="text"
-              {...register('dateMin')}
-              placeholder="Data minima da transação"
+            <Controller
+              name="transaction.dateMin"
+              control={control}
+              render={({ field }) => (
+                <InputPattern
+                  {...field}
+                  id="date"
+                  mask="_"
+                  icon={faCalendar}
+                  iconPosition="left"
+                  format="##/##/## ##:##"
+                  placeholder="dd/mm/aa --:--"
+                />
+              )}
             />
           </div>
         </div>
@@ -203,11 +258,20 @@ const Filter = ({
             Data máxima da transação
           </label>
           <div className="relative">
-            <Input
-              id="dateMax"
-              type="text"
-              {...register('dateMax')}
-              placeholder="Data máxima da transação"
+            <Controller
+              name="transaction.dateMax"
+              control={control}
+              render={({ field }) => (
+                <InputPattern
+                  {...field}
+                  id="date"
+                  mask="_"
+                  icon={faCalendar}
+                  iconPosition="left"
+                  format="##/##/## ##:##"
+                  placeholder="dd/mm/aa --:--"
+                />
+              )}
             />
           </div>
         </div>
@@ -220,11 +284,23 @@ const Filter = ({
             Quantia minima
           </label>
           <div className="relative">
-            <Input
-              id="amountMin"
-              type="text"
-              {...register('amountMin')}
-              placeholder="Quantia minima"
+            <Controller
+              name="transaction.amountMin"
+              control={control}
+              render={({ field }) => (
+                <InputNumeric
+                  {...field}
+                  icon={faDollarSign}
+                  iconPosition="left"
+                  prefix={'R$ '}
+                  fixedDecimalScale
+                  decimalScale={2}
+                  allowNegative={false}
+                  decimalSeparator=","
+                  thousandSeparator="."
+                  placeholder="Digite a quantia minima"
+                />
+              )}
             />
           </div>
         </div>
@@ -237,11 +313,23 @@ const Filter = ({
             Quantia máxima
           </label>
           <div className="relative">
-            <Input
-              id="amountMax"
-              type="text"
-              {...register('amountMax')}
-              placeholder="Quantia máxima"
+            <Controller
+              name="transaction.amountMax"
+              control={control}
+              render={({ field }) => (
+                <InputNumeric
+                  {...field}
+                  icon={faDollarSign}
+                  iconPosition="left"
+                  prefix={'R$ '}
+                  fixedDecimalScale
+                  decimalScale={2}
+                  allowNegative={false}
+                  decimalSeparator=","
+                  thousandSeparator="."
+                  placeholder="Digite a quantia maxima"
+                />
+              )}
             />
           </div>
         </div>
@@ -254,7 +342,13 @@ const Filter = ({
             Usuário
           </label>
           <div className="relative">
-            <Input type="text" id="userUuid" disabled hidden {...register('userUuid')} />
+            <Input
+              type="text"
+              id="userUuid"
+              disabled
+              hidden
+              {...register('transaction.userUuid')}
+            />
 
             <UserSearch user={user} setUser={setUser} />
           </div>
@@ -268,7 +362,13 @@ const Filter = ({
             Projeto
           </label>
           <div className="relative">
-            <Input type="text" id="projectUuid" disabled hidden {...register('projectUuid')} />
+            <Input
+              type="text"
+              id="projectUuid"
+              disabled
+              hidden
+              {...register('transaction.projectUuid')}
+            />
 
             <ProjectSearch project={project} setProject={setProject} />
           </div>

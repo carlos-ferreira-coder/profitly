@@ -3,6 +3,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Checkbox } from '../../../components/Form/Checkbox'
 import { Input } from '../../../components/Form/Input'
+import qs from 'qs'
 
 const Filter = ({
   filtering,
@@ -53,44 +54,17 @@ const Filter = ({
   // Pass filter on url
   const filter = (data: FilterProps) => {
     setFiltering('filter')
-    let urlQuery = ''
 
-    // Function to add query in url
-    const appendQuery = (key: string, value: string) => {
-      const encodeKey = encodeURIComponent(key)
-      const encodeValue = encodeURIComponent(value)
-
-      if (urlQuery === '') {
-        return `?${encodeKey}=${encodeValue}`
-      }
-      return `${urlQuery}&${encodeKey}=${encodeValue}`
+    const query = {
+      name: data.name || undefined,
+      description: data.description || undefined,
+      priority: data.priority
+        .filter(({ value }) => value)
+        .map(({ key }) => key)
+        .map((i) => i),
     }
 
-    // Get all filters
-    ;(Object.keys(data) as Array<keyof FilterProps>).forEach((key) => {
-      const value = data[key]
-
-      if (typeof value === 'string') {
-        if (value !== '') urlQuery = appendQuery(key, value)
-      }
-
-      if (typeof value === 'object') {
-        let keys = ''
-        value.map((item: { key: number[]; name: string; value: boolean }) => {
-          if (item.value) {
-            if (keys === '') keys = `${item.key}`
-            else keys = `${keys},${item.key}`
-          }
-        })
-        if (keys !== '') urlQuery = appendQuery(key, keys)
-      }
-    })
-
-    if (location.search === urlQuery) {
-      setFiltering('idle')
-    } else {
-      navigate(`/status/select${urlQuery}`)
-    }
+    navigate(`/status/select?${qs.stringify(query, { encode: false })}`)
   }
 
   return (

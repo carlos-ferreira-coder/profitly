@@ -1,8 +1,17 @@
 import Button from '../../../components/Form/Button'
 import { Controller, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Input } from '../../../components/Form/Input'
+import { Input, InputPattern } from '../../../components/Form/Input'
 import { Checkbox } from '../../../components/Form/Checkbox'
+import qs from 'qs'
+import {
+  faAddressCard,
+  faEnvelope,
+  faLocationDot,
+  faPhone,
+  faUser,
+  faUserTie,
+} from '@fortawesome/free-solid-svg-icons'
 
 const Filter = ({
   filtering,
@@ -28,37 +37,61 @@ const Filter = ({
       name: string
       value: boolean
     }[]
-    cpf: string
-    cnpj: string
-    name: string
-    fantasy: string
-    email: string
-    phone: string
-    address: string
+    person: {
+      cpf: string
+      entity: {
+        name: string
+        email: string
+        phone: string
+        address: string
+      }
+    }
+    enterprise: {
+      cnpj: string
+      fantasy: string
+      entity: {
+        name: string
+        email: string
+        phone: string
+        address: string
+      }
+    }
   }
 
   const defaultValues = {
     allType: true,
     type: [
-      { key: 'Person', name: 'Person', value: true },
-      { key: 'Enterprise', name: 'Enterprise', value: true },
+      { key: 'person', name: 'Person', value: true },
+      { key: 'enterprise', name: 'Enterprise', value: true },
     ],
     allActive: true,
     active: [
       { key: true, name: 'active', value: true },
       { key: false, name: 'inactive', value: true },
     ],
-    cpf: '',
-    cnpj: '',
-    name: '',
-    email: '',
-    fantasy: '',
-    phone: '',
-    address: '',
+    person: {
+      cpf: '',
+      entity: {
+        name: '',
+        email: '',
+        phone: '',
+        address: '',
+      },
+    },
+    enterprise: {
+      cnpj: '',
+      fantasy: '',
+      entity: {
+        name: '',
+        email: '',
+        phone: '',
+        address: '',
+      },
+    },
   }
 
   // Hookform
-  const { reset, control, register, setValue, handleSubmit } = useForm<FilterProps>({
+  const { watch, reset, control, register, setValue, handleSubmit } = useForm<FilterProps>({
     defaultValues: defaultValues,
   })
 
@@ -73,44 +106,41 @@ const Filter = ({
   // Pass filter on url
   const filter = (data: FilterProps) => {
     setFiltering('filter')
-    let urlQuery = ''
 
-    // Function to add query in url
-    const appendQuery = (key: string, value: string) => {
-      const encodeKey = encodeURIComponent(key)
-      const encodeValue = encodeURIComponent(value)
-
-      if (urlQuery === '') {
-        return `?${encodeKey}=${encodeValue}`
-      }
-      return `${urlQuery}&${encodeKey}=${encodeValue}`
+    const query = {
+      active: data.active.filter(({ value }) => value).map(({ key }) => key),
+      person:
+        data.type.filter(({ key, value }) => key === 'person' && value) &&
+        (data.person.cpf || Object.values(data.person.entity).some((value) => value !== ''))
+          ? {
+              cpf: data.person.cpf,
+              entity: {
+                name: data.person.entity.name || undefined,
+                email: data.person.entity.email || undefined,
+                phone: data.person.entity.phone || undefined,
+                address: data.person.entity.address || undefined,
+              },
+            }
+          : undefined,
+      enterprise:
+        data.type.filter(({ key, value }) => key === 'enterprise' && value) &&
+        (data.enterprise.cnpj ||
+          data.enterprise.fantasy ||
+          Object.values(data.enterprise.entity).some((value) => value !== ''))
+          ? {
+              cnpj: data.enterprise.cnpj || undefined,
+              fantasy: data.enterprise.fantasy || undefined,
+              entity: {
+                name: data.enterprise.entity.name || undefined,
+                email: data.enterprise.entity.email || undefined,
+                phone: data.enterprise.entity.phone || undefined,
+                address: data.enterprise.entity.address || undefined,
+              },
+            }
+          : undefined,
     }
 
-    // Get all filters
-    ;(Object.keys(data) as Array<keyof FilterProps>).forEach((key) => {
-      const value = data[key]
-
-      if (typeof value === 'string') {
-        if (value !== '') urlQuery = appendQuery(key, value)
-      }
-
-      if (typeof value === 'object') {
-        let keys = ''
-        value.map((item: { key: boolean | string; name: string; value: boolean }) => {
-          if (item.value) {
-            if (keys === '') keys = `${item.key}`
-            else keys = `${keys},${item.key}`
-          }
-        })
-        if (keys !== '') urlQuery = appendQuery(key, keys)
-      }
-    })
-
-    if (location.search === urlQuery) {
-      setFiltering('idle')
-    } else {
-      navigate(`/supplier/select${urlQuery}`)
-    }
+    navigate(`/supplier/select?${qs.stringify(query, { encode: false })}`)
   }
 
   return (
@@ -206,29 +236,59 @@ const Filter = ({
           </div>
         </div>
 
-        <div className="mb-5.5">
-          <label
-            htmlFor="cpf"
-            className="mb-3 block text-sm font-medium text-black dark:text-white"
-          >
-            CPF
-          </label>
-          <div className="relative">
-            <Input id="cpf" type="text" {...register('cpf')} placeholder="Digite o cpf" />
+        {watch('type.0.value') && (
+          <div className="mb-5.5">
+            <label
+              htmlFor="cpf"
+              className="mb-3 block text-sm font-medium text-black dark:text-white"
+            >
+              CPF
+            </label>
+            <div className="relative">
+              <Controller
+                name="person.cpf"
+                control={control}
+                render={({ field }) => (
+                  <InputPattern
+                    {...field}
+                    mask="_"
+                    disabled
+                    icon={faAddressCard}
+                    iconPosition="left"
+                    format="###.###.###-##"
+                  />
+                )}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
-        <div className="mb-5.5">
-          <label
-            htmlFor="cnpj"
-            className="mb-3 block text-sm font-medium text-black dark:text-white"
-          >
-            CNPJ
-          </label>
-          <div className="relative">
-            <Input id="cnpj" type="text" {...register('cnpj')} placeholder="Digite o cnpj" />
+        {watch('type.1.value') && (
+          <div className="mb-5.5">
+            <label
+              htmlFor="cnpj"
+              className="mb-3 block text-sm font-medium text-black dark:text-white"
+            >
+              CNPJ
+            </label>
+            <div className="relative">
+              <Controller
+                name="enterprise.cnpj"
+                control={control}
+                render={({ field }) => (
+                  <InputPattern
+                    {...field}
+                    mask="_"
+                    disabled
+                    icon={faAddressCard}
+                    iconPosition="left"
+                    format="##.###.###/####-##"
+                  />
+                )}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="mb-5.5">
           <label
@@ -238,26 +298,46 @@ const Filter = ({
             Nome
           </label>
           <div className="relative">
-            <Input id="name" type="text" {...register('name')} placeholder="Digite o nome" />
+            {watch('type.0.value') && (
+              <Input
+                id="name"
+                type="text"
+                icon={faUserTie}
+                iconPosition="left"
+                {...register('person.entity.name')}
+              />
+            )}
+            {watch('type.1.value') && (
+              <Input
+                id="name"
+                type="text"
+                icon={faUserTie}
+                iconPosition="left"
+                {...register('enterprise.entity.name')}
+              />
+            )}
           </div>
         </div>
 
-        <div className="mb-5.5">
-          <label
-            htmlFor="fantasy"
-            className="mb-3 block text-sm font-medium text-black dark:text-white"
-          >
-            Nome fantasia
-          </label>
-          <div className="relative">
-            <Input
-              id="fantasy"
-              type="text"
-              {...register('fantasy')}
-              placeholder="Digite o nome fantasia"
-            />
+        {watch('type.1.value') && (
+          <div className="mb-5.5">
+            <label
+              htmlFor="fantasy"
+              className="mb-3 block text-sm font-medium text-black dark:text-white"
+            >
+              Nome fantasia
+            </label>
+            <div className="relative">
+              <Input
+                id="fantasy"
+                type="text"
+                icon={faUser}
+                iconPosition="left"
+                {...register('enterprise.fantasy')}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="mb-5.5">
           <label
@@ -267,13 +347,24 @@ const Filter = ({
             Email
           </label>
           <div className="relative">
-            <Input
-              id="email"
-              type="text"
-              autoComplete="email"
-              {...register('email')}
-              placeholder="Digite o email"
-            />
+            {watch('type.0.value') && (
+              <Input
+                id="email"
+                type="text"
+                icon={faEnvelope}
+                iconPosition="left"
+                {...register('person.entity.email')}
+              />
+            )}
+            {watch('type.1.value') && (
+              <Input
+                id="email"
+                type="text"
+                icon={faEnvelope}
+                iconPosition="left"
+                {...register('enterprise.entity.email')}
+              />
+            )}
           </div>
         </div>
 
@@ -285,13 +376,26 @@ const Filter = ({
             Contato
           </label>
           <div className="relative">
-            <Input
-              id="phone"
-              type="text"
-              autoComplete="phone"
-              {...register('phone')}
-              placeholder="Digite o contato"
-            />
+            {watch('type.0.value') && (
+              <Input
+                id="phone"
+                type="text"
+                icon={faPhone}
+                iconPosition="left"
+                {...register('person.entity.phone')}
+                placeholder="Digite o telefone"
+              />
+            )}
+            {watch('type.1.value') && (
+              <Input
+                id="phone"
+                type="text"
+                icon={faPhone}
+                iconPosition="left"
+                {...register('enterprise.entity.phone')}
+                placeholder="Digite o telefone"
+              />
+            )}
           </div>
         </div>
 
@@ -303,12 +407,26 @@ const Filter = ({
             Endereço
           </label>
           <div className="relative">
-            <Input
-              id="address"
-              type="text"
-              {...register('address')}
-              placeholder="Digite o endereço"
-            />
+            {watch('type.0.value') && (
+              <Input
+                id="address"
+                type="text"
+                icon={faLocationDot}
+                iconPosition="left"
+                {...register('person.entity.address')}
+                placeholder="Digite o endereço"
+              />
+            )}
+            {watch('type.1.value') && (
+              <Input
+                id="address"
+                type="text"
+                icon={faLocationDot}
+                iconPosition="left"
+                {...register('enterprise.entity.address')}
+                placeholder="Digite o endereço"
+              />
+            )}
           </div>
         </div>
 

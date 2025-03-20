@@ -1,7 +1,7 @@
 import Button from '../../../components/Form/Button'
 import { Controller, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Input } from '../../../components/Form/Input'
+import { Input, InputPattern } from '../../../components/Form/Input'
 import Alert from '../../../components/Alert/Index'
 import { useEffect, useState } from 'react'
 import { ClientProps, StatusProps, UserProps } from '../../../types/Database'
@@ -9,6 +9,8 @@ import StatusSearch from '../../../hooks/search/useSearchStatus'
 import { Checkbox } from '../../../components/Form/Checkbox'
 import ClientSearch from '../../../hooks/search/useSearchClient'
 import UserSearch from '../../../hooks/search/useSearchUser'
+import qs from 'qs'
+import { faAlignLeft, faCalendar, faProjectDiagram } from '@fortawesome/free-solid-svg-icons'
 
 const Filter = ({
   filtering,
@@ -97,44 +99,19 @@ const Filter = ({
   // Pass filter on url
   const filter = (data: FilterProps) => {
     setFiltering('filter')
-    let urlQuery = ''
 
-    // Function to add query in url
-    const appendQuery = (key: string, value: string) => {
-      const encodeKey = encodeURIComponent(key)
-      const encodeValue = encodeURIComponent(value)
-
-      if (urlQuery === '') {
-        return `?${encodeKey}=${encodeValue}`
-      }
-      return `${urlQuery}&${encodeKey}=${encodeValue}`
+    const query = {
+      active: data.active.filter(({ value }) => value).map(({ key }) => key),
+      name: data.name || undefined,
+      description: data.description || undefined,
+      registerMin: data.registerMin || undefined,
+      registerMax: data.registerMax || undefined,
+      userUuid: data.userUuid || undefined,
+      clientUuid: data.clientUuid || undefined,
+      statusUuid: data.statusUuid || undefined,
     }
 
-    // Get all filters
-    ;(Object.keys(data) as Array<keyof FilterProps>).forEach((key) => {
-      const value = data[key]
-
-      if (typeof value === 'string') {
-        if (value !== '') urlQuery = appendQuery(key, value)
-      }
-
-      if (value && typeof value === 'object') {
-        let keys = ''
-        value.map((item: { key: boolean | string; name: string; value: boolean }) => {
-          if (item.value) {
-            if (keys === '') keys = `${item.key}`
-            else keys = `${keys},${item.key}`
-          }
-        })
-        if (keys !== '') urlQuery = appendQuery(key, keys)
-      }
-    })
-
-    if (location.search === urlQuery) {
-      setFiltering('idle')
-    } else {
-      navigate(`/project/select${urlQuery}`)
-    }
+    navigate(`/project/select?${qs.stringify(query, { encode: false })}`)
   }
 
   return (
@@ -193,7 +170,14 @@ const Filter = ({
             Nome
           </label>
           <div className="relative">
-            <Input id="name" type="text" {...register('name')} placeholder="Digite o nome" />
+            <Input
+              id="name"
+              type="text"
+              icon={faProjectDiagram}
+              iconPosition="left"
+              {...register('name')}
+              placeholder="Digite o nome"
+            />
           </div>
         </div>
 
@@ -208,6 +192,8 @@ const Filter = ({
             <Input
               id="description"
               type="text"
+              icon={faAlignLeft}
+              iconPosition="left"
               {...register('description')}
               placeholder="Digite a descrição"
             />
@@ -222,11 +208,20 @@ const Filter = ({
             Data de registro minima
           </label>
           <div className="relative">
-            <Input
-              id="registerMin"
-              type="text"
-              {...register('registerMin')}
-              placeholder="Data de registro minima"
+            <Controller
+              name="registerMin"
+              control={control}
+              render={({ field }) => (
+                <InputPattern
+                  {...field}
+                  id="date"
+                  mask="_"
+                  icon={faCalendar}
+                  iconPosition="left"
+                  format="##/##/## ##:##"
+                  placeholder="dd/mm/aa --:--"
+                />
+              )}
             />
           </div>
         </div>
@@ -239,11 +234,20 @@ const Filter = ({
             Data de registro máxima
           </label>
           <div className="relative">
-            <Input
-              id="registerMax"
-              type="text"
-              {...register('registerMax')}
-              placeholder="Data de registro máxima"
+            <Controller
+              name="registerMax"
+              control={control}
+              render={({ field }) => (
+                <InputPattern
+                  {...field}
+                  id="date"
+                  mask="_"
+                  icon={faCalendar}
+                  iconPosition="left"
+                  format="##/##/## ##:##"
+                  placeholder="dd/mm/aa --:--"
+                />
+              )}
             />
           </div>
         </div>

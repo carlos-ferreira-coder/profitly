@@ -10,7 +10,7 @@ import {
   faAlignLeft,
   faCalendar,
   faDollarSign,
-  faSignature,
+  faFileInvoiceDollar,
 } from '@fortawesome/free-solid-svg-icons'
 import { useEffect, useState } from 'react'
 import { incomeCreateSchema } from '../../../../hooks/useSchema'
@@ -112,7 +112,7 @@ const Form = () => {
           <Input
             id="name"
             type="text"
-            icon={faSignature}
+            icon={faFileInvoiceDollar}
             iconPosition="left"
             {...register('transaction.name')}
             placeholder="Digite o nome"
