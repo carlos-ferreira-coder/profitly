@@ -85,6 +85,8 @@ export const tasksSelect = async (req: Request, res: Response): Promise<void> =>
       ...query.data,
     }
 
+    console.log(filter)
+
     // server request
     const tasks = await prisma.task.findMany({
       include: {
@@ -112,6 +114,8 @@ export const tasksSelect = async (req: Request, res: Response): Promise<void> =>
           : undefined,
       },
     })
+
+    console.log(tasks)
 
     res.status(200).json(responseTasks(tasks))
     return
