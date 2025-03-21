@@ -35,12 +35,9 @@ const Create = () => {
 
         const query = { taskExpense: { uuid: [uuid] } }
 
-        const response = await axios.get(
-          `tasks/select/all?${qs.stringify(query, { encode: false })}`,
-          {
-            withCredentials: true,
-          }
-        )
+        const response = await axios.get(`tasks/select/all`, {
+          withCredentials: true,
+        })
 
         console.log(response)
       } catch (error) {
