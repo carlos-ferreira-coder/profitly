@@ -5,8 +5,7 @@ import Logo from '../../../../images/logo/logo.png'
 import Form from './Form'
 import { useEffect, useState } from 'react'
 import { TaskProps } from '../../../../types/Database'
-import axios from 'axios'
-import { handleAxiosError } from '../../../../services/Axios'
+import { api as axios, handleAxiosError } from '../../../../services/Axios'
 import Alert from '../../../../components/Alert/Index'
 import Loader from '../../../../components/Loader'
 import qs from 'qs'
@@ -19,12 +18,8 @@ const Create = () => {
   useEffect(() => {
     ;(async () => {
       try {
-        const query = qs.stringify(
-          {
-            projectUuid: ['767c9836-62b2-49f3-8d7b-fb183fcc2791'],
-          },
-          { encode: false }
-        )
+        const filter = { taskExpense: { uuid: [uuid] } }
+        const query = qs.stringify(filter, { encode: false })
 
         const {
           data: { 0: resTask },
