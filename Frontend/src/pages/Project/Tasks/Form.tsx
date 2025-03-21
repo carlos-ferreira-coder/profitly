@@ -162,17 +162,19 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
         }
 
         if (task.dones) {
-          task.dones.map((done) => {
-            if (done.doneExpense) acc.done.cost += currencyToNumber(done.doneExpense.amount, 'BRL')
+          acc.done.cost += task.dones.reduce((sum, done) => {
+            if (done.doneExpense) sum += currencyToNumber(done.doneExpense.amount, 'BRL')
 
             if (done.doneActivity) {
               const beginDate = parse(done.doneActivity.beginDate, 'dd/MM/yy HH:mm', new Date())
               const endDate = parse(done.doneActivity.endDate, 'dd/MM/yy HH:mm', new Date())
               const hours = differenceInHours(endDate, beginDate)
 
-              acc.done.cost += hours * currencyToNumber(done.doneActivity.hourlyRate, 'BRL')
+              sum += hours * currencyToNumber(done.doneActivity.hourlyRate, 'BRL')
             }
-          })
+
+            return sum
+          }, 0)
         }
 
         return acc
@@ -345,8 +347,8 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                   key={field.id}
                   className="my-8 p-3 text-black dark:text-white shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
                 >
-                  <div className="flex justify-between">
-                    <div className="flex gap-5">
+                  <div className="flex justify-between mb-3">
+                    <div className="flex gap-8">
                       <Button
                         color="primary"
                         type="button"

@@ -316,19 +316,30 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                   key={field.id}
                   className="my-8 p-3 text-black dark:text-white shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
                 >
-                  <Button
-                    color="primary"
-                    type="button"
-                    className="w-8 h-8"
-                    onClick={() =>
-                      setResume(
-                        (prevResume) =>
-                          prevResume && prevResume.map((r, i) => (i === index ? !r : r))
-                      )
-                    }
-                  >
-                    <FontAwesomeIcon icon={resume[index] ? faAngleDown : faAngleUp} />
-                  </Button>
+                  <div className="flex justify-between mb-3">
+                    <Button
+                      color="primary"
+                      type="button"
+                      className="w-8 h-8"
+                      onClick={() =>
+                        setResume(
+                          (prevResume) =>
+                            prevResume && prevResume.map((r, i) => (i === index ? !r : r))
+                        )
+                      }
+                    >
+                      <FontAwesomeIcon icon={resume[index] ? faAngleDown : faAngleUp} />
+                    </Button>
+
+                    <Button
+                      color="danger"
+                      type="button"
+                      className="h-8 w-8"
+                      onClick={() => rmvTask(index)}
+                    >
+                      <FontAwesomeIcon icon={faTrashCan} />
+                    </Button>
+                  </div>
 
                   <div className={resume[index] ? 'block' : 'hidden'}>
                     <p>
@@ -733,10 +744,6 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                         />
                       )}
                     </div>
-
-                    <Button color="danger" type="button" onClick={() => rmvTask(index)}>
-                      <FontAwesomeIcon icon={faTrashCan} />
-                    </Button>
                   </div>
                 </div>
               )
