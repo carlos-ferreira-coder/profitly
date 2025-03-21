@@ -151,24 +151,6 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
           ? new Date(Math.max(...dates.map((d) => new Date(d).getTime())))
           : project.register
 
-      const budget: { cost: number; revenue: number } = project.budget.tasks.reduce(
-        (sum, task) => {
-          if (task.taskExpense) {
-            sum.cost += task.taskExpense.amount.toNumber()
-            sum.revenue += +task.revenue.toNumber()
-          }
-
-          if (task.taskActivity) {
-            const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
-            sum.cost += hours * task.taskActivity.hourlyRate.toNumber()
-            sum.revenue += hours * task.revenue.toNumber()
-          }
-
-          return sum
-        },
-        { cost: 0, revenue: 0 },
-      )
-
       const txs: {
         expense: number
         income: number
@@ -187,6 +169,90 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
           return sum
         },
         { expense: 0, income: 0, refund: 0, loan: { income: 0, expense: 0 } },
+      )
+
+      const tx = {
+        income: txs.income + txs.loan.income - txs.refund,
+        expense: txs.expense + txs.loan.expense + txs.refund,
+      }
+
+      const budget = project.budget.tasks.reduce(
+        (acc, task) => {
+          if (task.taskExpense) {
+            acc.cost += task.taskExpense.amount.toNumber()
+            acc.revn += task.revenue.toNumber()
+          }
+
+          if (task.taskActivity) {
+            const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+            acc.cost += hours * task.taskActivity.hourlyRate.toNumber()
+            acc.revn += hours * task.revenue.toNumber()
+          }
+
+          return acc
+        },
+        { cost: 0, revn: 0 },
+      )
+
+      const tasks = project.tasks.reduce(
+        (acc, task) => {
+          let prev = 0,
+            cost = 0,
+            revn = 0
+
+          if (task.taskExpense) {
+            prev = task.taskExpense.amount.toNumber()
+            revn = task.revenue.toNumber()
+          }
+
+          if (task.taskActivity) {
+            const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+            prev = hours * task.taskActivity.hourlyRate.toNumber()
+            revn += hours * task.revenue.toNumber()
+          }
+
+          if (task.dones)
+            cost = task.dones.reduce((sum, done) => {
+              if (done.doneExpense) sum += done.doneExpense.amount.toNumber()
+
+              if (done.doneActivity) {
+                const hours =
+                  (done.doneActivity.endDate.getTime() - done.doneActivity.beginDate.getTime()) /
+                  3600000
+                sum += hours * done.doneActivity.hourlyRate.toNumber()
+              }
+
+              return sum
+            }, 0)
+
+          const ratio = cost / (prev || 1)
+
+          acc.cost = cost
+          acc.revn = !task.finished || ratio <= 1 ? revn * ratio : cost > prev ? prev - cost : revn
+
+          return acc
+        },
+        { cost: 0, revn: 0 },
+      )
+
+      /*
+
+      const budget: { cost: number; revenue: number } = project.budget.tasks.reduce(
+        (sum, task) => {
+          if (task.taskExpense) {
+            sum.cost += task.taskExpense.amount.toNumber()
+            sum.revenue += +task.revenue.toNumber()
+          }
+
+          if (task.taskActivity) {
+            const hours = (task.endDate.getTime() - task.beginDate.getTime()) / 3600000
+            sum.cost += hours * task.taskActivity.hourlyRate.toNumber()
+            sum.revenue += hours * task.revenue.toNumber()
+          }
+
+          return sum
+        },
+        { cost: 0, revenue: 0 },
       )
 
       // calculate project
@@ -277,17 +343,13 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
             },
           },
         )
-
-      const tx = {
-        income: txs.income + txs.loan.income - txs.refund,
-        expense: txs.expense + txs.loan.expense + txs.refund,
-      }
-
+          
       const proj = {
         total: prj.expected.prev + prj.expected.revn,
         cost: prj.expected.cost + prj.unexpected.cost,
         revenue: prj.expected.revn - prj.unexpected.cost + prj.expected.prev - prj.expected.cost,
       }
+        */
 
       return {
         ...project,
@@ -298,9 +360,9 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
         },
         budget: {
           ...project.budget,
-          total: numberToCurrency(budget.revenue - budget.cost, 'BRL'),
+          total: numberToCurrency(budget.cost + budget.revn, 'BRL'),
           cost: numberToCurrency(budget.cost, 'BRL'),
-          revenue: numberToCurrency(budget.revenue, 'BRL'),
+          revenue: numberToCurrency(budget.revn, 'BRL'),
         },
         tx: {
           income: numberToCurrency(tx.income, 'BRL'),
@@ -308,9 +370,9 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
           revenue: numberToCurrency(tx.income - tx.expense, 'BRL'),
         },
         proj: {
-          total: numberToCurrency(proj.total, 'BRL'),
-          cost: numberToCurrency(proj.cost, 'BRL'),
-          revenue: numberToCurrency(proj.revenue, 'BRL'),
+          total: numberToCurrency(tasks.cost + tasks.revn, 'BRL'),
+          cost: numberToCurrency(tasks.cost, 'BRL'),
+          revenue: numberToCurrency(tasks.revn, 'BRL'),
         },
       }
     })
