@@ -774,9 +774,11 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                       )}
                     </div>
 
-                    <Button color="danger" type="button" onClick={() => rmvTask(index)}>
-                      <FontAwesomeIcon icon={faTrashCan} />
-                    </Button>
+                    {!field.dones && (
+                      <Button color="danger" type="button" onClick={() => rmvTask(index)}>
+                        Remover <FontAwesomeIcon icon={faTrashCan} className="ml-3" />
+                      </Button>
+                    )}
                   </div>
                 </div>
               )
