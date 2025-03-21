@@ -309,7 +309,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                   key={field.id}
                   className="my-8 p-3 text-black dark:text-white shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
                 >
-                  <div>
+                  <div className="flex justify-between">
                     <Button
                       color="primary"
                       type="button"
@@ -328,7 +328,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                       <Button
                         color="success"
                         type="button"
-                        className="h-8 w-20"
+                        className="h-8 w-50"
                         onClick={() =>
                           navigate(`/project/tasks/expense/${field.taskExpense?.uuid}`)
                         }
@@ -341,7 +341,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                       <Button
                         color="success"
                         type="button"
-                        className="h-8 w-20"
+                        className="h-8 w-50"
                         onClick={() =>
                           navigate(`/project/tasks/activity/${field.taskActivity?.uuid}`)
                         }
