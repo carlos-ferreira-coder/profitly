@@ -19,6 +19,7 @@ const Create = () => {
   useEffect(() => {
     ;(async () => {
       try {
+        /*
         const query = { taskExpense: { uuid: [uuid] } }
 
         console.log(qs.stringify(query, { encode: false }))
@@ -30,6 +31,18 @@ const Create = () => {
         })
 
         setTask(resTask)
+        */
+
+        const query = { taskExpense: { uuid: [uuid] } }
+
+        const response = await axios.get(
+          `tasks/select/all?${qs.stringify(query, { encode: false })}`,
+          {
+            withCredentials: true,
+          }
+        )
+
+        console.log(response)
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])
       }
