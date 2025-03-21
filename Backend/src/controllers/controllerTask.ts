@@ -60,6 +60,10 @@ export const tasksSelect = async (req: Request, res: Response): Promise<void> =>
       return
     }
 
+    const filter = {
+      ...query.data,
+    }
+
     // server request
     const tasks = await prisma.task.findMany({
       include: {
@@ -67,8 +71,18 @@ export const tasksSelect = async (req: Request, res: Response): Promise<void> =>
         taskActivity: true,
       },
       where: {
-        projectUuid: query.data.projectUuid?.length ? { in: query.data.projectUuid } : undefined,
+        projectUuid: filter.projectUuid?.length ? { in: filter.projectUuid } : undefined,
         budgetUuid: null,
+        taskExpense: filter.taskExpense
+          ? {
+              uuid: filter.taskExpense.uuid?.length ? { in: filter.taskExpense.uuid } : undefined,
+            }
+          : undefined,
+        taskActivity: filter.taskActivity
+          ? {
+              uuid: filter.taskActivity.uuid?.length ? { in: filter.taskActivity.uuid } : undefined,
+            }
+          : undefined,
       },
     })
 

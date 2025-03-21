@@ -439,3 +439,73 @@ export const budgetSchema = z.object({
   uuid: zodUuid('orçamento'),
   tasks: z.array(taskSchema),
 })
+
+export const doneExpenseSchema = z.object({
+  uuid: zodUuid('realizado de despesa'),
+  amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
+  date: zodRegex(
+    'data',
+    /^(0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/(\d{2}) ([01]\d|2[0-3]):[0-5]\d$/,
+    true
+  ).transform((s) => {
+    const [date, time] = s.split(' ')
+    const [hour, minute] = time.split(':')
+    const [day, month, year] = date.split('/')
+
+    return `20${year}-${month}-${day}T${hour}:${minute}:00`
+  }),
+  supplierUuid: zodUuid('fornecedor'),
+})
+
+export const doneActivitySchema = z.object({
+  uuid: zodUuid('realizado de despesa'),
+  hourlyRate: zodRegex('valor da hora', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
+  beginDate: zodRegex(
+    'data inicial',
+    /^(0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/(\d{2}) ([01]\d|2[0-3]):[0-5]\d$/,
+    true
+  ).transform((s) => {
+    const [date, time] = s.split(' ')
+    const [hour, minute] = time.split(':')
+    const [day, month, year] = date.split('/')
+
+    return `20${year}-${month}-${day}T${hour}:${minute}:00`
+  }),
+  endDate: zodRegex(
+    'data final',
+    /^(0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/(\d{2}) ([01]\d|2[0-3]):[0-5]\d$/,
+    true
+  ).transform((s) => {
+    const [date, time] = s.split(' ')
+    const [hour, minute] = time.split(':')
+    const [day, month, year] = date.split('/')
+
+    return `20${year}-${month}-${day}T${hour}:${minute}:00`
+  }),
+})
+
+export const doneSchema = z
+  .object({
+    name: zodString('nome', true),
+    description: zodString('descrição', true),
+    userUuid: zodUuid('usuário'),
+    doneExpense: doneExpenseSchema.optional(),
+    doneActivity: doneActivitySchema.optional(),
+  })
+  .superRefine(({ doneExpense, doneActivity }, ctx) => {
+    if (!(doneExpense || doneActivity)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'O realizado precisa ser despesa ou atividade!',
+        path: ['doneExpense', 'doneActivity'],
+      })
+    }
+
+    if (doneExpense && doneActivity) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Cadastre separadamente despesa e atividade!',
+        path: ['doneExpense', 'doneActivity'],
+      })
+    }
+  })

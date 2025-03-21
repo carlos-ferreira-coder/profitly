@@ -444,6 +444,16 @@ export const budgetSelectSchema = z.object({
 
 export const tasksSelectSchema = z.object({
   projectUuid: z.array(zodUuid('projeto')).optional(),
+  taskExpense: z
+    .object({
+      uuid: z.array(zodUuid('tarefa de despesa')).optional(),
+    })
+    .optional(),
+  taskActivity: z
+    .object({
+      uuid: z.array(zodUuid('tarefa de atividade')).optional(),
+    })
+    .optional(),
 })
 
 const taskUpdateSchema = z
