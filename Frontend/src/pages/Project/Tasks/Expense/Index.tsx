@@ -19,21 +19,16 @@ const Create = () => {
   useEffect(() => {
     ;(async () => {
       try {
-        /*
-        const query = { taskExpense: { uuid: [uuid] } }
-
-        console.log(qs.stringify(query, { encode: false }))
+        const query = qs.stringify(
+          {
+            projectUuid: ['767c9836-62b2-49f3-8d7b-fb183fcc2791'],
+          },
+          { encode: false }
+        )
 
         const {
           data: { 0: resTask },
-        } = await axios.get(`tasks/select/all?${qs.stringify(query, { encode: false })}`, {
-          withCredentials: true,
-        })
-
-        setTask(resTask)
-        */
-
-        const { data: resTask } = await axios.get(`tasks/select/all?taskExpense[uuid][0]=${uuid}`, {
+        } = await axios.get(`tasks/select/all?${query}`, {
           withCredentials: true,
         })
 

@@ -243,11 +243,9 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
           onClick={() => navigate(`/project/tasks/${projectUuid}`)}
           className="h-8 w-50 bg-green-400 dark:text-form-input dark:bg-green-400"
         >
-          Atualizar Pagina
+          Atualize a pagina
         </Button>,
       ])
-
-      // TODO colocar os uuids na tarefas adicionadas
     } catch (error) {
       setAlertErrors([handleAxiosError(error)])
     }
