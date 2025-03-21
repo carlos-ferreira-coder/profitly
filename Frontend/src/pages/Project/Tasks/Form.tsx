@@ -191,8 +191,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
             return sum
           }, 0)
 
-          const prevSafe = prev || 1
-          const ratio = cost / prevSafe
+          const ratio = cost / (prev || 1)
 
           acc.dones.cost += cost
           acc.dones.revn += task.finished || ratio > 1 ? prev + revn - cost : revn * ratio
@@ -337,7 +336,8 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
             fields.map((task, index) => {
               let prev = 0,
                 cost = 0,
-                revn = 0
+                revn = 0,
+                rven = 0
 
               const dateRegex = /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{2} ([01]\d|2[0-3]):[0-5]\d$/
               const parseDate = (date: string) => parse(date, 'dd/MM/yy HH:mm', new Date())
@@ -384,6 +384,10 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
 
                   return sum
                 }, 0)
+
+                const ratio = cost / (prev || 1)
+
+                rven = task.finished || ratio > 1 ? revn : revn * ratio
               }
 
               return (
@@ -456,7 +460,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                     <p>
                       <b>Nome: </b>
                       {task.name}
-                      {task.finished ? (
+                      {task.finished && task.dones ? (
                         <FontAwesomeIcon icon={faCircleCheck} className="ml-2 text-success" />
                       ) : (
                         <FontAwesomeIcon icon={faCircleXmark} className="ml-2 text-danger" />
@@ -468,7 +472,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                     </p>
                     <p>
                       <b>Total realizado: </b>
-                      {numberToCurrency(cost + revn, 'BRL')}
+                      {numberToCurrency(cost + rven, 'BRL')}
                     </p>
                     <p>
                       <b>Status: </b>
