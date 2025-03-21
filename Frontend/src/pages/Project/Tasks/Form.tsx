@@ -226,6 +226,8 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
           {numberToCurrency(total.tasks.revn, 'BRL')}
         </p>
 
+        <div className="border-stroke dark:border-strokedark h-1/2 border-t-2"></div>
+
         <p>
           <b>Total realizado: </b>
           {numberToCurrency(total.dones.cost + total.dones.revn, 'BRL')}
