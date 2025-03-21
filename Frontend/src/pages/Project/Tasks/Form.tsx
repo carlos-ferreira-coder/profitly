@@ -194,7 +194,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
           const ratio = cost / (prev || 1)
 
           acc.dones.cost += cost
-          acc.dones.revn += task.finished || ratio > 1 ? prev + revn - cost : revn * ratio
+          acc.dones.revn += task.finished || ratio > 1 ? revn : revn * ratio
         }
 
         return acc
