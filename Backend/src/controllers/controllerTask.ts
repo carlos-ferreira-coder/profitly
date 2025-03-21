@@ -113,8 +113,6 @@ export const tasksSelect = async (req: Request, res: Response): Promise<void> =>
       },
     })
 
-    console.log(tasks)
-
     res.status(200).json(responseTasks(tasks))
     return
   } catch (e) {

@@ -27,6 +27,8 @@ const Create = () => {
           withCredentials: true,
         })
 
+        console.log(resTask)
+
         setTask(resTask)
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])
