@@ -329,45 +329,60 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                   className="my-8 p-3 text-black dark:text-white shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
                 >
                   <div className="flex justify-between">
-                    <Button
-                      color="primary"
-                      type="button"
-                      className="h-8 w-8"
-                      onClick={() =>
-                        setResume(
-                          (prevResume) =>
-                            prevResume && prevResume.map((r, i) => (i === index ? !r : r))
-                        )
-                      }
-                    >
-                      <FontAwesomeIcon icon={resume[index] ? faAngleDown : faAngleUp} />
-                    </Button>
-
-                    {field.taskExpense && (
+                    <div className="flex gap-5">
                       <Button
-                        color="success"
+                        color="primary"
                         type="button"
-                        className="h-8 w-40"
+                        className="h-8 w-8"
                         onClick={() =>
-                          navigate(`/project/tasks/expense/${field.taskExpense?.uuid}`)
+                          setResume(
+                            (prevResume) =>
+                              prevResume && prevResume.map((r, i) => (i === index ? !r : r))
+                          )
                         }
                       >
-                        Inserir realizado <FontAwesomeIcon icon={faCheck} className="ml-2" />
+                        <FontAwesomeIcon icon={resume[index] ? faAngleDown : faAngleUp} />
                       </Button>
-                    )}
 
-                    {field.taskActivity && (
-                      <Button
-                        color="success"
-                        type="button"
-                        className="h-8 w-40"
-                        onClick={() =>
-                          navigate(`/project/tasks/activity/${field.taskActivity?.uuid}`)
-                        }
-                      >
-                        Inserir realizado <FontAwesomeIcon icon={faCheck} className="ml-2" />
-                      </Button>
-                    )}
+                      {!field.dones && (
+                        <Button
+                          color="danger"
+                          type="button"
+                          className="h-8 w-8"
+                          onClick={() => rmvTask(index)}
+                        >
+                          <FontAwesomeIcon icon={faTrashCan} />
+                        </Button>
+                      )}
+                    </div>
+
+                    <div className="flex gap-5">
+                      {field.taskExpense && (
+                        <Button
+                          color="success"
+                          type="button"
+                          className="h-8 w-40"
+                          onClick={() =>
+                            navigate(`/project/tasks/expense/${field.taskExpense?.uuid}`)
+                          }
+                        >
+                          Inserir realizado <FontAwesomeIcon icon={faCheck} className="ml-2" />
+                        </Button>
+                      )}
+
+                      {field.taskActivity && (
+                        <Button
+                          color="success"
+                          type="button"
+                          className="h-8 w-40"
+                          onClick={() =>
+                            navigate(`/project/tasks/activity/${field.taskActivity?.uuid}`)
+                          }
+                        >
+                          Inserir realizado <FontAwesomeIcon icon={faCheck} className="ml-2" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
 
                   <div className={resume[index] ? 'block' : 'hidden'}>
@@ -773,12 +788,6 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                         />
                       )}
                     </div>
-
-                    {!field.dones && (
-                      <Button color="danger" type="button" onClick={() => rmvTask(index)}>
-                        Remover <FontAwesomeIcon icon={faTrashCan} className="ml-3" />
-                      </Button>
-                    )}
                   </div>
                 </div>
               )
