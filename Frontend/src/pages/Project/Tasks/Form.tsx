@@ -184,11 +184,10 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
             return sum
           }, 0)
 
-          if (task.finished) {
-            acc.dones.cost += cost
+          acc.dones.cost += cost
+          if (task.finished || cost / prev > 1) {
             acc.dones.revn += prev + revn - cost
           } else {
-            acc.dones.cost += cost
             acc.dones.revn += revn * (cost / prev)
           }
         }
@@ -376,7 +375,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                   return sum
                 }, 0)
 
-                if (task.finished) {
+                if (task.finished || cost / prev > 1) {
                   rven = prev + revn - cost
                 } else {
                   rven = revn * (cost / prev)
