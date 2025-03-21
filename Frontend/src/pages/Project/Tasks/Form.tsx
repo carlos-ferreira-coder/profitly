@@ -227,12 +227,12 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
           {numberToCurrency(total.dones.cost + total.dones.revn, 'BRL')}
         </p>
         <p>
-          <b>Lucros realizados: </b>
-          {numberToCurrency(total.dones.revn, 'BRL')}
-        </p>
-        <p>
           <b>Custos realizados: </b>
           {numberToCurrency(total.dones.cost, 'BRL')}
+        </p>
+        <p>
+          <b>Lucros realizados: </b>
+          {numberToCurrency(total.dones.revn, 'BRL')}
         </p>
       </>
     )
@@ -416,31 +416,35 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                       )}
                     </div>
 
-                    <div className="flex gap-5">
-                      {task.taskExpense && (
-                        <Button
-                          color="success"
-                          type="button"
-                          className="h-8 w-40"
-                          onClick={() =>
-                            navigate(`/project/tasks/expense/${task.taskExpense?.uuid}`)
-                          }
-                        >
-                          Inserir realizado <FontAwesomeIcon icon={faCheck} className="ml-2" />
-                        </Button>
-                      )}
+                    <div className="flex gap-3">
+                      {!task.finished && (
+                        <>
+                          {task.taskExpense && (
+                            <Button
+                              color="success"
+                              type="button"
+                              className="h-8 w-40"
+                              onClick={() =>
+                                navigate(`/project/tasks/expense/${task.taskExpense?.uuid}`)
+                              }
+                            >
+                              Inserir realizado <FontAwesomeIcon icon={faCheck} className="ml-2" />
+                            </Button>
+                          )}
 
-                      {task.taskActivity && (
-                        <Button
-                          color="success"
-                          type="button"
-                          className="h-8 w-40"
-                          onClick={() =>
-                            navigate(`/project/tasks/activity/${task.taskActivity?.uuid}`)
-                          }
-                        >
-                          Inserir realizado <FontAwesomeIcon icon={faCheck} className="ml-2" />
-                        </Button>
+                          {task.taskActivity && (
+                            <Button
+                              color="success"
+                              type="button"
+                              className="h-8 w-40"
+                              onClick={() =>
+                                navigate(`/project/tasks/activity/${task.taskActivity?.uuid}`)
+                              }
+                            >
+                              Inserir realizado <FontAwesomeIcon icon={faCheck} className="ml-2" />
+                            </Button>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
