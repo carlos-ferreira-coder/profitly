@@ -9,6 +9,7 @@ import axios from 'axios'
 import { handleAxiosError } from '../../../../services/Axios'
 import Alert from '../../../../components/Alert/Index'
 import Loader from '../../../../components/Loader'
+import qs from 'qs'
 
 const Create = () => {
   const { uuid } = useParams()
@@ -18,9 +19,11 @@ const Create = () => {
   useEffect(() => {
     ;(async () => {
       try {
+        const query = { taskExpense: { uuid: [uuid] } }
+
         const {
           data: { 0: resTask },
-        } = await axios.get(`tasks/select/all?taskActivity[0]=${uuid}`, {
+        } = await axios.get(`tasks/select/all?${qs.stringify(query, { encode: false })}`, {
           withCredentials: true,
         })
 

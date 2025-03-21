@@ -328,12 +328,12 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                       <Button
                         color="success"
                         type="button"
-                        className="h-8 w-50"
+                        className="h-8 w-40"
                         onClick={() =>
                           navigate(`/project/tasks/expense/${field.taskExpense?.uuid}`)
                         }
                       >
-                        Inserir realizado <FontAwesomeIcon icon={faCheck} />
+                        Inserir realizado <FontAwesomeIcon icon={faCheck} className="ml-2" />
                       </Button>
                     )}
 
@@ -341,12 +341,12 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                       <Button
                         color="success"
                         type="button"
-                        className="h-8 w-50"
+                        className="h-8 w-40"
                         onClick={() =>
                           navigate(`/project/tasks/activity/${field.taskActivity?.uuid}`)
                         }
                       >
-                        Inserir realizado <FontAwesomeIcon icon={faCheck} />
+                        Inserir realizado <FontAwesomeIcon icon={faCheck} className="ml-2" />
                       </Button>
                     )}
                   </div>

@@ -54,8 +54,8 @@ import ProjectUpdate from './pages/Project/Update/Index'
 import ProjectDelete from './pages/Project/Delete/Index'
 import ProjectBudget from './pages/Project/Budget/Index'
 import ProjectTasks from './pages/Project/Tasks/Index'
-import ProjectDoneExpense from './pages/Project/Tasks/Expense/Index'
-import ProjectDoneActivity from './pages/Project/Tasks/Activity/Index'
+import ProjectExpense from './pages/Project/Tasks/Expense/Index'
+import ProjectActivity from './pages/Project/Tasks/Activity/Index'
 
 export type PageProps = {
   icon: IconProp
@@ -105,7 +105,7 @@ export const pages: PageProps[] = [
     protection: ['logged'],
     useIn: [],
     icon: faQuestion,
-    component: ProjectDoneExpense,
+    component: ProjectExpense,
   },
   {
     title: 'Realizado',
@@ -113,7 +113,7 @@ export const pages: PageProps[] = [
     protection: ['logged'],
     useIn: [],
     icon: faQuestion,
-    component: ProjectDoneActivity,
+    component: ProjectActivity,
   },
   {
     title: 'Cadastrar Projeto',
