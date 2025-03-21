@@ -21,13 +21,13 @@ const Create = () => {
       try {
         const query = { taskExpense: { uuid: [uuid] } }
 
+        console.log(query)
+
         const {
           data: { 0: resTask },
         } = await axios.get(`tasks/select/all?${qs.stringify(query, { encode: false })}`, {
           withCredentials: true,
         })
-
-        console.log(resTask)
 
         setTask(resTask)
       } catch (error) {

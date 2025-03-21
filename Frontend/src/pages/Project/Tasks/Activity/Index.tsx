@@ -21,7 +21,6 @@ const Create = () => {
       try {
         const query = { taskExpense: { uuid: [uuid] } }
 
-        /*
         const {
           data: { 0: resTask },
         } = await axios.get(`tasks/select/all?${qs.stringify(query, { encode: false })}`, {
@@ -29,16 +28,6 @@ const Create = () => {
         })
 
         setTask(resTask)
-          */
-
-        const resTask = await axios.get(
-          `tasks/select/all?${qs.stringify(query, { encode: false })}`,
-          {
-            withCredentials: true,
-          }
-        )
-
-        console.log(resTask)
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])
       }
