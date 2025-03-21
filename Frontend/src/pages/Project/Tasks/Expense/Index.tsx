@@ -33,13 +33,13 @@ const Create = () => {
         setTask(resTask)
         */
 
-        const query = { taskExpense: { uuid: [uuid] } }
-
-        const response = await axios.get(`tasks/select/all`, {
+        const { data: resTask } = await axios.get(`tasks/select/all?taskExpense[uuid][0]=${uuid}`, {
           withCredentials: true,
         })
 
-        console.log(response)
+        console.log(resTask)
+
+        setTask(resTask)
       } catch (error) {
         setAlertErrors([handleAxiosError(error)])
       }
