@@ -36,6 +36,8 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
   const [alertSuccesses, setAlertSuccesses] = useState<(string | JSX.Element)[] | null>(null)
 
+  console.log(tasks)
+
   const getDefaultValues = useCallback(async () => {
     setRequest('request')
 
@@ -181,20 +183,20 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
     return (
       <>
         <p>
-          <b>Total da tarefa: </b> {numberToCurrency(total.task.cost + total.task.revenue, 'BRL')}
+          <b>Total das tarefas: </b> {numberToCurrency(total.task.cost + total.task.revenue, 'BRL')}
         </p>
         <p>
-          <b>Lucro da tarefa: </b> {numberToCurrency(total.task.revenue, 'BRL')}
+          <b>Lucros das tarefas: </b> {numberToCurrency(total.task.revenue, 'BRL')}
         </p>
         <p>
-          <b>Custo da tarefa: </b> {numberToCurrency(total.task.cost, 'BRL')}
+          <b>Custos das tarefas: </b> {numberToCurrency(total.task.cost, 'BRL')}
         </p>
         <p>
-          <b>Lucro realizado: </b>
+          <b>Lucros realizados: </b>
           {numberToCurrency(total.task.cost - total.done.cost + total.task.revenue, 'BRL')}
         </p>
         <p>
-          <b>Custo realizado: </b> {numberToCurrency(total.done.cost, 'BRL')}
+          <b>Custos realizados: </b> {numberToCurrency(total.done.cost, 'BRL')}
         </p>
       </>
     )
@@ -292,15 +294,16 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
 
           {resume && user && status ? (
             fields.map((field, index) => {
-              let total = numberToCurrency(0, 'BRL')
+              const total = {
+                task: 0,
+                done: 0,
+              }
 
               if (field.taskExpense) {
                 if (field.revenue !== '' && field.taskExpense.amount !== '')
-                  total = numberToCurrency(
+                  total.task +=
                     currencyToNumber(field.revenue, 'BRL') +
-                      currencyToNumber(field.taskExpense.amount, 'BRL'),
-                    'BRL'
-                  )
+                    currencyToNumber(field.taskExpense.amount, 'BRL')
               }
 
               if (field.taskActivity) {
@@ -312,15 +315,29 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                   regex.test(field.beginDate) &&
                   regex.test(field.endDate)
                 )
-                  total = numberToCurrency(
+                  total.task =
                     (currencyToNumber(field.revenue, 'BRL') +
                       currencyToNumber(field.taskActivity.hourlyRate, 'BRL')) *
+                    differenceInHours(
+                      parse(field.endDate, 'dd/MM/yy HH:mm', new Date()),
+                      parse(field.beginDate, 'dd/MM/yy HH:mm', new Date())
+                    )
+              }
+
+              if (field.dones) {
+                total.done += field.dones.reduce((sum, done) => {
+                  if (done.doneExpense) sum += currencyToNumber(done.doneExpense.amount, 'BRL')
+
+                  if (done.doneActivity)
+                    sum +=
+                      currencyToNumber(done.doneActivity.hourlyRate, 'BRL') *
                       differenceInHours(
-                        parse(field.endDate, 'dd/MM/yy HH:mm', new Date()),
-                        parse(field.beginDate, 'dd/MM/yy HH:mm', new Date())
-                      ),
-                    'BRL'
-                  )
+                        parse(done.doneActivity.endDate, 'dd/MM/yy HH:mm', new Date()),
+                        parse(done.doneActivity.beginDate, 'dd/MM/yy HH:mm', new Date())
+                      )
+
+                  return sum
+                }, 0)
               }
 
               return (
@@ -344,7 +361,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                         <FontAwesomeIcon icon={resume[index] ? faAngleDown : faAngleUp} />
                       </Button>
 
-                      {field.dones?.length === 0 && (
+                      {!field.dones && (
                         <Button
                           color="danger"
                           type="button"
@@ -390,7 +407,10 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                       <b>Nome: </b> {field.name}
                     </p>
                     <p>
-                      <b>Total: </b> {total}
+                      <b>Total da tarefa: </b> {total.task}
+                    </p>
+                    <p>
+                      <b>Total realizado: </b> {total.done}
                     </p>
                     <p>
                       <b>Status: </b>
