@@ -116,6 +116,7 @@ export type TaskProps = {
   budget: BudgetProps
   taskExpense?: TaskExpenseProps
   taskActivity?: TaskActivityProps
+  dones?: DoneProps[]
 }
 
 export type TaskExpenseProps = {
@@ -136,6 +137,8 @@ export type DoneProps = {
   register: string
   userUuid: string
   user: UserProps
+  doneExpense?: DoneExpenseProps
+  doneActivity?: DoneActivityProps
 }
 
 export type DoneActivityProps = {

@@ -51,11 +51,16 @@ const responseTasks = (tasks: TaskProps[]) => {
               doneExpense: done.doneExpense
                 ? {
                     ...done.doneExpense,
+                    amount: numberToCurrency(done.doneExpense.amount.toNumber(), 'BRL'),
+                    date: formatDate(done.doneExpense.date),
                   }
                 : undefined,
               doneActivity: done.doneActivity
                 ? {
                     ...done.doneActivity,
+                    hourlyRate: numberToCurrency(done.doneActivity.hourlyRate.toNumber(), 'BRL'),
+                    beginDate: formatDate(done.doneActivity.beginDate),
+                    endDate: formatDate(done.doneActivity.endDate),
                   }
                 : undefined,
             }
@@ -85,8 +90,6 @@ export const tasksSelect = async (req: Request, res: Response): Promise<void> =>
       ...query.data,
     }
 
-    console.log(filter)
-
     // server request
     const tasks = await prisma.task.findMany({
       include: {
@@ -114,8 +117,6 @@ export const tasksSelect = async (req: Request, res: Response): Promise<void> =>
           : undefined,
       },
     })
-
-    console.log(tasks)
 
     res.status(200).json(responseTasks(tasks))
     return
@@ -375,7 +376,7 @@ export const tasksUpdate = async (req: Request, res: Response): Promise<void> =>
       }),
     ])
 
-    res.status(201).json({ message: 'As tarefas do orçamento foram atualizadas.' })
+    res.status(201).json({ message: 'As tarefas do projeto foram atualizadas.' })
     return
   } catch (e) {
     console.log(e)

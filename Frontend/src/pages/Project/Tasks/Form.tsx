@@ -136,8 +136,8 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
       (acc, task) => {
         if (task.taskExpense) {
           if (task.revenue !== '' && task.taskExpense.amount !== '') {
-            acc.revenue += currencyToNumber(task.revenue, 'BRL')
-            acc.cost += currencyToNumber(task.taskExpense.amount, 'BRL')
+            acc.task.revenue += currencyToNumber(task.revenue, 'BRL')
+            acc.task.cost += currencyToNumber(task.taskExpense.amount, 'BRL')
           }
         }
 
@@ -154,26 +154,47 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
             const endDate = parse(task.endDate, 'dd/MM/yy HH:mm', new Date())
             const hours = differenceInHours(endDate, beginDate)
 
-            acc.revenue += hours * currencyToNumber(task.revenue, 'BRL')
-            acc.cost += hours * currencyToNumber(task.taskActivity.hourlyRate, 'BRL')
+            acc.task.revenue += hours * currencyToNumber(task.revenue, 'BRL')
+            acc.task.cost += hours * currencyToNumber(task.taskActivity.hourlyRate, 'BRL')
           }
+        }
+
+        if (task.dones) {
+          task.dones.map((done) => {
+            if (done.doneExpense) acc.done.cost += currencyToNumber(done.doneExpense.amount, 'BRL')
+
+            if (done.doneActivity) {
+              const beginDate = parse(done.doneActivity.beginDate, 'dd/MM/yy HH:mm', new Date())
+              const endDate = parse(done.doneActivity.endDate, 'dd/MM/yy HH:mm', new Date())
+              const hours = differenceInHours(endDate, beginDate)
+
+              acc.done.cost += hours * currencyToNumber(done.doneActivity.hourlyRate, 'BRL')
+            }
+          })
         }
 
         return acc
       },
-      { cost: 0, revenue: 0 }
+      { task: { cost: 0, revenue: 0 }, done: { cost: 0 } }
     )
 
     return (
       <>
         <p>
-          <b>Valor Total: </b> {numberToCurrency(total.cost + total.revenue, 'BRL')}
+          <b>Total da tarefa: </b> {numberToCurrency(total.task.cost + total.task.revenue, 'BRL')}
         </p>
         <p>
-          <b>Custo Total: </b> {numberToCurrency(total.cost, 'BRL')}
+          <b>Lucro da tarefa: </b> {numberToCurrency(total.task.revenue, 'BRL')}
         </p>
         <p>
-          <b>Lucro Total: </b> {numberToCurrency(total.revenue, 'BRL')}
+          <b>Custo da tarefa: </b> {numberToCurrency(total.task.cost, 'BRL')}
+        </p>
+        <p>
+          <b>Lucro realizado: </b>
+          {numberToCurrency(total.task.cost - total.done.cost + total.task.revenue, 'BRL')}
+        </p>
+        <p>
+          <b>Custo realizado: </b> {numberToCurrency(total.done.cost, 'BRL')}
         </p>
       </>
     )
