@@ -344,7 +344,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                         <FontAwesomeIcon icon={resume[index] ? faAngleDown : faAngleUp} />
                       </Button>
 
-                      {!field.dones && (
+                      {field.dones?.length === 0 && (
                         <Button
                           color="danger"
                           type="button"

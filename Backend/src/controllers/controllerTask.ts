@@ -44,28 +44,29 @@ const responseTasks = (tasks: TaskProps[]) => {
             hourlyRate: numberToCurrency(task.taskActivity.hourlyRate.toNumber(), 'BRL'),
           }
         : undefined,
-      dones: task.dones
-        ? task.dones.map((done) => {
-            return {
-              ...done,
-              doneExpense: done.doneExpense
-                ? {
-                    ...done.doneExpense,
-                    amount: numberToCurrency(done.doneExpense.amount.toNumber(), 'BRL'),
-                    date: formatDate(done.doneExpense.date),
-                  }
-                : undefined,
-              doneActivity: done.doneActivity
-                ? {
-                    ...done.doneActivity,
-                    hourlyRate: numberToCurrency(done.doneActivity.hourlyRate.toNumber(), 'BRL'),
-                    beginDate: formatDate(done.doneActivity.beginDate),
-                    endDate: formatDate(done.doneActivity.endDate),
-                  }
-                : undefined,
-            }
-          })
-        : undefined,
+      dones:
+        task.dones && task.dones.length > 0
+          ? task.dones.map((done) => {
+              return {
+                ...done,
+                doneExpense: done.doneExpense
+                  ? {
+                      ...done.doneExpense,
+                      amount: numberToCurrency(done.doneExpense.amount.toNumber(), 'BRL'),
+                      date: formatDate(done.doneExpense.date),
+                    }
+                  : undefined,
+                doneActivity: done.doneActivity
+                  ? {
+                      ...done.doneActivity,
+                      hourlyRate: numberToCurrency(done.doneActivity.hourlyRate.toNumber(), 'BRL'),
+                      beginDate: formatDate(done.doneActivity.beginDate),
+                      endDate: formatDate(done.doneActivity.endDate),
+                    }
+                  : undefined,
+              }
+            })
+          : undefined,
     }
   })
 }
