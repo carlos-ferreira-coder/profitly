@@ -11,6 +11,8 @@ import {
   faAngleUp,
   faCalendar,
   faCheck,
+  faCircleCheck,
+  faCircleXmark,
   faDollarSign,
   faThumbTack,
   faTrashCan,
@@ -454,6 +456,11 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                     <p>
                       <b>Nome: </b>
                       {task.name}
+                      {task.finished ? (
+                        <FontAwesomeIcon icon={faCircleCheck} className="ml-2 text-success" />
+                      ) : (
+                        <FontAwesomeIcon icon={faCircleXmark} className="ml-2 text-danger" />
+                      )}
                     </p>
                     <p>
                       <b>Total da tarefa: </b>

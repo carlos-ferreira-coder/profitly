@@ -5,7 +5,12 @@ import Alert from '../../components/Alert/Index'
 import Loader from '../../components/Loader'
 import Button from '../../components/Form/Button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faAngleRight, faXmark } from '@fortawesome/free-solid-svg-icons'
+import {
+  faAngleRight,
+  faCircleCheck,
+  faCircleXmark,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons'
 import { SupplierProps } from '../../types/Database'
 
 const SupplierInfo = ({ supplier }: { supplier: SupplierProps }) => (
@@ -19,6 +24,11 @@ const SupplierInfo = ({ supplier }: { supplier: SupplierProps }) => (
           <p>
             <b>Nome: </b>
             {supplier.enterprise.entity.name}
+            {supplier.active ? (
+              <FontAwesomeIcon icon={faCircleCheck} className="ml-2 text-success" />
+            ) : (
+              <FontAwesomeIcon icon={faCircleXmark} className="ml-2 text-danger" />
+            )}
           </p>
           <p>
             <b>Fantasia: </b>
@@ -38,6 +48,11 @@ const SupplierInfo = ({ supplier }: { supplier: SupplierProps }) => (
           <p>
             <b>Nome: </b>
             {supplier.person.entity.name}
+            {supplier.active ? (
+              <FontAwesomeIcon icon={faCircleCheck} className="ml-2 text-success" />
+            ) : (
+              <FontAwesomeIcon icon={faCircleXmark} className="ml-2 text-danger" />
+            )}
           </p>
           <p>
             <b>CNPJ: </b>

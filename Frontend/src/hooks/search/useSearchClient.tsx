@@ -6,7 +6,12 @@ import Alert from '../../components/Alert/Index'
 import Loader from '../../components/Loader'
 import Button from '../../components/Form/Button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faAngleRight, faXmark } from '@fortawesome/free-solid-svg-icons'
+import {
+  faAngleRight,
+  faCircleCheck,
+  faCircleXmark,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons'
 
 const ClientInfo = ({ client }: { client: ClientProps }) => (
   <>
@@ -19,6 +24,11 @@ const ClientInfo = ({ client }: { client: ClientProps }) => (
           <p>
             <b>Nome: </b>
             {client.enterprise.entity.name}
+            {client.active ? (
+              <FontAwesomeIcon icon={faCircleCheck} className="ml-2 text-success" />
+            ) : (
+              <FontAwesomeIcon icon={faCircleXmark} className="ml-2 text-danger" />
+            )}
           </p>
           <p>
             <b>Fantasia: </b>
@@ -38,6 +48,11 @@ const ClientInfo = ({ client }: { client: ClientProps }) => (
           <p>
             <b>Nome: </b>
             {client.person.entity.name}
+            {client.active ? (
+              <FontAwesomeIcon icon={faCircleCheck} className="ml-2 text-success" />
+            ) : (
+              <FontAwesomeIcon icon={faCircleXmark} className="ml-2 text-danger" />
+            )}
           </p>
           <p>
             <b>CNPJ: </b>

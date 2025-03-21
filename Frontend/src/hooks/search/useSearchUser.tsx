@@ -6,7 +6,12 @@ import Alert from '../../components/Alert/Index'
 import Loader from '../../components/Loader'
 import Button from '../../components/Form/Button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faAngleRight, faXmark } from '@fortawesome/free-solid-svg-icons'
+import {
+  faAngleRight,
+  faCircleCheck,
+  faCircleXmark,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons'
 import { useAuth } from '../../context/AuthContext'
 
 const UserInfo = ({ user, auth }: { user: UserProps; auth: AuthProps }) => (
@@ -17,6 +22,11 @@ const UserInfo = ({ user, auth }: { user: UserProps; auth: AuthProps }) => (
         alt="User"
         className="h-12 w-12 rounded-full object-cover"
       />
+      {user.active ? (
+        <FontAwesomeIcon icon={faCircleCheck} className="ml-2 text-success" />
+      ) : (
+        <FontAwesomeIcon icon={faCircleXmark} className="ml-2 text-danger" />
+      )}
     </div>
 
     <div className="col-span-2 flex flex-col justify-center space-y-1">

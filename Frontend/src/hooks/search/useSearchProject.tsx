@@ -6,13 +6,23 @@ import Alert from '../../components/Alert/Index'
 import Loader from '../../components/Loader'
 import Button from '../../components/Form/Button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faAngleRight, faXmark } from '@fortawesome/free-solid-svg-icons'
+import {
+  faAngleRight,
+  faCircleCheck,
+  faCircleXmark,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons'
 
 const ProjectInfo = ({ project }: { project: ProjectProps }) => (
   <>
     <div className="col-span-5">
       <p>
         <b>Nome: </b> {project.name}
+        {project.active ? (
+          <FontAwesomeIcon icon={faCircleCheck} className="ml-2 text-success" />
+        ) : (
+          <FontAwesomeIcon icon={faCircleXmark} className="ml-2 text-danger" />
+        )}
       </p>
       <p>
         <b>Descrição: </b> {project.description}
