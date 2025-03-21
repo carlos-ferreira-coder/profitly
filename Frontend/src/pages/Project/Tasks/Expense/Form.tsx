@@ -30,6 +30,7 @@ const Form = ({ task }: { task: TaskProps }) => {
     description: task.description,
     userUuid: task.userUuid || undefined,
     doneExpense: {
+      taskUuid: task.taskExpense?.uuid,
       amount: task.taskExpense?.amount,
       date: task.endDate,
       supplierUuid: undefined,
@@ -75,7 +76,7 @@ const Form = ({ task }: { task: TaskProps }) => {
     setAlertSuccesses(null)
 
     try {
-      const response = await axios.post('/project/tasks/expense/create', data, {
+      const response = await axios.post('/tasks/done/create', data, {
         withCredentials: true,
       })
 

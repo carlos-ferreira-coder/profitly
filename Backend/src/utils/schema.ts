@@ -527,3 +527,53 @@ export const budgetTasksUpdateSchema = z.object({
 export const tasksUpdateSchema = z.object({
   tasks: z.array(taskUpdateSchema),
 })
+
+export const doneExpenseSchema = z.object({
+  taskUuid: zodUuid('tarefa de despesa'),
+  amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true).transform((s) =>
+    currencyToNumber(s, 'BRL'),
+  ),
+  date: zodRegex('data', /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/, true).transform(
+    (s) => new Date(s),
+  ),
+  supplierUuid: zodUuid('fornecedor'),
+})
+
+export const doneActivitySchema = z.object({
+  taskUuid: zodUuid('tarefa de despesa'),
+  hourlyRate: zodRegex('valor da hora', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true).transform(
+    (s) => currencyToNumber(s, 'BRL'),
+  ),
+  beginDate: zodRegex('data inicial', /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/, true).transform(
+    (s) => new Date(s),
+  ),
+  endDate: zodRegex('data inicial', /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/, true).transform(
+    (s) => new Date(s),
+  ),
+})
+
+export const doneSchema = z
+  .object({
+    name: zodString('nome', true),
+    description: zodString('descrição', true),
+    userUuid: zodUuid('usuário'),
+    doneExpense: doneExpenseSchema.optional(),
+    doneActivity: doneActivitySchema.optional(),
+  })
+  .superRefine(({ doneExpense, doneActivity }, ctx) => {
+    if (!(doneExpense || doneActivity)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'O realizado precisa ser despesa ou atividade!',
+        path: ['doneExpense', 'doneActivity'],
+      })
+    }
+
+    if (doneExpense && doneActivity) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Cadastre separadamente despesa e atividade!',
+        path: ['doneExpense', 'doneActivity'],
+      })
+    }
+  })

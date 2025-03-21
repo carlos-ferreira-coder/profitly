@@ -28,6 +28,7 @@ const Form = ({ task }: { task: TaskProps }) => {
     description: task.description,
     userUuid: task.userUuid || undefined,
     doneActivity: {
+      taskUuid: task.taskActivity?.uuid,
       hourlyRate: task.taskActivity?.hourlyRate,
       beginDate: task.beginDate,
       endDate: task.endDate,
@@ -68,7 +69,7 @@ const Form = ({ task }: { task: TaskProps }) => {
     setAlertSuccesses(null)
 
     try {
-      const response = await axios.post('/project/tasks/activity/create', data, {
+      const response = await axios.post('/tasks/done/create', data, {
         withCredentials: true,
       })
 

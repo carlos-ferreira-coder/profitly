@@ -440,8 +440,8 @@ export const budgetSchema = z.object({
   tasks: z.array(taskSchema),
 })
 
-export const doneExpenseSchema = z.object({
-  uuid: zodUuid('realizado de despesa'),
+const doneExpenseSchema = z.object({
+  taskUuid: zodUuid('tarefa de despesa'),
   amount: zodRegex('quantia', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
   date: zodRegex(
     'data',
@@ -457,8 +457,8 @@ export const doneExpenseSchema = z.object({
   supplierUuid: zodUuid('fornecedor'),
 })
 
-export const doneActivitySchema = z.object({
-  uuid: zodUuid('realizado de despesa'),
+const doneActivitySchema = z.object({
+  taskUuid: zodUuid('tarefa de despesa'),
   hourlyRate: zodRegex('valor da hora', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
   beginDate: zodRegex(
     'data inicial',

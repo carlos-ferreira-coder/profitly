@@ -1,13 +1,17 @@
 import { Request, Response } from 'express'
 import { prisma } from '@/server'
-import { tasksSelectSchema, tasksUpdateSchema } from '@utils/schema'
+import { doneSchema, tasksSelectSchema, tasksUpdateSchema } from '@utils/schema'
 import { authorization } from '@utils/auth'
-import { TaskExpense, TaskActivity, Task } from '@prisma/client'
+import { TaskExpense, TaskActivity, Task, Done, DoneExpense, DoneActivity } from '@prisma/client'
 import { numberToCurrency } from '@utils/currency'
 
 type TaskProps = Task & {
   taskExpense?: TaskExpense | null
   taskActivity?: TaskActivity | null
+  dones?: (Done & {
+    doneExpense?: DoneExpense | null
+    doneActivity?: DoneActivity | null
+  })[]
 }
 
 const formatDate = (date: Date) => {
@@ -40,6 +44,23 @@ const responseTasks = (tasks: TaskProps[]) => {
             hourlyRate: numberToCurrency(task.taskActivity.hourlyRate.toNumber(), 'BRL'),
           }
         : undefined,
+      dones: task.dones
+        ? task.dones.map((done) => {
+            return {
+              ...done,
+              doneExpense: done.doneExpense
+                ? {
+                    ...done.doneExpense,
+                  }
+                : undefined,
+              doneActivity: done.doneActivity
+                ? {
+                    ...done.doneActivity,
+                  }
+                : undefined,
+            }
+          })
+        : undefined,
     }
   })
 }
@@ -69,6 +90,12 @@ export const tasksSelect = async (req: Request, res: Response): Promise<void> =>
       include: {
         taskExpense: true,
         taskActivity: true,
+        dones: {
+          include: {
+            doneExpense: true,
+            doneActivity: true,
+          },
+        },
       },
       where: {
         projectUuid: filter.projectUuid?.length ? { in: filter.projectUuid } : undefined,
@@ -350,6 +377,75 @@ export const tasksUpdate = async (req: Request, res: Response): Promise<void> =>
     return
   } catch (e) {
     console.log(e)
+    res.status(500).json({ message: 'Erro no servidor!' })
+    return
+  }
+}
+
+export const doneCreate = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // check schema
+    const body = doneSchema.safeParse(req.body)
+    if (!body.success) {
+      res.status(401).json({ message: `Body inválido: ${JSON.stringify(body.error.format())}` })
+      return
+    }
+
+    // check if has user
+    const token = req.user
+    if (!token) {
+      res.status(401).json({ message: 'Token não encontrado!' })
+      return
+    }
+
+    const task = body.data.doneExpense
+      ? await prisma.taskExpense.findUnique({
+          where: { uuid: body.data.doneExpense.taskUuid },
+        })
+      : body.data.doneActivity
+        ? await prisma.taskActivity.findUnique({
+            where: { uuid: body.data.doneActivity.taskUuid },
+          })
+        : undefined
+    if (!task) {
+      res.status(401).json({ message: 'Tarefa não encontrada!' })
+      return
+    }
+
+    const done = await prisma.done.create({
+      data: {
+        name: body.data.name,
+        description: body.data.description,
+        register: new Date(),
+        taskId: task.id,
+        userUuid: body.data.userUuid,
+      },
+    })
+    if (body.data.doneExpense) {
+      await prisma.doneExpense.create({
+        data: {
+          id: done.id,
+          amount: body.data.doneExpense.amount,
+          date: body.data.doneExpense.date,
+          supplierUuid: body.data.doneExpense.supplierUuid,
+        },
+      })
+    }
+    if (body.data.doneActivity) {
+      await prisma.doneActivity.create({
+        data: {
+          id: done.id,
+          beginDate: body.data.doneActivity.beginDate,
+          endDate: body.data.doneActivity.endDate,
+          hourlyRate: body.data.doneActivity.hourlyRate,
+        },
+      })
+    }
+
+    res.status(201).json({ message: 'O realizado da tarefa foi cadastrado.' })
+    return
+  } catch (e) {
+    console.error('Erro no servidor:', e)
     res.status(500).json({ message: 'Erro no servidor!' })
     return
   }
