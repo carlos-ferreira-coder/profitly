@@ -335,8 +335,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
             fields.map((task, index) => {
               let prev = 0,
                 cost = 0,
-                revn = 0,
-                rven = 0
+                revn = 0
 
               const dateRegex = /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{2} ([01]\d|2[0-3]):[0-5]\d$/
               const parseDate = (date: string) => parse(date, 'dd/MM/yy HH:mm', new Date())
@@ -383,11 +382,6 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
 
                   return sum
                 }, 0)
-
-                const prevSafe = prev || 1
-                const ratio = cost / prevSafe
-
-                rven = task.finished || ratio > 1 ? prev + revn - cost : revn * ratio
               }
 
               return (
@@ -458,7 +452,8 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
 
                   <div className={resume[index] ? 'block' : 'hidden'}>
                     <p>
-                      <b>Nome: </b> {task.name}
+                      <b>Nome: </b>
+                      {task.name}
                     </p>
                     <p>
                       <b>Total da tarefa: </b>
@@ -466,7 +461,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                     </p>
                     <p>
                       <b>Total realizado: </b>
-                      {numberToCurrency(cost + rven, 'BRL')}
+                      {numberToCurrency(cost + revn, 'BRL')}
                     </p>
                     <p>
                       <b>Status: </b>
