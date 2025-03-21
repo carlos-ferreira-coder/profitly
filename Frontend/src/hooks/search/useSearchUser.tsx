@@ -28,13 +28,13 @@ const UserInfo = ({ user, auth }: { user: UserProps; auth: AuthProps }) => (
       </p>
     </div>
 
-    {auth.financial && user.hourlyRate && (
-      <div className="col-span-2 flex flex-col justify-center space-y-1">
+    <div className="col-span-2 flex flex-col justify-center space-y-1">
+      {auth.financial && user.hourlyRate && (
         <p>
           <b>Valor da hora: </b> {user.hourlyRate}
         </p>
-      </div>
-    )}
+      )}
+    </div>
   </>
 )
 

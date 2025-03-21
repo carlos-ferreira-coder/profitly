@@ -5,8 +5,7 @@ import Logo from '../../../../images/logo/logo.png'
 import Form from './Form'
 import { useEffect, useState } from 'react'
 import { TaskProps } from '../../../../types/Database'
-import axios from 'axios'
-import { handleAxiosError } from '../../../../services/Axios'
+import { api as axios, handleAxiosError } from '../../../../services/Axios'
 import Alert from '../../../../components/Alert/Index'
 import Loader from '../../../../components/Loader'
 import qs from 'qs'
@@ -19,7 +18,7 @@ const Create = () => {
   useEffect(() => {
     ;(async () => {
       try {
-        const query = { taskExpense: { uuid: [uuid] } }
+        const query = { taskActivity: { uuid: [uuid] } }
 
         const {
           data: { 0: resTask },
