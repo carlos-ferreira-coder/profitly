@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, Controller, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { supplierCreateSchema } from '../../../hooks/useSchema'
@@ -18,7 +18,7 @@ import {
   faUser,
   faUserTie,
 } from '@fortawesome/free-solid-svg-icons'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 const Form = () => {
   const navigate = useNavigate()
@@ -30,33 +30,35 @@ const Form = () => {
   const schema = supplierCreateSchema
   type SchemaProps = z.infer<typeof schema>
 
-  const defaultValues = {
-    active: true,
-    type: 'enterprise',
-    person: {
-      cpf: '',
-      entity: {
-        name: '',
-        email: '',
-        phone: '',
-        address: '',
+  const defaultValues = useMemo(
+    () => ({
+      active: true,
+      type: 'enterprise',
+      person: {
+        cpf: '',
+        entity: {
+          name: '',
+          email: '',
+          phone: '',
+          address: '',
+        },
       },
-    },
-    enterprise: {
-      cnpj: '',
-      fantasy: '',
-      entity: {
-        name: '',
-        email: '',
-        phone: '',
-        address: '',
+      enterprise: {
+        cnpj: '',
+        fantasy: '',
+        entity: {
+          name: '',
+          email: '',
+          phone: '',
+          address: '',
+        },
       },
-    },
-  }
+    }),
+    []
+  )
 
   // Hookform
   const {
-    watch,
     reset,
     control,
     register,
@@ -71,19 +73,21 @@ const Form = () => {
     },
   })
 
+  const type = useWatch({ control, name: 'type' })
+  const person = useWatch({ control, name: 'person' })
+  const enterprise = useWatch({ control, name: 'enterprise' })
+
   useEffect(() => {
-    if (watch('type') === 'person') {
+    if (type === 'person') {
       setValue('person', { ...defaultValues.person })
       setValue('enterprise', undefined)
     }
 
-    if (watch('type') === 'enterprise') {
+    if (type === 'enterprise') {
       setValue('person', undefined)
       setValue('enterprise', { ...defaultValues.enterprise })
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watch('type')])
+  }, [type, setValue, defaultValues])
 
   // Handle reset
   const handleReset = () => {
@@ -148,7 +152,7 @@ const Form = () => {
       </div>
 
       <div className="flex justify-between gap-5 mb-6">
-        {watch('person') && (
+        {person && (
           <div className="w-full">
             <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="cpf">
               CPF <span className="text-danger">*</span>
@@ -176,7 +180,7 @@ const Form = () => {
           </div>
         )}
 
-        {watch('enterprise') && (
+        {enterprise && (
           <div className="w-full">
             <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="cnpj">
               CNPJ <span className="text-danger">*</span>
@@ -229,7 +233,7 @@ const Form = () => {
           Nome <span className="text-danger">*</span>
         </label>
         <div className="relative">
-          {watch('person') && (
+          {person && (
             <Input
               id="name"
               type="text"
@@ -240,7 +244,7 @@ const Form = () => {
             />
           )}
 
-          {watch('enterprise') && (
+          {enterprise && (
             <Input
               id="name"
               type="text"
@@ -259,7 +263,7 @@ const Form = () => {
         )}
       </div>
 
-      {watch('enterprise') && (
+      {enterprise && (
         <div className="mb-6">
           <label className="mb-2.5 block font-medium text-black dark:text-white" htmlFor="fantasy">
             Nome fantasia <span className="text-danger">*</span>
@@ -285,7 +289,7 @@ const Form = () => {
           Email <span className="text-danger">*</span>
         </label>
         <div className="relative">
-          {watch('person') && (
+          {person && (
             <Input
               id="email"
               type="text"
@@ -296,7 +300,7 @@ const Form = () => {
               placeholder="Digite o email"
             />
           )}
-          {watch('enterprise') && (
+          {enterprise && (
             <Input
               id="email"
               type="text"
@@ -321,7 +325,7 @@ const Form = () => {
           Contato <span className="text-slate-400">?</span>
         </label>
         <div className="relative">
-          {watch('person') && (
+          {person && (
             <Controller
               name="person.entity.phone"
               control={control}
@@ -339,7 +343,7 @@ const Form = () => {
               )}
             />
           )}
-          {watch('enterprise') && (
+          {enterprise && (
             <Controller
               name="enterprise.entity.phone"
               control={control}
@@ -371,7 +375,7 @@ const Form = () => {
           Endereço <span className="text-slate-400">?</span>
         </label>
         <div className="relative">
-          {watch('person') && (
+          {person && (
             <Input
               id="address"
               type="text"
@@ -381,7 +385,7 @@ const Form = () => {
               placeholder="Digite o endereço"
             />
           )}
-          {watch('enterprise') && (
+          {enterprise && (
             <Input
               id="address"
               type="text"

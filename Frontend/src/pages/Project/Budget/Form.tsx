@@ -15,7 +15,7 @@ import {
   faTrashCan,
 } from '@fortawesome/free-solid-svg-icons'
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SearchUser from '../../../hooks/search/useSearchUser'
 import { currencyToNumber, numberToCurrency } from '../../../hooks/useCurrency'
@@ -35,7 +35,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
   const [alertSuccesses, setAlertSuccesses] = useState<(string | JSX.Element)[] | null>(null)
 
-  const getDefaultValues = async () => {
+  const getDefaultValues = useCallback(async () => {
     setRequest('request')
 
     try {
@@ -65,13 +65,11 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
     }
 
     setRequest('idle')
-  }
+  }, [budget.tasks])
 
   useEffect(() => {
     getDefaultValues()
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [getDefaultValues])
 
   // Budget schema
   const schema = budgetSchema

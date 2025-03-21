@@ -10,12 +10,13 @@ import {
   faAngleDown,
   faAngleUp,
   faCalendar,
+  faCheck,
   faDollarSign,
   faThumbTack,
   faTrashCan,
 } from '@fortawesome/free-solid-svg-icons'
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { currencyToNumber, numberToCurrency } from '../../../hooks/useCurrency'
 import { differenceInHours, parse } from 'date-fns'
@@ -35,7 +36,7 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
   const [alertSuccesses, setAlertSuccesses] = useState<(string | JSX.Element)[] | null>(null)
 
-  const getDefaultValues = async () => {
+  const getDefaultValues = useCallback(async () => {
     setRequest('request')
 
     try {
@@ -65,13 +66,11 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
     }
 
     setRequest('idle')
-  }
+  }, [tasks])
 
   useEffect(() => {
     getDefaultValues()
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [getDefaultValues])
 
   // Tasks schema
   const schema = tasksSchema
@@ -310,19 +309,47 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                   key={field.id}
                   className="my-8 p-3 text-black dark:text-white shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
                 >
-                  <Button
-                    color="primary"
-                    type="button"
-                    className="w-8 h-8"
-                    onClick={() =>
-                      setResume(
-                        (prevResume) =>
-                          prevResume && prevResume.map((r, i) => (i === index ? !r : r))
-                      )
-                    }
-                  >
-                    <FontAwesomeIcon icon={resume[index] ? faAngleDown : faAngleUp} />
-                  </Button>
+                  <div>
+                    <Button
+                      color="primary"
+                      type="button"
+                      className="h-8 w-8"
+                      onClick={() =>
+                        setResume(
+                          (prevResume) =>
+                            prevResume && prevResume.map((r, i) => (i === index ? !r : r))
+                        )
+                      }
+                    >
+                      <FontAwesomeIcon icon={resume[index] ? faAngleDown : faAngleUp} />
+                    </Button>
+
+                    {field.taskExpense && (
+                      <Button
+                        color="success"
+                        type="button"
+                        className="h-8 w-20"
+                        onClick={() =>
+                          navigate(`/project/tasks/expense/${field.taskExpense?.uuid}`)
+                        }
+                      >
+                        Inserir realizado <FontAwesomeIcon icon={faCheck} />
+                      </Button>
+                    )}
+
+                    {field.taskActivity && (
+                      <Button
+                        color="success"
+                        type="button"
+                        className="h-8 w-20"
+                        onClick={() =>
+                          navigate(`/project/tasks/activity/${field.taskActivity?.uuid}`)
+                        }
+                      >
+                        Inserir realizado <FontAwesomeIcon icon={faCheck} />
+                      </Button>
+                    )}
+                  </div>
 
                   <div className={resume[index] ? 'block' : 'hidden'}>
                     <p>

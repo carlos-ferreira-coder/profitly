@@ -194,6 +194,7 @@ export const tasksUpdate = async (req: Request, res: Response): Promise<void> =>
           task: {
             budgetUuid: null,
             projectUuid: projectUuid,
+            dones: { none: {} },
           },
         },
       }),
@@ -203,6 +204,7 @@ export const tasksUpdate = async (req: Request, res: Response): Promise<void> =>
           task: {
             budgetUuid: null,
             projectUuid: projectUuid,
+            dones: { none: {} },
           },
         },
       }),

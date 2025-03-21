@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -24,8 +24,6 @@ const Form = () => {
   const [alertSuccesses, setAlertSuccesses] = useState<(string | JSX.Element)[] | null>(null)
 
   useEffect(() => {
-    // TODO verificar se login sobre login da erro
-
     // Set alerts
     ;['errors', 'warnings', 'successes'].forEach((item) => {
       const message = sessionStorage.getItem(item)
@@ -66,13 +64,13 @@ const Form = () => {
     defaultValues: defaultValues,
   })
 
+  const type = useWatch({ control, name: 'type' })
+
   useEffect(() => {
     setValue('cpf', undefined)
     setValue('email', undefined)
     setValue('username', undefined)
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watch('type')])
+  }, [type, setValue])
 
   // Login on server
   const login = async (data: SchemaProps) => {
