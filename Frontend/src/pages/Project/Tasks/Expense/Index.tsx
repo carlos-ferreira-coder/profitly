@@ -21,7 +21,7 @@ const Create = () => {
       try {
         const query = { taskExpense: { uuid: [uuid] } }
 
-        console.log(query)
+        console.log(qs.stringify(query, { encode: false }))
 
         const {
           data: { 0: resTask },
