@@ -134,35 +134,43 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
       control,
     })
 
+    const dateRegex = /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{2} ([01]\d|2[0-3]):[0-5]\d$/
+    const parseDate = (date: string) => parse(date, 'dd/MM/yy HH:mm', new Date())
+    const getHoursDiff = (start: string, end: string) => {
+      const startDate = parseDate(start)
+      const endDate = parseDate(end)
+      return startDate && endDate ? differenceInHours(endDate, startDate) : 0
+    }
+
     const total = tasks.reduce(
       (acc, task) => {
-        let prev = 0
-        let cost = 0
-        let revn = 0
+        let prev = 0,
+          cost = 0,
+          revn = 0
 
         if (task.taskExpense) {
-          if (task.revenue !== '' && task.taskExpense.amount !== '') {
-            prev = currencyToNumber(task.taskExpense.amount, 'BRL')
-            revn = currencyToNumber(task.revenue, 'BRL')
+          const revenue = currencyToNumber(task.revenue, 'BRL')
+          const amount = currencyToNumber(task.taskExpense.amount, 'BRL')
+
+          if (amount && revenue) {
+            prev = amount
+            revn = revenue
           }
         }
 
         if (task.taskActivity) {
-          const regex = /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{2} ([01]\d|2[0-3]):[0-5]\d$/
+          const revenue = currencyToNumber(task.revenue, 'BRL')
+          const hourlyRate = currencyToNumber(task.taskActivity.hourlyRate, 'BRL')
 
           if (
-            regex.test(task.beginDate) &&
-            regex.test(task.endDate) &&
-            task.revenue !== '' &&
-            task.taskActivity.hourlyRate !== ''
+            revenue &&
+            hourlyRate &&
+            dateRegex.test(task.beginDate) &&
+            dateRegex.test(task.endDate)
           ) {
-            const hours = differenceInHours(
-              parse(task.endDate, 'dd/MM/yy HH:mm', new Date()),
-              parse(task.beginDate, 'dd/MM/yy HH:mm', new Date())
-            )
-
-            prev = hours * currencyToNumber(task.taskActivity.hourlyRate, 'BRL')
-            revn = hours * currencyToNumber(task.revenue, 'BRL')
+            const hours = getHoursDiff(task.beginDate, task.endDate)
+            prev = hours * hourlyRate
+            revn = hours * revenue
           }
         }
 
@@ -176,20 +184,16 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
             if (done.doneActivity)
               sum +=
                 currencyToNumber(done.doneActivity.hourlyRate, 'BRL') *
-                differenceInHours(
-                  parse(done.doneActivity.endDate, 'dd/MM/yy HH:mm', new Date()),
-                  parse(done.doneActivity.beginDate, 'dd/MM/yy HH:mm', new Date())
-                )
+                getHoursDiff(done.doneActivity.beginDate, done.doneActivity.endDate)
 
             return sum
           }, 0)
 
+          const prevSafe = prev || 1
+          const ratio = cost / prevSafe
+
           acc.dones.cost += cost
-          if (task.finished || cost / prev > 1) {
-            acc.dones.revn += prev + revn - cost
-          } else {
-            acc.dones.revn += revn * (cost / prev)
-          }
+          acc.dones.revn += task.finished || ratio > 1 ? prev + revn - cost : revn * ratio
         }
 
         return acc
@@ -329,34 +333,42 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
 
           {resume && user && status ? (
             fields.map((task, index) => {
-              let prev = 0
-              let cost = 0
-              let revn = 0
-              let rven = 0
+              let prev = 0,
+                cost = 0,
+                revn = 0,
+                rven = 0
+
+              const dateRegex = /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{2} ([01]\d|2[0-3]):[0-5]\d$/
+              const parseDate = (date: string) => parse(date, 'dd/MM/yy HH:mm', new Date())
+              const getHoursDiff = (start: string, end: string) => {
+                const startDate = parseDate(start)
+                const endDate = parseDate(end)
+                return startDate && endDate ? differenceInHours(endDate, startDate) : 0
+              }
 
               if (task.taskExpense) {
-                if (task.revenue !== '' && task.taskExpense.amount !== '') {
-                  prev = currencyToNumber(task.taskExpense.amount, 'BRL')
-                  revn = currencyToNumber(task.revenue, 'BRL')
+                const revenue = currencyToNumber(task.revenue, 'BRL')
+                const amount = currencyToNumber(task.taskExpense.amount, 'BRL')
+
+                if (amount && revenue) {
+                  prev = amount
+                  revn = revenue
                 }
               }
 
               if (task.taskActivity) {
-                const regex = /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{2} ([01]\d|2[0-3]):[0-5]\d$/
+                const revenue = currencyToNumber(task.revenue, 'BRL')
+                const hourlyRate = currencyToNumber(task.taskActivity.hourlyRate, 'BRL')
 
                 if (
-                  task.revenue !== '' &&
-                  task.taskActivity.hourlyRate !== '' &&
-                  regex.test(task.beginDate) &&
-                  regex.test(task.endDate)
+                  revenue &&
+                  hourlyRate &&
+                  dateRegex.test(task.beginDate) &&
+                  dateRegex.test(task.endDate)
                 ) {
-                  const hours = differenceInHours(
-                    parse(task.endDate, 'dd/MM/yy HH:mm', new Date()),
-                    parse(task.beginDate, 'dd/MM/yy HH:mm', new Date())
-                  )
-
-                  prev = hours * currencyToNumber(task.taskActivity.hourlyRate, 'BRL')
-                  revn = hours * currencyToNumber(task.revenue, 'BRL')
+                  const hours = getHoursDiff(task.beginDate, task.endDate)
+                  prev = hours * hourlyRate
+                  revn = hours * revenue
                 }
               }
 
@@ -367,19 +379,15 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                   if (done.doneActivity)
                     sum +=
                       currencyToNumber(done.doneActivity.hourlyRate, 'BRL') *
-                      differenceInHours(
-                        parse(done.doneActivity.endDate, 'dd/MM/yy HH:mm', new Date()),
-                        parse(done.doneActivity.beginDate, 'dd/MM/yy HH:mm', new Date())
-                      )
+                      getHoursDiff(done.doneActivity.beginDate, done.doneActivity.endDate)
 
                   return sum
                 }, 0)
 
-                if (task.finished || cost / prev > 1) {
-                  rven = prev + revn - cost
-                } else {
-                  rven = revn * (cost / prev)
-                }
+                const prevSafe = prev || 1
+                const ratio = cost / prevSafe
+
+                rven = task.finished || ratio > 1 ? prev + revn - cost : revn * ratio
               }
 
               return (
