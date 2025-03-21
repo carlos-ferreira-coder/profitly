@@ -128,18 +128,17 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
   }
 
   const Total = ({ control }: { control: Control<SchemaProps> }) => {
-    const tasks =
-      useWatch({
-        name: 'tasks',
-        control,
-      }) || []
+    const tasks = useWatch({
+      name: 'tasks',
+      control,
+    })
 
     const total = tasks.reduce(
       (acc, task) => {
         if (task.taskExpense) {
           if (task.revenue !== '' && task.taskExpense.amount !== '') {
-            acc.revenue += currencyToNumber(task.revenue, 'BRL')
             acc.cost += currencyToNumber(task.taskExpense.amount, 'BRL')
+            acc.revn += currencyToNumber(task.revenue, 'BRL')
           }
         }
 
@@ -152,30 +151,37 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
             task.revenue !== '' &&
             task.taskActivity.hourlyRate !== ''
           ) {
-            const beginDate = parse(task.beginDate, 'dd/MM/yy HH:mm', new Date())
-            const endDate = parse(task.endDate, 'dd/MM/yy HH:mm', new Date())
-            const hours = differenceInHours(endDate, beginDate)
+            const hours = differenceInHours(
+              parse(task.endDate, 'dd/MM/yy HH:mm', new Date()),
+              parse(task.beginDate, 'dd/MM/yy HH:mm', new Date())
+            )
 
-            acc.revenue += hours * currencyToNumber(task.revenue, 'BRL')
             acc.cost += hours * currencyToNumber(task.taskActivity.hourlyRate, 'BRL')
+            acc.revn += hours * currencyToNumber(task.revenue, 'BRL')
           }
         }
 
         return acc
       },
-      { cost: 0, revenue: 0 }
+      {
+        cost: 0,
+        revn: 0,
+      }
     )
 
     return (
       <>
         <p>
-          <b>Valor Total: </b> {numberToCurrency(total.cost + total.revenue, 'BRL')}
+          <b>Total das tarefas: </b>
+          {numberToCurrency(total.cost + total.revn, 'BRL')}
         </p>
         <p>
-          <b>Custo Total: </b> {numberToCurrency(total.cost, 'BRL')}
+          <b>Custos das tarefas: </b>
+          {numberToCurrency(total.cost, 'BRL')}
         </p>
         <p>
-          <b>Lucro Total: </b> {numberToCurrency(total.revenue, 'BRL')}
+          <b>Lucros das tarefas: </b>
+          {numberToCurrency(total.revn, 'BRL')}
         </p>
       </>
     )
@@ -279,41 +285,39 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
           </div>
 
           {resume && user && status ? (
-            fields.map((field, index) => {
-              let total = numberToCurrency(0, 'BRL')
+            fields.map((task, index) => {
+              let prev = 0
+              let revn = 0
 
-              if (field.taskExpense) {
-                if (field.revenue !== '' && field.taskExpense.amount !== '')
-                  total = numberToCurrency(
-                    currencyToNumber(field.revenue, 'BRL') +
-                      currencyToNumber(field.taskExpense.amount, 'BRL'),
-                    'BRL'
-                  )
+              if (task.taskExpense) {
+                if (task.revenue !== '' && task.taskExpense.amount !== '') {
+                  prev = currencyToNumber(task.taskExpense.amount, 'BRL')
+                  revn = currencyToNumber(task.revenue, 'BRL')
+                }
               }
 
-              if (field.taskActivity) {
+              if (task.taskActivity) {
                 const regex = /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{2} ([01]\d|2[0-3]):[0-5]\d$/
 
                 if (
-                  field.revenue !== '' &&
-                  field.taskActivity.hourlyRate !== '' &&
-                  regex.test(field.beginDate) &&
-                  regex.test(field.endDate)
-                )
-                  total = numberToCurrency(
-                    (currencyToNumber(field.revenue, 'BRL') +
-                      currencyToNumber(field.taskActivity.hourlyRate, 'BRL')) *
-                      differenceInHours(
-                        parse(field.endDate, 'dd/MM/yy HH:mm', new Date()),
-                        parse(field.beginDate, 'dd/MM/yy HH:mm', new Date())
-                      ),
-                    'BRL'
+                  task.revenue !== '' &&
+                  task.taskActivity.hourlyRate !== '' &&
+                  regex.test(task.beginDate) &&
+                  regex.test(task.endDate)
+                ) {
+                  const hours = differenceInHours(
+                    parse(task.endDate, 'dd/MM/yy HH:mm', new Date()),
+                    parse(task.beginDate, 'dd/MM/yy HH:mm', new Date())
                   )
+
+                  prev = hours * currencyToNumber(task.taskActivity.hourlyRate, 'BRL')
+                  revn = hours * currencyToNumber(task.revenue, 'BRL')
+                }
               }
 
               return (
                 <div
-                  key={field.id}
+                  key={task.id}
                   className="my-8 p-3 text-black dark:text-white shadow-1 rounded-md border border-stroke dark:border-strokedark dark:bg-form-input/50"
                 >
                   <div className="flex justify-between mb-3">
@@ -343,10 +347,10 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
 
                   <div className={resume[index] ? 'block' : 'hidden'}>
                     <p>
-                      <b>Nome: </b> {field.name}
+                      <b>Nome: </b> {task.name}
                     </p>
                     <p>
-                      <b>Total: </b> {total}
+                      <b>Total: </b> {numberToCurrency(prev + revn, 'BRL')}
                     </p>
                     <p>
                       <b>Status: </b>
@@ -384,7 +388,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                       />
                     )}
 
-                    {field.taskExpense && (
+                    {task.taskExpense && (
                       <Input
                         id={`tasks.${index}.taskExpense.uuid`}
                         type="text"
@@ -394,7 +398,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                       />
                     )}
 
-                    {field.taskActivity && (
+                    {task.taskActivity && (
                       <Input
                         id={`tasks.${index}.taskActivity.uuid`}
                         type="text"
@@ -559,7 +563,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                       )}
                     </div>
 
-                    {field.taskExpense && (
+                    {task.taskExpense && (
                       <div className="mb-6">
                         <label
                           className="mb-2.5 block font-medium text-black dark:text-white"
@@ -598,7 +602,7 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                       </div>
                     )}
 
-                    {field.taskActivity && (
+                    {task.taskActivity && (
                       <div className="mb-6">
                         <label
                           className="mb-2.5 block font-medium text-black dark:text-white"
