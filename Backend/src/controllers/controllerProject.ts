@@ -195,9 +195,7 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
       )
 
       console.log('tasks')
-      console.log(project.tasks)
-      console.log('tasks !budget')
-      console.log(project.tasks.filter(({ budgetUuid }) => !budgetUuid))
+      console.log(project.tasks.filter(({ budgetUuid, dones }) => !budgetUuid && dones.length > 0))
 
       const tasks = project.tasks
         .filter(({ budgetUuid, dones }) => !budgetUuid && dones.length > 0)
