@@ -230,7 +230,7 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
 
             if (!task.originalTaskId) {
               const ratio = cost / (prev || 1)
-              unforeseen = !task.finished || ratio < 1 ? cost * ratio : cost
+              unforeseen = task.finished || ratio >= 1 ? cost : cost * ratio
             }
 
             const ratio = cost / (prev || 1)
@@ -238,9 +238,9 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
             acc.cost += cost
             acc.revn += unforeseen
               ? -unforeseen
-              : !task.finished || ratio < 1
-                ? revn * ratio
-                : prev - cost
+              : task.finished || ratio >= 1
+                ? prev - cost
+                : revn * ratio
 
             return acc
           },
