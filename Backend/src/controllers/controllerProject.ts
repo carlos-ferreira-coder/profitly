@@ -229,8 +229,8 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
 
             const ratio = cost / (prev || 1)
 
-            acc.cost = cost
-            acc.revn = !task.finished || ratio < 1 ? revn * ratio : prev - cost
+            acc.cost += cost
+            acc.revn += !task.finished || ratio < 1 ? revn * ratio : prev - cost
 
             return acc
           },
