@@ -38,8 +38,6 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
   const [alertErrors, setAlertErrors] = useState<(string | JSX.Element)[] | null>(null)
   const [alertSuccesses, setAlertSuccesses] = useState<(string | JSX.Element)[] | null>(null)
 
-  console.log(tasks)
-
   const getDefaultValues = useCallback(async () => {
     setRequest('request')
 
