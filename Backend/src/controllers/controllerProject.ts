@@ -200,7 +200,8 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
           (acc, task) => {
             let prev = 0,
               cost = 0,
-              revn = 0
+              revn = 0,
+              unforeseen: number | undefined = undefined
 
             if (task.taskExpense) {
               prev = task.taskExpense.amount.toNumber()
@@ -227,10 +228,19 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
                 return sum
               }, 0)
 
+            if (!task.originalTaskId) {
+              const ratio = cost / (prev || 1)
+              unforeseen = !task.finished || ratio < 1 ? cost * ratio : cost
+            }
+
             const ratio = cost / (prev || 1)
 
             acc.cost += cost
-            acc.revn += !task.finished || ratio < 1 ? revn * ratio : prev - cost
+            acc.revn += unforeseen
+              ? -unforeseen
+              : !task.finished || ratio < 1
+                ? revn * ratio
+                : prev - cost
 
             return acc
           },
