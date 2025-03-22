@@ -200,7 +200,7 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
       console.log(project.tasks.filter(({ budgetUuid }) => !budgetUuid))
 
       const tasks = project.tasks
-        .filter(({ budgetUuid }) => !budgetUuid)
+        .filter(({ budgetUuid, dones }) => !budgetUuid && dones.length > 0)
         .reduce(
           (acc, task) => {
             let prev = 0,
