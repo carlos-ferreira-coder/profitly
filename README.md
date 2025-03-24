@@ -1,10 +1,10 @@
 # Profitly - Gestão de Projetos e Lucratividade 📊💰
 
-**Profitly** é uma plataforma web para gestão de projetos, com foco na análise da lucratividade. O sistema permite cadastrar projetos, acompanhar receitas e despesas e calcular automaticamente o lucro obtido.
+**Profitly[text](https://profitly.onrender.com/)** é uma plataforma web para gestão de projetos, com foco na análise da lucratividade. O sistema permite cadastrar projetos, acompanhar receitas e despesas e calcular automaticamente o lucro obtido.
 
 ## 🚀 Tecnologias Utilizadas
 
-- **Frontend:** React, Tailwind, Zod, Axios, FontAwesome, Qs e Hookform
+- **Frontend:** Vite, React, Tailwind, Zod, Axios, FontAwesome, Qs e Hookform
 - **Backend:** Node.js, Prisma, Zod e Axios
 - **Banco de Dados:** PostgreSQL
 - **Autenticação:** JWT
