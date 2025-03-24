@@ -71,7 +71,7 @@ export const pages: PageProps[] = [
     title: 'Home',
     route: '/home',
     protection: ['logged'],
-    useIn: ['Navigate'],
+    useIn: [], //['Navigate'],
     icon: faHouse,
     component: Home,
   },
