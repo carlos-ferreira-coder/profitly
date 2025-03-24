@@ -6,10 +6,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
-    allowedHosts: [process.env.DOMAIN || ''],
+    allowedHosts: [process.env.REACT_APP_DOMAIN || ''],
     proxy: {
       '/api': {
-        target: process.env.SERVER_DOMAIN || '',
+        target: process.env.REACT_APP_SERVER_DOMAIN || '',
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
