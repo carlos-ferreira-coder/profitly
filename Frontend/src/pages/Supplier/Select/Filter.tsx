@@ -1,5 +1,5 @@
 import Button from '../../../components/Form/Button'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Input, InputPattern } from '../../../components/Form/Input'
 import { Checkbox } from '../../../components/Form/Checkbox'
@@ -12,6 +12,7 @@ import {
   faUser,
   faUserTie,
 } from '@fortawesome/free-solid-svg-icons'
+import { useEffect, useMemo } from 'react'
 
 const Filter = ({
   filtering,
@@ -37,63 +38,88 @@ const Filter = ({
       name: string
       value: boolean
     }[]
-    person: {
-      cpf: string
-      entity: {
-        name: string
-        email: string
-        phone: string
-        address: string
-      }
-    }
-    enterprise: {
-      cnpj: string
-      fantasy: string
-      entity: {
-        name: string
-        email: string
-        phone: string
-        address: string
-      }
-    }
+    person:
+      | {
+          cpf: string
+          entity: {
+            name: string
+            email: string
+            phone: string
+            address: string
+          }
+        }
+      | undefined
+    enterprise:
+      | {
+          cnpj: string
+          fantasy: string
+          entity: {
+            name: string
+            email: string
+            phone: string
+            address: string
+          }
+        }
+      | undefined
   }
 
-  const defaultValues = {
-    allType: true,
-    type: [
-      { key: 'person', name: 'Person', value: true },
-      { key: 'enterprise', name: 'Enterprise', value: true },
-    ],
-    allActive: true,
-    active: [
-      { key: true, name: 'active', value: true },
-      { key: false, name: 'inactive', value: true },
-    ],
-    person: {
-      cpf: '',
-      entity: {
-        name: '',
-        email: '',
-        phone: '',
-        address: '',
+  const defaultValues = useMemo(
+    () => ({
+      allType: true,
+      type: [
+        { key: 'person', name: 'Person', value: true },
+        { key: 'enterprise', name: 'Enterprise', value: true },
+      ],
+      allActive: true,
+      active: [
+        { key: true, name: 'active', value: true },
+        { key: false, name: 'inactive', value: true },
+      ],
+      person: {
+        cpf: '',
+        entity: {
+          name: '',
+          email: '',
+          phone: '',
+          address: '',
+        },
       },
-    },
-    enterprise: {
-      cnpj: '',
-      fantasy: '',
-      entity: {
-        name: '',
-        email: '',
-        phone: '',
-        address: '',
+      enterprise: {
+        cnpj: '',
+        fantasy: '',
+        entity: {
+          name: '',
+          email: '',
+          phone: '',
+          address: '',
+        },
       },
-    },
-  }
+    }),
+    []
+  )
 
   // Hookform
-  const { watch, reset, control, register, setValue, handleSubmit } = useForm<FilterProps>({
+  const { reset, control, register, setValue, handleSubmit } = useForm<FilterProps>({
     defaultValues: defaultValues,
   })
+
+  const type = useWatch({ control, name: 'type' })
+    .filter(({ value }) => value)
+    .map(({ key }) => key)
+
+  useEffect(() => {
+    if (type.includes('person')) {
+      setValue('person', { ...defaultValues.person })
+    } else {
+      setValue('person', undefined)
+    }
+
+    if (type.includes('enterprise')) {
+      setValue('enterprise', { ...defaultValues.enterprise })
+    } else {
+      setValue('enterprise', undefined)
+    }
+  }, [type, setValue, defaultValues])
 
   // Handle reset
   const handleReset = () => {
@@ -111,6 +137,7 @@ const Filter = ({
       active: data.active.filter(({ value }) => value).map(({ key }) => key),
       person:
         data.type.filter(({ key, value }) => key === 'person' && value) &&
+        data.person &&
         (data.person.cpf || Object.values(data.person.entity).some((value) => value !== ''))
           ? {
               cpf: data.person.cpf,
@@ -124,6 +151,7 @@ const Filter = ({
           : undefined,
       enterprise:
         data.type.filter(({ key, value }) => key === 'enterprise' && value) &&
+        data.enterprise &&
         (data.enterprise.cnpj ||
           data.enterprise.fantasy ||
           Object.values(data.enterprise.entity).some((value) => value !== ''))
@@ -236,7 +264,7 @@ const Filter = ({
           </div>
         </div>
 
-        {watch('type.0.value') && (
+        {type.includes('person') && !type.includes('enterprise') && (
           <div className="mb-5.5">
             <label
               htmlFor="cpf"
@@ -263,7 +291,7 @@ const Filter = ({
           </div>
         )}
 
-        {watch('type.1.value') && (
+        {!type.includes('person') && type.includes('enterprise') && (
           <div className="mb-5.5">
             <label
               htmlFor="cnpj"
@@ -290,36 +318,38 @@ const Filter = ({
           </div>
         )}
 
-        <div className="mb-5.5">
-          <label
-            htmlFor="name"
-            className="mb-3 block text-sm font-medium text-black dark:text-white"
-          >
-            Nome
-          </label>
-          <div className="relative">
-            {watch('type.0.value') && (
-              <Input
-                id="name"
-                type="text"
-                icon={faUserTie}
-                iconPosition="left"
-                {...register('person.entity.name')}
-              />
-            )}
-            {watch('type.1.value') && (
-              <Input
-                id="name"
-                type="text"
-                icon={faUserTie}
-                iconPosition="left"
-                {...register('enterprise.entity.name')}
-              />
-            )}
+        {type.includes('person') !== type.includes('enterprise') && (
+          <div className="mb-5.5">
+            <label
+              htmlFor="name"
+              className="mb-3 block text-sm font-medium text-black dark:text-white"
+            >
+              Nome
+            </label>
+            <div className="relative">
+              {type.includes('person') && !type.includes('enterprise') && (
+                <Input
+                  id="name"
+                  type="text"
+                  icon={faUserTie}
+                  iconPosition="left"
+                  {...register('person.entity.name')}
+                />
+              )}
+              {!type.includes('person') && type.includes('enterprise') && (
+                <Input
+                  id="name"
+                  type="text"
+                  icon={faUserTie}
+                  iconPosition="left"
+                  {...register('enterprise.entity.name')}
+                />
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
-        {watch('type.1.value') && (
+        {!type.includes('person') && type.includes('enterprise') && (
           <div className="mb-5.5">
             <label
               htmlFor="fantasy"
@@ -339,96 +369,102 @@ const Filter = ({
           </div>
         )}
 
-        <div className="mb-5.5">
-          <label
-            htmlFor="email"
-            className="mb-3 block text-sm font-medium text-black dark:text-white"
-          >
-            Email
-          </label>
-          <div className="relative">
-            {watch('type.0.value') && (
-              <Input
-                id="email"
-                type="text"
-                icon={faEnvelope}
-                iconPosition="left"
-                {...register('person.entity.email')}
-              />
-            )}
-            {watch('type.1.value') && (
-              <Input
-                id="email"
-                type="text"
-                icon={faEnvelope}
-                iconPosition="left"
-                {...register('enterprise.entity.email')}
-              />
-            )}
+        {type.includes('person') !== type.includes('enterprise') && (
+          <div className="mb-5.5">
+            <label
+              htmlFor="email"
+              className="mb-3 block text-sm font-medium text-black dark:text-white"
+            >
+              Email
+            </label>
+            <div className="relative">
+              {type.includes('person') && !type.includes('enterprise') && (
+                <Input
+                  id="email"
+                  type="text"
+                  icon={faEnvelope}
+                  iconPosition="left"
+                  {...register('person.entity.email')}
+                />
+              )}
+              {!type.includes('person') && type.includes('enterprise') && (
+                <Input
+                  id="email"
+                  type="text"
+                  icon={faEnvelope}
+                  iconPosition="left"
+                  {...register('enterprise.entity.email')}
+                />
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
-        <div className="mb-5.5">
-          <label
-            htmlFor="phone"
-            className="mb-3 block text-sm font-medium text-black dark:text-white"
-          >
-            Contato
-          </label>
-          <div className="relative">
-            {watch('type.0.value') && (
-              <Input
-                id="phone"
-                type="text"
-                icon={faPhone}
-                iconPosition="left"
-                {...register('person.entity.phone')}
-                placeholder="Digite o telefone"
-              />
-            )}
-            {watch('type.1.value') && (
-              <Input
-                id="phone"
-                type="text"
-                icon={faPhone}
-                iconPosition="left"
-                {...register('enterprise.entity.phone')}
-                placeholder="Digite o telefone"
-              />
-            )}
+        {type.includes('person') !== type.includes('enterprise') && (
+          <div className="mb-5.5">
+            <label
+              htmlFor="phone"
+              className="mb-3 block text-sm font-medium text-black dark:text-white"
+            >
+              Contato
+            </label>
+            <div className="relative">
+              {type.includes('person') && !type.includes('enterprise') && (
+                <Input
+                  id="phone"
+                  type="text"
+                  icon={faPhone}
+                  iconPosition="left"
+                  {...register('person.entity.phone')}
+                  placeholder="Digite o telefone"
+                />
+              )}
+              {!type.includes('person') && type.includes('enterprise') && (
+                <Input
+                  id="phone"
+                  type="text"
+                  icon={faPhone}
+                  iconPosition="left"
+                  {...register('enterprise.entity.phone')}
+                  placeholder="Digite o telefone"
+                />
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
-        <div className="mb-5.5">
-          <label
-            htmlFor="address"
-            className="mb-3 block text-sm font-medium text-black dark:text-white"
-          >
-            Endereço
-          </label>
-          <div className="relative">
-            {watch('type.0.value') && (
-              <Input
-                id="address"
-                type="text"
-                icon={faLocationDot}
-                iconPosition="left"
-                {...register('person.entity.address')}
-                placeholder="Digite o endereço"
-              />
-            )}
-            {watch('type.1.value') && (
-              <Input
-                id="address"
-                type="text"
-                icon={faLocationDot}
-                iconPosition="left"
-                {...register('enterprise.entity.address')}
-                placeholder="Digite o endereço"
-              />
-            )}
+        {type.includes('person') !== type.includes('enterprise') && (
+          <div className="mb-5.5">
+            <label
+              htmlFor="address"
+              className="mb-3 block text-sm font-medium text-black dark:text-white"
+            >
+              Endereço
+            </label>
+            <div className="relative">
+              {type.includes('person') && !type.includes('enterprise') && (
+                <Input
+                  id="address"
+                  type="text"
+                  icon={faLocationDot}
+                  iconPosition="left"
+                  {...register('person.entity.address')}
+                  placeholder="Digite o endereço"
+                />
+              )}
+              {!type.includes('person') && type.includes('enterprise') && (
+                <Input
+                  id="address"
+                  type="text"
+                  icon={faLocationDot}
+                  iconPosition="left"
+                  {...register('enterprise.entity.address')}
+                  placeholder="Digite o endereço"
+                />
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="flex gap-5.5">
           <Button
