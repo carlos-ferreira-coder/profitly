@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios'
 
-export const serverURL = 'https://server-g7vl.onrender.com'
+export const serverURL = process.env.DOMAIN || ''
 
 export const api = axios.create({
   baseURL: serverURL,
