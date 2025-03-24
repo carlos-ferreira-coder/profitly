@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios'
 
-export const serverURL = process.env.DOMAIN || ''
+export const serverURL = process.env.SERVER_DOMAIN || ''
 
 export const api = axios.create({
   baseURL: serverURL,
