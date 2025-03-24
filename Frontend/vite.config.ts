@@ -6,13 +6,13 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
-    allowedHosts: ['profitly.onrender.com'],
+    allowedHosts: [process.env.DOMAIN || ''],
     proxy: {
       '/api': {
-        target: 'https://server-g7vl.onrender.com',
+        target: process.env.SERVER_DOMAIN || '',
         changeOrigin: true,
         secure: true,
-        rewrite: (path) => path.replace(/^\/api/, ''), // Remove /api se necessário
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },
