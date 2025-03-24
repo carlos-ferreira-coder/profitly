@@ -1,0 +1,265 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Entity {
+  id         Int         @id @default(autoincrement())
+  name       String
+  email      String      @unique
+  phone      String?
+  address    String?
+  person     Person?
+  enterprise Enterprise?
+
+  @@index([email])
+}
+
+model Person {
+  id       Int       @id @default(autoincrement())
+  cpf      String    @unique
+  entity   Entity    @relation(fields: [id], references: [id], onDelete: Cascade)
+  user     User?
+  client   Client?
+  supplier Supplier?
+
+  @@index([cpf])
+}
+
+model Enterprise {
+  id       Int       @id @default(autoincrement())
+  cnpj     String    @unique
+  fantasy  String
+  entity   Entity    @relation(fields: [id], references: [id], onDelete: Cascade)
+  client   Client?
+  supplier Supplier?
+
+  @@index([cnpj])
+}
+
+model Client {
+  id           Int         @id @default(autoincrement())
+  uuid         String      @unique @default(uuid()) @db.Uuid
+  active       Boolean
+  personId     Int?        @unique
+  enterpriseId Int?        @unique
+  person       Person?     @relation(fields: [personId], references: [id], onDelete: Cascade)
+  enterprise   Enterprise? @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
+  projects     Project[]
+  incomes      Income[]
+  refunds      Refund[]
+}
+
+model Supplier {
+  id           Int           @id @default(autoincrement())
+  uuid         String        @unique @default(uuid()) @db.Uuid
+  active       Boolean
+  personId     Int?          @unique
+  enterpriseId Int?          @unique
+  person       Person?       @relation(fields: [personId], references: [id], onDelete: Cascade)
+  enterprise   Enterprise?   @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
+  doneExpenses DoneExpense[]
+  expenses     Expense[]
+  refunds      Refund[]
+  loans        Loan[]
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  uuid         String        @unique @default(uuid()) @db.Uuid
+  username     String        @unique
+  password     String
+  active       Boolean
+  photo        String?
+  hourlyRate   Decimal?      @map("hourly_rate") @db.Decimal(15, 2)
+  authUuid     String        @map("auth_uuid") @db.Uuid
+  person       Person        @relation(fields: [id], references: [id], onDelete: Cascade)
+  auth         Auth          @relation(fields: [authUuid], references: [uuid], onDelete: Restrict)
+  tasks        Task[]
+  projects     Project[]
+  dones        Done[]
+  transactions Transaction[]
+
+  @@index([username])
+}
+
+model Auth {
+  id        Int     @id @default(autoincrement())
+  uuid      String  @unique @default(uuid()) @db.Uuid
+  name      String
+  admin     Boolean
+  project   Boolean
+  personal  Boolean
+  financial Boolean
+  users     User[]
+}
+
+model Status {
+  id          Int       @id @default(autoincrement())
+  uuid        String    @unique @default(uuid()) @db.Uuid
+  name        String
+  description String
+  priority    Int
+  tasks       Task[]
+  projects    Project[]
+}
+
+model Project {
+  id           Int           @id @default(autoincrement())
+  uuid         String        @unique @default(uuid()) @db.Uuid
+  name         String
+  description  String
+  register     DateTime
+  active       Boolean
+  userUuid     String?       @map("user_uuid") @db.Uuid
+  clientUuid   String        @map("client_uuid") @db.Uuid
+  statusUuid   String        @map("status_uuid") @db.Uuid
+  budgetUuid   String        @unique @map("budget_uuid") @db.Uuid
+  user         User?         @relation(fields: [userUuid], references: [uuid], onDelete: SetNull)
+  client       Client        @relation(fields: [clientUuid], references: [uuid], onDelete: Restrict)
+  status       Status        @relation(fields: [statusUuid], references: [uuid], onDelete: Restrict)
+  budget       Budget        @relation(fields: [budgetUuid], references: [uuid], onDelete: Restrict)
+  tasks        Task[]
+  transactions Transaction[]
+}
+
+model Budget {
+  id       Int       @id @default(autoincrement())
+  uuid     String    @unique @default(uuid()) @db.Uuid
+  register DateTime?
+  project  Project?
+  tasks    Task[]
+}
+
+model Task {
+  id              Int           @id @default(autoincrement())
+  name            String
+  description     String
+  finished        Boolean       @default(false)
+  beginDate       DateTime      @map("begin_date")
+  endDate         DateTime      @map("end_date")
+  revenue         Decimal       @db.Decimal(15, 2)
+  statusUuid      String        @map("status_uuid") @db.Uuid
+  projectUuid     String        @map("project_uuid") @db.Uuid
+  userUuid        String?       @map("user_uuid") @db.Uuid
+  budgetUuid      String?       @map("budget_uuid") @db.Uuid
+  originalTaskId  Int?          @map("original_task_id")
+  status          Status        @relation(fields: [statusUuid], references: [uuid], onDelete: Restrict)
+  project         Project       @relation(fields: [projectUuid], references: [uuid], onDelete: Restrict)
+  user            User?         @relation(fields: [userUuid], references: [uuid], onDelete: SetNull)
+  budget          Budget?       @relation(fields: [budgetUuid], references: [uuid], onDelete: Cascade)
+  originalTask    Task?         @relation("TaskDuplication", fields: [originalTaskId], references: [id])
+  duplicatedTasks Task[]        @relation("TaskDuplication")
+  dones           Done[]
+  taskExpense     TaskExpense?
+  taskActivity    TaskActivity?
+
+  @@unique([id])
+}
+
+model TaskExpense {
+  id     Int     @id @default(autoincrement())
+  uuid   String  @unique @default(uuid()) @db.Uuid
+  amount Decimal @db.Decimal(15, 2)
+  task   Task    @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model TaskActivity {
+  id         Int     @id @default(autoincrement())
+  uuid       String  @unique @default(uuid()) @db.Uuid
+  hourlyRate Decimal @map("hourly_rate") @db.Decimal(15, 2)
+  task       Task    @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model Done {
+  id           Int           @id @default(autoincrement())
+  name         String
+  description  String
+  register     DateTime
+  taskId       Int
+  userUuid     String        @map("user_uuid") @db.Uuid
+  user         User          @relation(fields: [userUuid], references: [uuid], onDelete: Restrict)
+  task         Task          @relation(fields: [taskId], references: [id], onDelete: Restrict)
+  doneActivity DoneActivity?
+  doneExpense  DoneExpense?
+
+  @@unique([id])
+}
+
+model DoneActivity {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid()) @db.Uuid
+  beginDate  DateTime @map("begin_date")
+  endDate    DateTime @map("end_date")
+  hourlyRate Decimal  @map("hourly_rate") @db.Decimal(15, 2)
+  done       Done     @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model DoneExpense {
+  id           Int      @id @default(autoincrement())
+  uuid         String   @unique @default(uuid()) @db.Uuid
+  amount       Decimal  @db.Decimal(15, 2)
+  date         DateTime
+  supplierUuid String   @map("supplier_uuid") @db.Uuid
+  supplier     Supplier @relation(fields: [supplierUuid], references: [uuid], onDelete: Restrict)
+  done         Done     @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  register    DateTime
+  date        DateTime
+  amount      Decimal  @db.Decimal(15, 2)
+  userUuid    String   @map("user_uuid") @db.Uuid
+  projectUuid String?  @map("project_uuid") @db.Uuid
+  user        User     @relation(fields: [userUuid], references: [uuid], onDelete: Restrict)
+  project     Project? @relation(fields: [projectUuid], references: [uuid], onDelete: Restrict)
+  expense     Expense?
+  income      Income?
+  refund      Refund?
+  loan        Loan?
+
+  @@unique([id])
+}
+
+model Expense {
+  id           Int         @id @default(autoincrement())
+  uuid         String      @unique @default(uuid()) @db.Uuid
+  supplierUuid String      @map("supplier_uuid") @db.Uuid
+  supplier     Supplier    @relation(fields: [supplierUuid], references: [uuid], onDelete: Restrict)
+  transaction  Transaction @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model Income {
+  id          Int         @id @default(autoincrement())
+  uuid        String      @unique @default(uuid()) @db.Uuid
+  clientUuid  String      @map("client_uuid") @db.Uuid
+  client      Client      @relation(fields: [clientUuid], references: [uuid], onDelete: Restrict)
+  transaction Transaction @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model Refund {
+  id           Int         @id @default(autoincrement())
+  uuid         String      @unique @default(uuid()) @db.Uuid
+  clientUuid   String?     @map("client_uuid") @db.Uuid
+  supplierUuid String?     @map("supplier_uuid") @db.Uuid
+  client       Client?     @relation(fields: [clientUuid], references: [uuid], onDelete: Restrict)
+  supplier     Supplier?   @relation(fields: [supplierUuid], references: [uuid], onDelete: Restrict)
+  transaction  Transaction @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model Loan {
+  id           Int         @id @default(autoincrement())
+  uuid         String      @unique @default(uuid()) @db.Uuid
+  installment  Decimal     @db.Decimal(15, 2)
+  months       Int
+  supplierUuid String      @map("supplier_uuid") @db.Uuid
+  supplier     Supplier    @relation(fields: [supplierUuid], references: [uuid], onDelete: Restrict)
+  transaction  Transaction @relation(fields: [id], references: [id], onDelete: Cascade)
+}
