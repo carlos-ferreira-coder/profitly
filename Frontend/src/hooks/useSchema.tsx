@@ -297,7 +297,7 @@ export const projectCreateSchema = z.object({
   active: zodBoolean('ativo'),
   userUuid: zodRegex(
     'uuid de usuário',
-    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+    /^$|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
     false
   )
     .transform((s) => (s === '' ? undefined : s))
