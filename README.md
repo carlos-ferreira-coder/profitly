@@ -35,6 +35,11 @@ npm install
 cd ..
 
 ### 3️⃣ Configurar as variáveis de ambiente
+Crie um arquivo .env na raiz do Frontend e adicione as configurações
+'''
+  REACT_APP_DOMAIN=dominio_do_frontend
+  REACT_APP_SERVER_DOMAIN=dominio_do_backend
+'''
 Crie um arquivo .env na raiz do Backend e adicione as configurações
 '''
   CORS_ORIGIN=dominio_do_frontend
