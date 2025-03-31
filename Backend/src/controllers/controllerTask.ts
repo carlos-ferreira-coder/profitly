@@ -52,6 +52,7 @@ const responseTasks = (tasks: TaskProps[]) => {
                 doneExpense: done.doneExpense
                   ? {
                       ...done.doneExpense,
+                      taskUuid: task.taskExpense?.uuid || task.taskActivity?.uuid,
                       amount: numberToCurrency(done.doneExpense.amount.toNumber(), 'BRL'),
                       date: formatDate(done.doneExpense.date),
                     }
