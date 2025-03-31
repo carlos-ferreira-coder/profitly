@@ -311,7 +311,13 @@ export const projectUpdateSchema = z.object({
   name: zodString('nome', true),
   description: zodString('descrição', true),
   active: zodBoolean('ativo'),
-  userUuid: zodUuid('usuário').optional(),
+  userUuid: zodRegex(
+    'uuid de usuário',
+    /^$|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+    false
+  )
+    .transform((s) => (s === '' ? undefined : s))
+    .optional(),
   clientUuid: zodUuid('cliente'),
   statusUuid: zodUuid('status'),
 })
@@ -332,7 +338,13 @@ export const projectDeleteSchema = z.object({
     return `20${year}-${month}-${day}T${hour}:${minute}:00`
   }),
   active: zodBoolean('ativo'),
-  userUuid: zodUuid('usuário').optional(),
+  userUuid: zodRegex(
+    'uuid de usuário',
+    /^$|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+    false
+  )
+    .transform((s) => (s === '' ? undefined : s))
+    .optional(),
   clientUuid: zodUuid('cliente'),
   statusUuid: zodUuid('status'),
 })
