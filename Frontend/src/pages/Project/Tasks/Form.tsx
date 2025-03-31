@@ -505,8 +505,44 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                     )}
 
                     {Array.isArray(taskError?.dones) &&
-                      taskError.dones.map((done) => (
-                        <Alert type="danger" size="sm" data={[done.message || '']} />
+                      taskError.dones.map((doneError) => (
+                        <>
+                          {doneError.name && (
+                            <Alert type="danger" size="sm" data={[doneError.name.message || '']} />
+                          )}
+
+                          {doneError.description && (
+                            <Alert
+                              type="danger"
+                              size="sm"
+                              data={[doneError.description.message || '']}
+                            />
+                          )}
+
+                          {doneError.userUuid && (
+                            <Alert
+                              type="danger"
+                              size="sm"
+                              data={[doneError.userUuid.message || '']}
+                            />
+                          )}
+
+                          {doneError.doneExpense && (
+                            <Alert
+                              type="danger"
+                              size="sm"
+                              data={[doneError.doneExpense.message || '']}
+                            />
+                          )}
+
+                          {doneError.doneActivity && (
+                            <Alert
+                              type="danger"
+                              size="sm"
+                              data={[doneError.doneActivity.message || '']}
+                            />
+                          )}
+                        </>
                       ))}
 
                     {task.taskExpense && (
