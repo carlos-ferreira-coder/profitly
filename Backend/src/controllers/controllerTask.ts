@@ -52,7 +52,7 @@ const responseTasks = (tasks: TaskProps[]) => {
                 doneExpense: done.doneExpense
                   ? {
                       ...done.doneExpense,
-                      taskUuid: task.taskExpense?.uuid || task.taskActivity?.uuid,
+                      taskUuid: task.taskExpense?.uuid,
                       amount: numberToCurrency(done.doneExpense.amount.toNumber(), 'BRL'),
                       date: formatDate(done.doneExpense.date),
                     }
@@ -60,6 +60,7 @@ const responseTasks = (tasks: TaskProps[]) => {
                 doneActivity: done.doneActivity
                   ? {
                       ...done.doneActivity,
+                      taskUuid: task.taskActivity?.uuid,
                       hourlyRate: numberToCurrency(done.doneActivity.hourlyRate.toNumber(), 'BRL'),
                       beginDate: formatDate(done.doneActivity.beginDate),
                       endDate: formatDate(done.doneActivity.endDate),
