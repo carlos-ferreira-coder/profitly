@@ -458,6 +458,33 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                     </div>
                   </div>
 
+                  <div>
+                    {task.dones &&
+                      task.dones.map((done) => (
+                        <>
+                          <p>name: {done.name}</p>
+                          <p>description: {done.description}</p>
+                          <p>userUuid: {done.userUuid}</p>
+                          {done.doneExpense && (
+                            <>
+                              <p>doneExpense.taskUuid: {done.doneExpense.taskUuid}</p>
+                              <p>doneExpense.amount: {done.doneExpense.amount}</p>
+                              <p>doneExpense.date: {done.doneExpense.date}</p>
+                              <p>doneExpense.supplierUuid: {done.doneExpense.supplierUuid}</p>
+                            </>
+                          )}
+                          {done.doneActivity && (
+                            <>
+                              <p>doneActivity.taskUuid: {done.doneActivity.taskUuid}</p>
+                              <p>doneActivity.hourlyRate: {done.doneActivity.hourlyRate}</p>
+                              <p>doneActivity.beginDate: {done.doneActivity.beginDate}</p>
+                              <p>doneActivity.endDate: {done.doneActivity.endDate}</p>
+                            </>
+                          )}
+                        </>
+                      ))}
+                  </div>
+
                   <div className={resume[index] ? 'block' : 'hidden'}>
                     <p>
                       <b>Nome: </b>
@@ -503,47 +530,6 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
                     {taskError?.budgetUuid && (
                       <Alert type="danger" size="sm" data={[taskError.budgetUuid.message || '']} />
                     )}
-
-                    {Array.isArray(taskError?.dones) &&
-                      taskError.dones.map((doneError) => (
-                        <>
-                          {doneError.name && (
-                            <Alert type="danger" size="sm" data={[doneError.name.message || '']} />
-                          )}
-
-                          {doneError.description && (
-                            <Alert
-                              type="danger"
-                              size="sm"
-                              data={[doneError.description.message || '']}
-                            />
-                          )}
-
-                          {doneError.userUuid && (
-                            <Alert
-                              type="danger"
-                              size="sm"
-                              data={[doneError.userUuid.message || '']}
-                            />
-                          )}
-
-                          {doneError.doneExpense && (
-                            <Alert
-                              type="danger"
-                              size="sm"
-                              data={[doneError.doneExpense.message || '']}
-                            />
-                          )}
-
-                          {doneError.doneActivity && (
-                            <Alert
-                              type="danger"
-                              size="sm"
-                              data={[doneError.doneActivity.message || '']}
-                            />
-                          )}
-                        </>
-                      ))}
 
                     {task.taskExpense && (
                       <Input
