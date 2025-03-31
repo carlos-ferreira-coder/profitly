@@ -460,26 +460,84 @@ const Form = ({ tasks, projectUuid }: { tasks: TaskProps[]; projectUuid: string 
 
                   <div>
                     {task.dones &&
-                      task.dones.map((done) => (
+                      task.dones.map((_done, idx) => (
                         <>
-                          <p>name: {done.name}</p>
-                          <p>description: {done.description}</p>
-                          <p>userUuid: {done.userUuid}</p>
-                          {done.doneExpense && (
-                            <>
-                              <p>doneExpense.taskUuid: {done.doneExpense.taskUuid}</p>
-                              <p>doneExpense.amount: {done.doneExpense.amount}</p>
-                              <p>doneExpense.date: {done.doneExpense.date}</p>
-                              <p>doneExpense.supplierUuid: {done.doneExpense.supplierUuid}</p>
-                            </>
+                          {taskError?.dones?.[idx]?.name && (
+                            <Alert
+                              type="danger"
+                              size="sm"
+                              data={[taskError.dones[idx].name.message || '']}
+                            />
                           )}
-                          {done.doneActivity && (
-                            <>
-                              <p>doneActivity.taskUuid: {done.doneActivity.taskUuid}</p>
-                              <p>doneActivity.hourlyRate: {done.doneActivity.hourlyRate}</p>
-                              <p>doneActivity.beginDate: {done.doneActivity.beginDate}</p>
-                              <p>doneActivity.endDate: {done.doneActivity.endDate}</p>
-                            </>
+                          {taskError?.dones?.[idx]?.description && (
+                            <Alert
+                              type="danger"
+                              size="sm"
+                              data={[taskError.dones[idx].description.message || '']}
+                            />
+                          )}
+                          {taskError?.dones?.[idx]?.userUuid && (
+                            <Alert
+                              type="danger"
+                              size="sm"
+                              data={[taskError.dones[idx].userUuid.message || '']}
+                            />
+                          )}
+                          {taskError?.dones?.[idx]?.doneExpense?.taskUuid && (
+                            <Alert
+                              type="danger"
+                              size="sm"
+                              data={[taskError.dones[idx].doneExpense.taskUuid.message || '']}
+                            />
+                          )}
+                          {taskError?.dones?.[idx]?.doneExpense?.amount && (
+                            <Alert
+                              type="danger"
+                              size="sm"
+                              data={[taskError.dones[idx].doneExpense.amount.message || '']}
+                            />
+                          )}
+                          {taskError?.dones?.[idx]?.doneExpense?.date && (
+                            <Alert
+                              type="danger"
+                              size="sm"
+                              data={[taskError.dones[idx].doneExpense.date.message || '']}
+                            />
+                          )}
+                          {taskError?.dones?.[idx]?.doneExpense?.supplierUuid && (
+                            <Alert
+                              type="danger"
+                              size="sm"
+                              data={[taskError.dones[idx].doneExpense.supplierUuid.message || '']}
+                            />
+                          )}
+                          {taskError?.dones?.[idx]?.doneActivity?.taskUuid && (
+                            <Alert
+                              type="danger"
+                              size="sm"
+                              data={[taskError.dones[idx].doneActivity.taskUuid.message || '']}
+                            />
+                          )}
+                          {taskError?.dones?.[idx]?.doneActivity?.hourlyRate && (
+                            <Alert
+                              type="danger"
+                              size="sm"
+                              data={[taskError.dones[idx].doneActivity.hourlyRate.message || '']}
+                            />
+                          )}
+                          {taskError?.dones?.[idx]?.doneActivity?.beginDate && (
+                            <Alert
+                              type="danger"
+                              size="sm"
+                              data={[taskError.dones[idx].doneActivity.beginDate.message || '']}
+                            />
+                          )}
+                          {taskError?.dones?.[idx]?.doneActivity?.endDate && (
+                            <Alert
+                              type="danger"
+                              size="sm"
+                              data={[taskError.dones[idx].doneActivity.endDate.message || '']}
+                            />
                           )}
                         </>
                       ))}
