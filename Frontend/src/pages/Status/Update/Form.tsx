@@ -39,7 +39,7 @@ const Form = ({ status }: { status: StatusProps }) => {
     uuid: status.uuid,
     name: status.name,
     description: status.description,
-    priority: status.priority,
+    priority: status.priority.toString(),
   }
 
   // Hookform

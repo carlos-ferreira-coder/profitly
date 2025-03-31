@@ -53,7 +53,10 @@ export const statusUpdateSchema = z.object({
   uuid: zodUuid('status'),
   name: zodString('nome', true),
   description: zodString('descrição', true),
-  priority: zodRegex('prioridade', /^\d+$/, true).transform((s) => parseInt(s)),
+  priority: z.union([
+    z.number(),
+    zodRegex('prioridade', /^\d+$/, true).transform((s) => parseInt(s)),
+  ]),
 })
 
 export const statusDeleteSchema = z.object({
