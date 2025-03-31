@@ -88,7 +88,7 @@ const Filter = ({
 
       reset(defaultValues)
 
-      navigate('/expense/select')
+      navigate('/transaction/expense/select')
     }
   }
 

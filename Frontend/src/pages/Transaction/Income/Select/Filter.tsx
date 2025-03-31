@@ -88,7 +88,7 @@ const Filter = ({
 
       reset(defaultValues)
 
-      navigate('/income/select')
+      navigate('/transaction/income/select')
     }
   }
 

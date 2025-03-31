@@ -96,7 +96,7 @@ const Filter = ({
 
       reset(defaultValues)
 
-      navigate('/loan/select')
+      navigate('/transaction/loan/select')
     }
   }
 

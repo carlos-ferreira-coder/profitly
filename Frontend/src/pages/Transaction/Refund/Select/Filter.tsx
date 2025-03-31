@@ -97,7 +97,7 @@ const Filter = ({
 
       reset(defaultValues)
 
-      navigate('/refund/select')
+      navigate('/transaction/refund/select')
     }
   }
 
