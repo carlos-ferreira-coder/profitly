@@ -34,9 +34,6 @@ const Form = ({ project }: { project: ProjectProps }) => {
     budgetUuid: project.budgetUuid,
   }
 
-  console.log('project.userUuid')
-  console.log(project.userUuid)
-
   // Hookform
   const {
     control,

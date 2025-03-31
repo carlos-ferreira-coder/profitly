@@ -250,6 +250,7 @@ export const projectSelect = async (req: Request, res: Response): Promise<void> 
       return {
         ...project,
         user: project.user || undefined,
+        userUuid: project.userUuid || undefined,
         register: formatDate(project.register),
         dates: {
           beginDate: formatDate(beginDate),
