@@ -294,6 +294,8 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
 
           {resume && user && status ? (
             fields.map((task, index) => {
+              const taskError = errors.tasks?.[index]
+
               let prev = 0,
                 revn = 0
 
@@ -375,33 +377,25 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                   </div>
 
                   <div className={resume[index] ? 'hidden' : 'block'}>
-                    {errors.tasks?.[index]?.taskExpense?.uuid && (
+                    {taskError?.taskExpense?.uuid && (
                       <Alert
                         type="danger"
                         size="sm"
-                        data={[errors.tasks?.[index].taskExpense.uuid.message || '']}
+                        data={[taskError.taskExpense.uuid.message || '']}
                       />
                     )}
-                    {errors.tasks?.[index]?.taskActivity?.uuid && (
+                    {taskError?.taskActivity?.uuid && (
                       <Alert
                         type="danger"
                         size="sm"
-                        data={[errors.tasks?.[index].taskActivity.uuid.message || '']}
+                        data={[taskError.taskActivity.uuid.message || '']}
                       />
                     )}
-                    {errors.tasks?.[index]?.projectUuid && (
-                      <Alert
-                        type="danger"
-                        size="sm"
-                        data={[errors.tasks?.[index].projectUuid.message || '']}
-                      />
+                    {taskError?.projectUuid && (
+                      <Alert type="danger" size="sm" data={[taskError.projectUuid.message || '']} />
                     )}
-                    {errors.tasks?.[index]?.budgetUuid && (
-                      <Alert
-                        type="danger"
-                        size="sm"
-                        data={[errors.tasks?.[index].budgetUuid.message || '']}
-                      />
+                    {taskError?.budgetUuid && (
+                      <Alert type="danger" size="sm" data={[taskError.budgetUuid.message || '']} />
                     )}
 
                     {task.taskExpense && (
@@ -458,12 +452,8 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                             placeholder="Digite o nome"
                           />
                         </div>
-                        {errors.tasks?.[index]?.name && (
-                          <Alert
-                            type="danger"
-                            size="sm"
-                            data={[errors.tasks?.[index].name.message || '']}
-                          />
+                        {taskError?.name && (
+                          <Alert type="danger" size="sm" data={[taskError.name.message || '']} />
                         )}
                       </div>
 
@@ -504,11 +494,11 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                           placeholder="Digite a descrição"
                         />
                       </div>
-                      {errors.tasks?.[index]?.description && (
+                      {taskError?.description && (
                         <Alert
                           type="danger"
                           size="sm"
-                          data={[errors.tasks?.[index].description.message || '']}
+                          data={[taskError.description.message || '']}
                         />
                       )}
                     </div>
@@ -537,12 +527,8 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                           )}
                         />
                       </div>
-                      {errors.tasks?.[index]?.beginDate && (
-                        <Alert
-                          type="danger"
-                          size="sm"
-                          data={[errors.tasks?.[index].beginDate.message || '']}
-                        />
+                      {taskError?.beginDate && (
+                        <Alert type="danger" size="sm" data={[taskError.beginDate.message || '']} />
                       )}
                     </div>
 
@@ -570,12 +556,8 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                           )}
                         />
                       </div>
-                      {errors.tasks?.[index]?.endDate && (
-                        <Alert
-                          type="danger"
-                          size="sm"
-                          data={[errors.tasks?.[index].endDate.message || '']}
-                        />
+                      {taskError?.endDate && (
+                        <Alert type="danger" size="sm" data={[taskError.endDate.message || '']} />
                       )}
                     </div>
 
@@ -608,11 +590,11 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                             )}
                           />
                         </div>
-                        {errors.tasks?.[index]?.taskExpense?.amount && (
+                        {taskError?.taskExpense?.amount && (
                           <Alert
                             type="danger"
                             size="sm"
-                            data={[errors.tasks?.[index].taskExpense.amount.message || '']}
+                            data={[taskError.taskExpense.amount.message || '']}
                           />
                         )}
                       </div>
@@ -647,11 +629,11 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                             )}
                           />
                         </div>
-                        {errors.tasks?.[index]?.taskActivity?.hourlyRate && (
+                        {taskError?.taskActivity?.hourlyRate && (
                           <Alert
                             type="danger"
                             size="sm"
-                            data={[errors.tasks?.[index].taskActivity.hourlyRate.message || '']}
+                            data={[taskError.taskActivity.hourlyRate.message || '']}
                           />
                         )}
                       </div>
@@ -685,12 +667,8 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                           )}
                         />
                       </div>
-                      {errors.tasks?.[index]?.revenue && (
-                        <Alert
-                          type="danger"
-                          size="sm"
-                          data={[errors.tasks?.[index].revenue.message || '']}
-                        />
+                      {taskError?.revenue && (
+                        <Alert type="danger" size="sm" data={[taskError.revenue.message || '']} />
                       )}
                     </div>
 
@@ -721,11 +699,11 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                           }}
                         />
                       </div>
-                      {errors.tasks?.[index]?.statusUuid && (
+                      {taskError?.statusUuid && (
                         <Alert
                           type="danger"
                           size="sm"
-                          data={[errors.tasks?.[index].statusUuid.message || '']}
+                          data={[taskError.statusUuid.message || '']}
                         />
                       )}
                     </div>
@@ -756,12 +734,8 @@ const Form = ({ budget }: { budget: BudgetProps }) => {
                           }}
                         />
                       </div>
-                      {errors.tasks?.[index]?.userUuid && (
-                        <Alert
-                          type="danger"
-                          size="sm"
-                          data={[errors.tasks?.[index].userUuid.message || '']}
-                        />
+                      {taskError?.userUuid && (
+                        <Alert type="danger" size="sm" data={[taskError.userUuid.message || '']} />
                       )}
                     </div>
                   </div>
