@@ -280,10 +280,10 @@ const Filter = ({
                   <InputPattern
                     {...field}
                     mask="_"
-                    disabled
                     icon={faAddressCard}
                     iconPosition="left"
                     format="###.###.###-##"
+                    placeholder="Digite o cpf"
                   />
                 )}
               />
@@ -307,10 +307,10 @@ const Filter = ({
                   <InputPattern
                     {...field}
                     mask="_"
-                    disabled
                     icon={faAddressCard}
                     iconPosition="left"
                     format="##.###.###/####-##"
+                    placeholder="Digite o cnpj"
                   />
                 )}
               />
@@ -334,6 +334,7 @@ const Filter = ({
                   icon={faUserTie}
                   iconPosition="left"
                   {...register('person.entity.name')}
+                  placeholder="Digite o npme"
                 />
               )}
               {!type.includes('person') && type.includes('enterprise') && (
@@ -343,6 +344,7 @@ const Filter = ({
                   icon={faUserTie}
                   iconPosition="left"
                   {...register('enterprise.entity.name')}
+                  placeholder="Digite o nome"
                 />
               )}
             </div>
@@ -364,6 +366,7 @@ const Filter = ({
                 icon={faUser}
                 iconPosition="left"
                 {...register('enterprise.fantasy')}
+                placeholder="Digite o nome fantasia"
               />
             </div>
           </div>
@@ -385,6 +388,7 @@ const Filter = ({
                   icon={faEnvelope}
                   iconPosition="left"
                   {...register('person.entity.email')}
+                  placeholder="Digite o email"
                 />
               )}
               {!type.includes('person') && type.includes('enterprise') && (
@@ -394,6 +398,7 @@ const Filter = ({
                   icon={faEnvelope}
                   iconPosition="left"
                   {...register('enterprise.entity.email')}
+                  placeholder="Digite o email"
                 />
               )}
             </div>
