@@ -214,7 +214,7 @@ const Form = () => {
           className="mb-2.5 block font-medium text-black dark:text-white"
           htmlFor="projectUuid"
         >
-          Projeto <span className="text-slate-400">?</span>
+          Projeto <span className="text-danger">*</span>
         </label>
         <div className="relative">
           <Input

@@ -39,7 +39,7 @@ const Form = ({ status }: { status: StatusProps }) => {
     uuid: status.uuid,
     name: status.name,
     description: status.description,
-    priority: status.priority.toString(),
+    priority: status.priority,
   }
 
   // Hookform
@@ -71,6 +71,7 @@ const Form = ({ status }: { status: StatusProps }) => {
       const response = await axios.put('/status/update', data, {
         withCredentials: true,
       })
+
       setAlertSuccesses([
         response.data.message,
         <Button

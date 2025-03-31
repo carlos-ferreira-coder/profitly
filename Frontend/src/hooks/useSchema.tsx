@@ -243,13 +243,7 @@ const transactionSchema = z.object({
     return `20${year}-${month}-${day}T${hour}:${minute}:00`
   }),
   amount: zodRegex('valor', /^R\$\s\d{1,3}(\.\d{3})*(,\d{1,2})?$/, true),
-  projectUuid: zodRegex(
-    'uuid de projeto',
-    /^$|^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
-    false
-  )
-    .transform((s) => (s === '' ? undefined : s))
-    .optional(),
+  projectUuid: zodUuid('projeto'),
 })
 
 export const expenseCreateSchema = z.object({

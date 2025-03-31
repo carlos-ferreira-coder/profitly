@@ -163,14 +163,12 @@ export const loanCreate = async (req: Request, res: Response): Promise<void> => 
     }
 
     // check if project has registered
-    if (body.data.transaction.projectUuid) {
-      const project = await prisma.project.findUnique({
-        where: { uuid: body.data.transaction.projectUuid },
-      })
-      if (!project) {
-        res.status(401).json({ message: 'Projeto não econtrado!' })
-        return
-      }
+    const project = await prisma.project.findUnique({
+      where: { uuid: body.data.transaction.projectUuid },
+    })
+    if (!project) {
+      res.status(401).json({ message: 'Projeto não econtrado!' })
+      return
     }
 
     // check if supplier has registered
