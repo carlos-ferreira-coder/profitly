@@ -97,7 +97,7 @@ const Form = () => {
         <Button
           type="button"
           color="success"
-          onClick={() => navigate('/refund/select')}
+          onClick={() => navigate('/transaction/refund/select')}
           className="h-8 w-35 bg-green-400 dark:text-form-input dark:bg-green-400"
         >
           Listar reembolso

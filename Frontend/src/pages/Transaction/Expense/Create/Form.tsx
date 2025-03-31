@@ -89,7 +89,7 @@ const Form = () => {
         <Button
           type="button"
           color="success"
-          onClick={() => navigate('/expense/select')}
+          onClick={() => navigate('/transaction/expense/select')}
           className="h-8 w-35 bg-green-400 dark:text-form-input dark:bg-green-400"
         >
           Listar despesas
