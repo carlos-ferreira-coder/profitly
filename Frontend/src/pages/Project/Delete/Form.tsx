@@ -34,6 +34,9 @@ const Form = ({ project }: { project: ProjectProps }) => {
     budgetUuid: project.budgetUuid,
   }
 
+  console.log('project.userUuid')
+  console.log(project.userUuid)
+
   // Hookform
   const {
     control,
@@ -78,7 +81,6 @@ const Form = ({ project }: { project: ProjectProps }) => {
     <form onSubmit={handleSubmit(deleteProject)}>
       <Input id="uuid" type="text" hidden disabled {...register('uuid')} />
       {errors.uuid && <Alert type="danger" size="sm" data={[errors.uuid.message || '']} />}
-      {errors.userUuid && <Alert type="danger" size="sm" data={[errors.userUuid.message || '']} />}
 
       <div className="flex justify-between gap-5 mb-6">
         <div className="w-full">
